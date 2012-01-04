@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2008 The Android Open Source Project
  *
@@ -213,18 +214,18 @@ public final class ShutdownThread extends Thread {
     private static void beginShutdownSequence(Context context) {
         synchronized (sIsStartedGuard) {
             if (sIsStarted) {
-                Log.d(TAG, "Shutdown sequence already running, returning.");
+                Log.d(TAG, "Shutdown/reboot sequence already running, returning.");
                 return;
             }
             sIsStarted = true;
         }
 
-        // throw up an indeterminate system dialog while services shut down
+        // throw up an indeterminate system dialog while services shut down.
         ProgressDialog pd = new ProgressDialog(context);
         if (mReboot) {
             if (mRebootHot) {
-                pd.setTitle(context.getText(com.android.internal.R.string.hot_restart_title));
-                pd.setMessage(context.getText(com.android.internal.R.string.hot_restart_progress));
+                pd.setTitle(context.getText(com.android.internal.R.string.hot_reboot_title));
+                pd.setMessage(context.getText(com.android.internal.R.string.hot_reboot_progress));
             } else {
                 pd.setTitle(context.getText(com.android.internal.R.string.reboot_system));
                 pd.setMessage(context.getText(com.android.internal.R.string.reboot_progress));

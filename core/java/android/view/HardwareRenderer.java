@@ -939,12 +939,20 @@ public abstract class HardwareRenderer {
                     fallback(true);
                     return SURFACE_STATE_ERROR;
                 } else {
-                    if (SystemProperties.QCOM_HARDWARE ) {
+		    if (SystemProperties.QCOM_HARDWARE ) {
                         if (mUpdateDirtyRegions) {
                             enableDirtyRegions();
                             mUpdateDirtyRegions = false;
                         }
                      }
+                    /**
+                      * Need to make sure preserve_buff swap is set properly for this context
+                      */
+                    if (sDirtyRegions) {
+                       if (!(mDirtyRegionsEnabled = GLES20Canvas.preserveBackBuffer())) {
+                                    Log.w(LOG_TAG, "Backbuffer cannot be preserved");
+                       }
+                    }
                     return SURFACE_STATE_UPDATED;
                 }
             }
