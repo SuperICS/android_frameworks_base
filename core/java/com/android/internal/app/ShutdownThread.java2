@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2008 The Android Open Source Project
  *
@@ -437,6 +436,7 @@ public final class ShutdownThread extends Thread {
                 }
             }
         }
+
         rebootOrShutdown(mReboot, mRebootReason);
     }
 
