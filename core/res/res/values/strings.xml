@@ -317,11 +317,11 @@
     <string name="reboot_confirm" product="tablet">Your tablet will reboot.</string>
 
     <!-- Hot Restart Progress Dialog message. Shown if the user chooses to hot restart. -->
-    <string name="hot_restart_progress">Restarting\u2026</string>
+    <string name="hot_reboot_progress">Restarting\u2026</string>
     <!-- Hot Restart Progress Dialog title. Shown if the user chooses to hot restart the tablet. -->
-    <string name="hot_restart_title" product="tablet">Your tablet will restart.</string>
+    <string name="hot_reboot_title" product="tablet">Your tablet will restart.</string>
     <!-- Hot Restart Progress Dialog title. Shown if the user chooses to hot restart the phone. -->
-    <string name="hot_restart_title" product="default">Your phone will restart.</string>
+    <string name="hot_reboot_title" product="default">Your phone will restart.</string>
     <!-- Spoken description for ringer silent option. [CHAR LIMIT=NONE] -->
     <string name="silent_mode_silent">Ringer off</string>
     <!-- Spoken description for ringer vibrate option. [CHAR LIMIT=NONE] -->
