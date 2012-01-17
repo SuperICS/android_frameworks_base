@@ -3902,6 +3902,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
     };
 
+    public void lockNow() {
+        mContext.enforceCallingOrSelfPermission(android.Manifest.permission.DEVICE_POWER, null);
+        mHandler.removeCallbacks(mScreenLockTimeout);
+        mHandler.post(mScreenLockTimeout);
+    }
+
     private void updateLockScreenTimeout() {
         synchronized (mScreenLockTimeout) {
             boolean enable = (mAllowLockscreenWhenOn && mScreenOnEarly && mKeyguardMediator.isSecure());
