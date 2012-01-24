@@ -891,27 +891,18 @@ public class NetworkController extends BroadcastReceiver {
 
         if (!mHasMobileDataFeature) {
             mDataSignalIconId = mPhoneSignalIconId = 0;
-        } else if (mDataConnected) {
-            mobileLabel = mNetworkName;
+            mobileLabel = "";
+        } else {
+            // We want to show the carrier name even if data is not being routed over that link, so
+            // we look only at the service state here.
+            mobileLabel = hasService() 
+                ? mNetworkName
+                : context.getString(R.string.status_bar_settings_signal_meter_disconnected);
             if (DEBUG) {
                 mobileLabel += "yyyyYYYYyyyyYYYY";
             }
-            combinedSignalIconId = mDataSignalIconId;
-            switch (mDataActivity) {
-                case TelephonyManager.DATA_ACTIVITY_IN:
-                    mMobileActivityIconId = R.drawable.stat_sys_signal_in;
-                    break;
-                case TelephonyManager.DATA_ACTIVITY_OUT:
-                    mMobileActivityIconId = R.drawable.stat_sys_signal_out;
-                    break;
-                case TelephonyManager.DATA_ACTIVITY_INOUT:
-                    mMobileActivityIconId = R.drawable.stat_sys_signal_inout;
-                    break;
-                default:
-                    mMobileActivityIconId = 0;
-                    break;
-            }
 
+<<<<<<< HEAD
             combinedLabel = mobileLabel;
             combinedActivityIconId = mMobileActivityIconId;
             combinedSignalIconId = mDataSignalIconId; // set by updateDataIcon()
@@ -923,6 +914,31 @@ public class NetworkController extends BroadcastReceiver {
             mobileLabel = mHasMobileDataFeature ?
                 context.getString(R.string.status_bar_settings_signal_meter_disconnected) : "";
 >>>>>>> Always show appropriate mobile service label.
+=======
+            // Now for things that should only be shown when actually using mobile data.
+            if (mDataConnected) {
+                combinedSignalIconId = mDataSignalIconId;
+                switch (mDataActivity) {
+                    case TelephonyManager.DATA_ACTIVITY_IN:
+                        mMobileActivityIconId = R.drawable.stat_sys_signal_in;
+                        break;
+                    case TelephonyManager.DATA_ACTIVITY_OUT:
+                        mMobileActivityIconId = R.drawable.stat_sys_signal_out;
+                        break;
+                    case TelephonyManager.DATA_ACTIVITY_INOUT:
+                        mMobileActivityIconId = R.drawable.stat_sys_signal_inout;
+                        break;
+                    default:
+                        mMobileActivityIconId = 0;
+                        break;
+                }
+
+                combinedLabel = mobileLabel;
+                combinedActivityIconId = mMobileActivityIconId;
+                combinedSignalIconId = mDataSignalIconId; // set by updateDataIcon()
+                mContentDescriptionCombinedSignal = mContentDescriptionDataType;
+            }
+>>>>>>> Stop showing "No internet connection" when there is one.
         }
 
         if (mWifiConnected) {
@@ -955,6 +971,12 @@ public class NetworkController extends BroadcastReceiver {
             combinedLabel = wifiLabel;
             combinedSignalIconId = mWifiIconId; // set by updateWifiIcons()
             mContentDescriptionCombinedSignal = mContentDescriptionWifi;
+        } else {
+            if (mHasMobileDataFeature) {
+                wifiLabel = "";
+            } else {
+                wifiLabel = context.getString(R.string.status_bar_settings_signal_meter_disconnected);
+            }
         }
 
         if (mBluetoothTethered) {
@@ -975,9 +997,17 @@ public class NetworkController extends BroadcastReceiver {
             mDataTypeIconId = 0;
 
             // combined values from connected wifi take precedence over airplane mode
-            if (!mWifiConnected) {
-                wifiLabel = context.getString(R.string.status_bar_settings_signal_meter_disconnected);
-                combinedLabel = wifiLabel;
+            if (mWifiConnected) {
+                // Suppress "No internet connection." from mobile if wifi connected.
+                mobileLabel = "";
+            } else {
+                if (mHasMobileDataFeature) {
+                    // let the mobile icon show "No internet connection."
+                    wifiLabel = "";
+                } else {
+                    wifiLabel = context.getString(R.string.status_bar_settings_signal_meter_disconnected);
+                    combinedLabel = wifiLabel;
+                }
                 mContentDescriptionCombinedSignal = mContentDescriptionPhoneSignal;
                 combinedSignalIconId = mDataSignalIconId;
             }
