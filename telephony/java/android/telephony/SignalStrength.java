@@ -48,6 +48,9 @@ public class SignalStrength implements Parcelable {
         "none", "poor", "moderate", "good", "great"
     };
 
+    /** @hide */
+    public static final int INVALID_SNR = 0x7FFFFFFF;
+
     private int mGsmSignalStrength; // Valid values are (0-31, 99) as defined in TS 27.007 8.5
     private int mGsmBitErrorRate;   // bit error rate (0-7, 99) as defined in TS 27.007 8.5
     private int mCdmaDbm;   // This value is the RSSI value
@@ -97,7 +100,7 @@ public class SignalStrength implements Parcelable {
         mLteSignalStrength = -1;
         mLteRsrp = -1;
         mLteRsrq = -1;
-        mLteRssnr = -1;
+        mLteRssnr = INVALID_SNR;
         mLteCqi = -1;
         isGsm = true;
     }
@@ -137,7 +140,8 @@ public class SignalStrength implements Parcelable {
             int evdoDbm, int evdoEcio, int evdoSnr,
             boolean gsm) {
         this(gsmSignalStrength, gsmBitErrorRate, cdmaDbm, cdmaEcio,
-                evdoDbm, evdoEcio, evdoSnr, -1, -1, -1, -1, -1, gsm);
+                evdoDbm, evdoEcio, evdoSnr, -1, -1,
+                -1, INVALID_SNR, -1, gsm);
     }
 
     /**
@@ -293,7 +297,7 @@ public class SignalStrength implements Parcelable {
             if ((mLteSignalStrength == -1)
                     && (mLteRsrp == -1)
                     && (mLteRsrq == -1)
-                    && (mLteRssnr == -1)
+                    && (mLteRssnr == INVALID_SNR)
                     && (mLteCqi == -1)) {
                 level = getGsmLevel();
             } else {
@@ -328,7 +332,7 @@ public class SignalStrength implements Parcelable {
             if ((mLteSignalStrength == -1)
                     && (mLteRsrp == -1)
                     && (mLteRsrq == -1)
-                    && (mLteRssnr == -1)
+                    && (mLteRssnr == INVALID_SNR)
                     && (mLteCqi == -1)) {
                 asuLevel = getGsmAsuLevel();
             } else {
@@ -364,7 +368,7 @@ public class SignalStrength implements Parcelable {
             if ((mLteSignalStrength == -1)
                     && (mLteRsrp == -1)
                     && (mLteRsrq == -1)
-                    && (mLteRssnr == -1)
+                    && (mLteRssnr == INVALID_SNR)
                     && (mLteCqi == -1)) {
                 dBm = getGsmDbm();
             } else {
@@ -567,6 +571,7 @@ public class SignalStrength implements Parcelable {
      */
     public int getLteLevel() {
         int levelLteRsrp = 0;
+        int levelLteRssnr = 0;
 
         if (mLteRsrp == -1) levelLteRsrp = 0;
         else if (mLteRsrp >= -95) levelLteRsrp = SIGNAL_STRENGTH_GREAT;
@@ -574,8 +579,23 @@ public class SignalStrength implements Parcelable {
         else if (mLteRsrp >= -115) levelLteRsrp = SIGNAL_STRENGTH_MODERATE;
         else levelLteRsrp = SIGNAL_STRENGTH_POOR;
 
-        if (DBG) log("Lte level: "+levelLteRsrp);
-        return levelLteRsrp;
+        if (mLteRssnr == INVALID_SNR) levelLteRssnr = 0;
+        else if (mLteRssnr >= 45) levelLteRssnr = SIGNAL_STRENGTH_GREAT;
+        else if (mLteRssnr >= 10) levelLteRssnr = SIGNAL_STRENGTH_GOOD;
+        else if (mLteRssnr >= -30) levelLteRssnr = SIGNAL_STRENGTH_MODERATE;
+        else levelLteRssnr = SIGNAL_STRENGTH_POOR;
+
+        int level;
+        if (mLteRsrp == -1)
+            level = levelLteRssnr;
+        else if (mLteRssnr == INVALID_SNR)
+            level = levelLteRsrp;
+        else
+            level = (levelLteRssnr < levelLteRsrp) ? levelLteRssnr : levelLteRsrp;
+
+        if (DBG) log("Lte rsrp level: "+levelLteRsrp
+                + " snr level: " + levelLteRssnr + " level: " + level);
+        return level;
     }
 
     /**
