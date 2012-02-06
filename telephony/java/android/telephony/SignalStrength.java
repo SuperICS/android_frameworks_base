@@ -294,10 +294,11 @@ public class SignalStrength implements Parcelable {
         int level;
 
         if (isGsm) {
+            // TODO Need solve the discrepancy of invalid values between
+            // RIL_LTE_SignalStrength and here.
             if ((mLteSignalStrength == -1)
                     && (mLteRsrp == -1)
                     && (mLteRsrq == -1)
-                    && (mLteRssnr == INVALID_SNR)
                     && (mLteCqi == -1)) {
                 level = getGsmLevel();
             } else {
@@ -332,7 +333,6 @@ public class SignalStrength implements Parcelable {
             if ((mLteSignalStrength == -1)
                     && (mLteRsrp == -1)
                     && (mLteRsrq == -1)
-                    && (mLteRssnr == INVALID_SNR)
                     && (mLteCqi == -1)) {
                 asuLevel = getGsmAsuLevel();
             } else {
@@ -368,7 +368,6 @@ public class SignalStrength implements Parcelable {
             if ((mLteSignalStrength == -1)
                     && (mLteRsrp == -1)
                     && (mLteRsrq == -1)
-                    && (mLteRssnr == INVALID_SNR)
                     && (mLteCqi == -1)) {
                 dBm = getGsmDbm();
             } else {
