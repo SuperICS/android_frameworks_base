@@ -765,6 +765,7 @@
     <!-- Base "touch slop" value used by ViewConfiguration as a
          movement threshold where scrolling should begin. -->
     <dimen name="config_viewConfigurationTouchSlop">8dp</dimen>
+<<<<<<< HEAD
     
     <!-- Whether to even allow system settings for crt animations
     		setting this to false will completely disable them -->
@@ -782,4 +783,13 @@
     <bool name="config_hasDockBattery">false</bool>
 
     <!-- If this value is true, we handle Samsung CDMA's message ID method -->
+=======
+
+    <!-- Array of OEM specific USB mode override config.
+         OEM can override a certain USB mode depending on ro.bootmode.
+         Specify an array of below items to set override rule.
+         [bootmode]:[original USB mode]:[USB mode used]-->
+    <integer-array translatable="false" name="config_oemUsbModeOverride">
+    </integer-array>
+>>>>>>> Add OEM specific USB mode enumeration based on ro.bootmode property
 </resources>
