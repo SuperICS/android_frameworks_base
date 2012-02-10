@@ -165,11 +165,9 @@
     <!-- Hot Restart Progress Dialog title. Shown if the user chooses to hot restart the phone. -->
     <string name="hot_reboot_title" product="default">Tu teléfono se reiniciará.</string>
     <!-- Spoken description for ringer silent option. [CHAR LIMIT=NONE] -->
-    <string name="silent_mode_silent">Timbre apagado</string>
-    <!-- Spoken description for ringer vibrate option. [CHAR LIMIT=NONE] -->
-    <string name="silent_mode_vibrate">Timbre vibración</string>
-    <!-- Spoken description for ringer normal option. [CHAR LIMIT=NONE] -->
-    <string name="silent_mode_ring">Timbre activado</string>
+    <string name="silent_mode_silent" msgid="319298163018473078">"Timbre desactivado"</string>
+    <string name="silent_mode_vibrate" msgid="7072043388581551395">"Modo vibración"</string>
+    <string name="silent_mode_ring" msgid="8592241816194074353">"Timbre activado"</string>
     <string name="shutdown_progress" msgid="2281079257329981203">"Apagando..."</string>
     <string name="shutdown_confirm" product="tablet" msgid="3385745179555731470">"El tablet se apagará."</string>
     <string name="shutdown_confirm" product="default" msgid="649792175242821353">"El teléfono se apagará."</string>
