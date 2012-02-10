@@ -157,4 +157,3 @@ public class WifiController extends BroadcastReceiver
             });
     }
 }
-

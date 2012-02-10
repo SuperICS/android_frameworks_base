@@ -42,8 +42,6 @@ import android.speech.tts.TextToSpeech;
 import android.text.TextUtils;
 import android.util.AndroidException;
 import android.util.Log;
-import android.view.WindowOrientationListener;
-
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -2921,6 +2919,11 @@ public final class Settings {
         /**
          * @hide
          */
+        public static final String LOCKSCREEN_QUICK_UNLOCK_CONTROL = "lockscreen_quick_unlock_control";
+
+        /**
+         * @hide
+         */
         public static final String USE_WEATHER = "use_weather";
     }
 
@@ -3190,6 +3193,11 @@ public final class Settings {
          * Whether ADB is enabled.
          */
         public static final String ADB_ENABLED = "adb_enabled";
+        
+        /**
+         * Whether to display the ADB notification.
+         */
+        public static final String ADB_ICON = "adb_icon";
 
         /**
          * The TCP/IP port to run ADB on, or -1 for USB
