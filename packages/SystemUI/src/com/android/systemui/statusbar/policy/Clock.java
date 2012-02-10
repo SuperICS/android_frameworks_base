@@ -58,31 +58,6 @@ public class Clock extends TextView {
     public static final int AM_PM_STYLE_SMALL = 1;
     public static final int AM_PM_STYLE_GONE = 2;
 
-    private static int AM_PM_STYLE = AM_PM_STYLE_GONE;
-
-    private int mAmPmStyle;
-    private boolean mShowClock;
-
-    Handler mHandler;
-
-    class SettingsObserver extends ContentObserver {
-        SettingsObserver(Handler handler) {
-            super(handler);
-        }
-
-        void observe() {
-            ContentResolver resolver = mContext.getContentResolver();
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.STATUS_BAR_AM_PM), false, this);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.STATUS_BAR_CLOCK), false, this);
-        }
-
-        @Override public void onChange(boolean selfChange) {
-            updateSettings();
-        }
-    }
-
     protected int mAmPmStyle = AM_PM_STYLE_GONE;
 
     public static final int STYLE_HIDE_CLOCK = 0;
@@ -105,11 +80,6 @@ public class Clock extends TextView {
     public Clock(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
-        mHandler = new Handler();
-        SettingsObserver settingsObserver = new SettingsObserver(mHandler);
-        settingsObserver.observe();
-
-        updateSettings();
     }
 
     @Override
@@ -248,30 +218,6 @@ public class Clock extends TextView {
 
     }
 
-    private void updateSettings(){
-        ContentResolver resolver = mContext.getContentResolver();
-
-        mAmPmStyle = (Settings.System.getInt(resolver,
-                Settings.System.STATUS_BAR_AM_PM, 2));
-
-        if (mAmPmStyle != AM_PM_STYLE) {
-            AM_PM_STYLE = mAmPmStyle;
-            mClockFormatString = "";
-
-            if (mAttached) {
-                updateClock();
-            }
-        }
-
-        mShowClock = (Settings.System.getInt(resolver,
-                Settings.System.STATUS_BAR_CLOCK, 1) == 1);
-
-        if(mShowClock)
-            setVisibility(View.VISIBLE);
-        else
-            setVisibility(View.GONE);
-    }
-}
 
     public void updateVisibilityFromStatusBar(boolean show) {
         if (mClockStyle == STYLE_CLOCK_RIGHT)

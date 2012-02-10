@@ -209,8 +209,6 @@ public class TabletStatusBar extends StatusBar implements
 
     private StorageManager mStorageManager;
 
-    private StorageManager mStorageManager;
-
     protected void addPanelWindows() {
         final Context context = mContext;
         final Resources res = mContext.getResources();

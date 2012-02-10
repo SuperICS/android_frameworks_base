@@ -505,7 +505,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     "fancy_rotation_anim"), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.NAVIGATION_BAR_VISIBLE), false, this);
+                   Settings.System.NAVIGATION_BAR_VISIBLE), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.ACCELEROMETER_ROTATION_ANGLES), false, this);
             updateSettings();
         }

@@ -2919,11 +2919,6 @@ public final class Settings {
         /**
          * @hide
          */
-        public static final String LOCKSCREEN_QUICK_UNLOCK_CONTROL = "lockscreen_quick_unlock_control";
-
-        /**
-         * @hide
-         */
         public static final String USE_WEATHER = "use_weather";
     }
 
@@ -3204,11 +3199,6 @@ public final class Settings {
          * @hide
          */
         public static final String ADB_PORT = "adb_port";
-        
-        /**
-         * Whether to display the ADB notification.
-         */
-        public static final String ADB_ICON = "adb_icon";
 
         /**
          * Setting to allow mock locations and location provider status to be injected into the

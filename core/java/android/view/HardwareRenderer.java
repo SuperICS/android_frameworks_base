@@ -939,17 +939,12 @@ public abstract class HardwareRenderer {
                     fallback(true);
                     return SURFACE_STATE_ERROR;
                 } else {
-<<<<<<< HEAD
 		    if (SystemProperties.QCOM_HARDWARE ) {
-=======
-                    if (SystemProperties.QCOM_HARDWARE ) {
->>>>>>> 2ed0e82ab41e7597be57f6a2442f50f873a9ba1c
                         if (mUpdateDirtyRegions) {
                             enableDirtyRegions();
                             mUpdateDirtyRegions = false;
                         }
                      }
-<<<<<<< HEAD
                     /**
                       * Need to make sure preserve_buff swap is set properly for this context
                       */
@@ -958,8 +953,6 @@ public abstract class HardwareRenderer {
                                     Log.w(LOG_TAG, "Backbuffer cannot be preserved");
                        }
                     }
-=======
->>>>>>> 2ed0e82ab41e7597be57f6a2442f50f873a9ba1c
                     return SURFACE_STATE_UPDATED;
                 }
             }

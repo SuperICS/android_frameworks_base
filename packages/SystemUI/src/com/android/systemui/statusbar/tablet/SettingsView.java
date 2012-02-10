@@ -21,9 +21,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
 import android.util.AttributeSet;
+import android.util.Slog;
+import android.widget.LinearLayout;
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.android.systemui.R;
 import com.android.systemui.statusbar.policy.AirplaneModeController;
@@ -40,6 +43,9 @@ import com.android.systemui.statusbar.policy.WifiController;
 public class SettingsView extends LinearLayout implements View.OnClickListener {
     static final String TAG = "SettingsView";
 
+    AirplaneModeController mAirplane;
+    AutoRotateController mRotate;
+    BrightnessController mBrightness;
     DoNotDisturbController mDoNotDisturb;
     BluetoothController mBluetooth;
     WifiController mWifi;
@@ -83,6 +89,8 @@ public class SettingsView extends LinearLayout implements View.OnClickListener {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        mAirplane.release();
+        mDoNotDisturb.release();
     }
 
     public void onClick(View v) {
@@ -100,7 +108,15 @@ public class SettingsView extends LinearLayout implements View.OnClickListener {
     }
 
     private StatusBarManager getStatusBarManager() {
-        return (StatusBarManager) getContext().getSystemService(Context.STATUS_BAR_SERVICE);
+        return (StatusBarManager)getContext().getSystemService(Context.STATUS_BAR_SERVICE);
+    }
+
+    // Network
+    // ----------------------------
+    private void onClickNetwork() {
+        getContext().startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        getStatusBarManager().collapse();
     }
 
 // Bluetooth
