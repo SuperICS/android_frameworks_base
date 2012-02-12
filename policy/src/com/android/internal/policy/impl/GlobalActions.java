@@ -125,9 +125,9 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
     public void showDialog(boolean keyguardShowing, boolean isDeviceProvisioned) {
         mKeyguardShowing = keyguardShowing;
         mDeviceProvisioned = isDeviceProvisioned;
-        if (mDialog == null) {
-            mDialog = createDialog();
-        }
+        
+        //always update the PowerMenu dialog
+        mDialog = createDialog();
 
         prepareDialog();
 
@@ -232,23 +232,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
                     return true;
                 }
             });
-        
-        // next: reboot
-        mItems.add(
-                new SinglePressAction(com.android.internal.R.drawable.ic_lock_reboot,
-                        R.string.global_action_reboot) {
-                    public void onPress() {
-                        ShutdownThread.reboot(mContext, "null", true);
-                    }
-
-                    public boolean showDuringKeyguard() {
-                        return true;
-                    }
-
-                    public boolean showBeforeProvisioning() {
-                        return true;
-                    }
-                });
 
         // next: reboot
         mItems.add(
@@ -437,9 +420,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         } else {
             mDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_DIALOG);
         }
-
-        mDialog.setTitle(R.string.global_actions);
-
         if (SHOW_SILENT_TOGGLE) {
             IntentFilter filter = new IntentFilter(AudioManager.RINGER_MODE_CHANGED_ACTION);
             mContext.registerReceiver(mRingerModeReceiver, filter);
