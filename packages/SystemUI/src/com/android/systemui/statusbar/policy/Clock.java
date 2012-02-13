@@ -180,11 +180,11 @@ public class Clock extends TextView {
                 if (a >= 0) {
                     // Move a back so any whitespace before AM/PM is also in the alternate size.
                     final int b = a;
-                    while (a > 0 && Character.isWhitespace(format.charAt(a - 1))) {
+                    while (a > 0 && Character.isWhitespace(format.charAt(a-1))) {
                         a--;
                     }
                     format = format.substring(0, a) + MAGIC1 + format.substring(a, b)
-                            + "a" + MAGIC2 + format.substring(b + 1);
+                        + "a" + MAGIC2 + format.substring(b + 1);
                 }
             }
 

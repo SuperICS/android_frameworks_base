@@ -746,8 +746,8 @@ public abstract class Window {
                     "No permission to prevent power key");
         }
         final WindowManager.LayoutParams attrs = getAttributes();
-        attrs.flags = (attrs.flags & ~mask) | (flags & mask);
-        if ((mask & WindowManager.LayoutParams.FLAG_NEEDS_MENU_KEY) != 0) {
+        attrs.flags = (attrs.flags&~mask) | (flags&mask);
+        if ((mask&WindowManager.LayoutParams.FLAG_NEEDS_MENU_KEY) != 0) {
             attrs.privateFlags |= WindowManager.LayoutParams.PRIVATE_FLAG_SET_NEEDS_MENU_KEY;
         }
         mForcedWindowFlags |= mask;
