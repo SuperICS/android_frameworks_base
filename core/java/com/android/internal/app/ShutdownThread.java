@@ -109,6 +109,8 @@ public final class ShutdownThread extends Thread {
                 ? com.android.internal.R.string.shutdown_confirm_question
                 : com.android.internal.R.string.shutdown_confirm;
 
+        Log.d(TAG, "Notifying thread to start shutdown longPressBehavior=" + longPressBehavior);
+
         if (confirm) {
             final AlertDialog dialog;
             // Set different dialog message based on whether or not we're rebooting

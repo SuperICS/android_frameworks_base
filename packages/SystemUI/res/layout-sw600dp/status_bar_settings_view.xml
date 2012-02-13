@@ -15,7 +15,6 @@
  * limitations under the License.
 -->
 
-
 <com.android.systemui.statusbar.tablet.SettingsView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:systemui="http://schemas.android.com/apk/res/com.android.systemui"
@@ -23,7 +22,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         >
-
         
     <!-- Toggles Toggle -->
     <LinearLayout
@@ -92,3 +90,4 @@
     <View style="@style/StatusBarPanelSettingsPanelSeparator" />
 
 </com.android.systemui.statusbar.tablet.SettingsView>
+

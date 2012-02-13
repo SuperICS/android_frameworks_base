@@ -218,7 +218,6 @@ public class Clock extends TextView {
 
     }
 
-
     public void updateVisibilityFromStatusBar(boolean show) {
         if (mClockStyle == STYLE_CLOCK_RIGHT)
             setVisibility(show ? View.VISIBLE : View.GONE);
