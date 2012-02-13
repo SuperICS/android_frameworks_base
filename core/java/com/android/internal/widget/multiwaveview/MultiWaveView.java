@@ -16,8 +16,6 @@
 
 package com.android.internal.widget.multiwaveview;
 
-import java.util.ArrayList;
-
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorListenerAdapter;
@@ -42,6 +40,7 @@ import android.view.accessibility.AccessibilityManager;
 
 import com.android.internal.R;
 
+import java.util.ArrayList;
 /**
  * A special widget containing a center and outer ring. Moving the center ring to the outer ring
  * causes an event that can be caught by implementing OnTriggerListener.
