@@ -89,6 +89,7 @@ public class NetworkController extends BroadcastReceiver {
     int mLastSignalLevel;
     boolean mShowPhoneRSSIForData = false;
     boolean mShowAtLeastThreeGees = false;
+    boolean mAlwaysShowCdmaRssi = false;
 
     String mContentDescriptionPhoneSignal;
     String mContentDescriptionWifi;
@@ -157,7 +158,7 @@ public class NetworkController extends BroadcastReceiver {
     IBatteryStats mBatteryStats;
 
     public interface SignalCluster {
-        void setWifiIndicators(boolean visible, int strengthIcon, int activityIcon, 
+        void setWifiIndicators(boolean visible, int strengthIcon, int activityIcon,
                 String contentDescription);
         void setMobileDataIndicators(boolean visible, int strengthIcon, int activityIcon,
                 int typeIcon, String contentDescription, String typeContentDescription);
@@ -177,6 +178,8 @@ public class NetworkController extends BroadcastReceiver {
 
         mShowPhoneRSSIForData = res.getBoolean(R.bool.config_showPhoneRSSIForData);
         mShowAtLeastThreeGees = res.getBoolean(R.bool.config_showMin3G);
+        mAlwaysShowCdmaRssi = res.getBoolean(
+                com.android.internal.R.bool.config_alwaysUseCdmaRssi);
 
         // set up the default wifi icon, used when no radios have ever appeared
         updateWifiIcons();
@@ -288,7 +291,7 @@ public class NetworkController extends BroadcastReceiver {
             // wimax is special
             cluster.setMobileDataIndicators(
                     true,
-                    mWimaxIconId,
+                    mAlwaysShowCdmaRssi ? mPhoneSignalIconId : mWimaxIconId,
                     mMobileActivityIconId,
                     mDataTypeIconId,
                     mContentDescriptionWimax,
@@ -352,7 +355,7 @@ public class NetworkController extends BroadcastReceiver {
         @Override
         public void onSignalStrengthsChanged(SignalStrength signalStrength) {
             if (DEBUG) {
-                Slog.d(TAG, "onSignalStrengthsChanged signalStrength=" + signalStrength + 
+                Slog.d(TAG, "onSignalStrengthsChanged signalStrength=" + signalStrength +
                     ((signalStrength == null) ? "" : (" level=" + signalStrength.getLevel())));
             }
             mSignalStrength = signalStrength;
@@ -470,7 +473,15 @@ public class NetworkController extends BroadcastReceiver {
             } else {
                 int iconLevel;
                 int[] iconList;
-                mLastSignalLevel = iconLevel = mSignalStrength.getLevel();
+                if (isCdma() && mAlwaysShowCdmaRssi) {
+                    mLastSignalLevel = iconLevel = mSignalStrength.getCdmaLevel();
+                    if(DEBUG) Slog.d(TAG, "mAlwaysShowCdmaRssi=" + mAlwaysShowCdmaRssi
+                            + " set to cdmaLevel=" + mSignalStrength.getCdmaLevel()
+                            + " instead of level=" + mSignalStrength.getLevel());
+                } else {
+                    mLastSignalLevel = iconLevel = mSignalStrength.getLevel();
+                }
+
                 if (isCdma()) {
                     if (isCdmaEri()) {
                         iconList = TelephonyIcons.TELEPHONY_SIGNAL_STRENGTH_ROAMING[mInetCondition];
@@ -488,7 +499,6 @@ public class NetworkController extends BroadcastReceiver {
                 mPhoneSignalIconId = iconList[iconLevel];
                 mContentDescriptionPhoneSignal = mContext.getString(
                         AccessibilityContentDescriptions.PHONE_SIGNAL_STRENGTH[iconLevel]);
-
                 mDataSignalIconId = TelephonyIcons.DATA_SIGNAL_STRENGTH[mInetCondition][iconLevel];
             }
         }
@@ -909,7 +919,7 @@ public class NetworkController extends BroadcastReceiver {
                     mobileLabel = "";
                 }
             } else {
-                mobileLabel 
+                mobileLabel
                     = context.getString(R.string.status_bar_settings_signal_meter_disconnected);
             }
 
@@ -1197,7 +1207,7 @@ public class NetworkController extends BroadcastReceiver {
                 v.setText(wifiLabel);
             }
         }
-        
+
         // mobile label
         N = mMobileLabelViews.size();
         for (int i=0; i<N; i++) {
