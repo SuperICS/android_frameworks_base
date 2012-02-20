@@ -286,10 +286,10 @@
     <string name="screen_lock">Screen lock</string>
     <!-- Button to turn off the phone, within the Phone Options dialog -->
     <string name="power_off">Power off</string>
+
     <!-- Button to reboot the phone, within the Phone Options dialog -->
-    <string name="reboot_system">Reboot phone</string>
-    <!-- Button to reboot the tablet, within the Tablet Options dialog -->
     <string name="reboot_system" product="tablet">Reboot tablet</string>
+    <string name="reboot_system" product="default">Reboot phone</string>
 
     <!-- label for item that screenshots in phone options dialog -->
     <string name="global_action_screenshot">Screenshot</string>
@@ -332,7 +332,7 @@
     <!-- Shutdown Progress Dialog. This is shown if the user chooses to power off the phone. -->
     <string name="shutdown_progress">Shutting down\u2026</string>
 
-    <!-- Shutdown Confirmation Dialog.  When the user chooses to power off the tablet, there will
+    <!-- Shutdown Confirmation Dialog.  When the user chooses to power off the phone, there will
          be a confirmation dialog.  This is the message. -->
     <string name="shutdown_confirm" product="tablet">Your tablet will shut down.</string>
     <!-- Shutdown Confirmation Dialog.  When the user chooses to power off the phone, there will
