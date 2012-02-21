@@ -101,7 +101,7 @@ public class NotificationManagerService extends INotificationManager.Stub
     private Vibrator mVibrator = new Vibrator();
 
     // for enabling and disabling notification pulse behavior
-    private boolean mScreenOn = true;
+    //private boolean mScreenOn = true;
     private boolean mWasScreenOn = false;
     private boolean mInCall = false;
     private boolean mNotificationPulseEnabled;
@@ -349,9 +349,9 @@ public class NotificationManagerService extends INotificationManager.Stub
             } else if (action.equals(Intent.ACTION_SCREEN_ON)) {
                 // Keep track of screen on/off state, but do not turn off the notification light
                 // until user passes through the lock screen or views the notification.
-                mScreenOn = true;
+               // mScreenOn = true;
             } else if (action.equals(Intent.ACTION_SCREEN_OFF)) {
-                mScreenOn = false;
+               // mScreenOn = false;
                 mWasScreenOn = true;
                 updateLightsLocked();
             } else if (action.equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
@@ -360,7 +360,7 @@ public class NotificationManagerService extends INotificationManager.Stub
                 updateNotificationPulse();
             } else if (action.equals(Intent.ACTION_USER_PRESENT)) {
                 // turn off LED when user passes through lock screen
-                mNotificationLight.turnOff();
+               // mNotificationLight.turnOff();
             }
         }
     };
@@ -1093,7 +1093,7 @@ public class NotificationManagerService extends INotificationManager.Stub
                 Notification.FLAG_FORCE_LED_SCREEN_OFF) != 0;
 
         // Don't flash while we are in a call or screen is on
-        if (mInCall || mScreenOn || (wasScreenOn && !forceWithScreenOff)) {
+        if (mInCall || (wasScreenOn && !forceWithScreenOff)) {
             mNotificationLight.turnOff();
         } else {
             int ledARGB = mLedNotification.notification.ledARGB;
