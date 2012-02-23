@@ -147,7 +147,7 @@ public class PowerManagerService extends IPowerManager.Stub
     // used for noChangeLights in setPowerState()
     private static final int LIGHTS_MASK        = SCREEN_BRIGHT_BIT | BUTTON_BRIGHT_BIT | KEYBOARD_BRIGHT_BIT;
 
-    boolean mAnimateScreenLights = false;
+    boolean mAnimateScreenLights = true;
 
     static final int ANIM_STEPS = 60/4;
     // Slower animation for autobrightness changes
@@ -263,8 +263,6 @@ public class PowerManagerService extends IPowerManager.Stub
     // hard-coded brightness settings that timeout-to-off in subsequent screen
     // power states.
     private boolean mAutoBrightnessButtonKeyboard;
-    private boolean mAnimateCrtOff = false;
-    private boolean mAnimateCrtOn = false;
 
     // Must match with the ISurfaceComposer constants in C++.
     private static final int ANIM_SETTING_ON = 0x01;
@@ -511,25 +509,16 @@ public class PowerManagerService extends IPowerManager.Stub
                 // recalculate everything
                 setScreenOffTimeoutsLocked();
 
-                // final float windowScale = getFloat(WINDOW_ANIMATION_SCALE, 1.0f);
-                // final float transitionScale = getFloat(TRANSITION_ANIMATION_SCALE, 1.0f);
+                final float windowScale = getFloat(WINDOW_ANIMATION_SCALE, 1.0f);
+                final float transitionScale = getFloat(TRANSITION_ANIMATION_SCALE, 1.0f);
                 mAnimationSetting = 0;
-                if (mContext.getResources().getBoolean(com.android.internal.R.bool.config_enableCrtAnimations)) {
-                    mAnimateCrtOn = getInt(Settings.System.CRT_ON_ANIMATION, 0) == 1;
-                    mAnimateCrtOff = getInt(Settings.System.CRT_OFF_ANIMATION, 1) == 1;
-                    if (mAnimateCrtOff)
-                        mAnimationSetting |= ANIM_SETTING_OFF;
-                    if (mAnimateCrtOn) {
-                        mAnimationSetting |= ANIM_SETTING_ON;
-                    }
+                if (windowScale > 0.5f) {
+                    mAnimationSetting |= ANIM_SETTING_OFF;
                 }
-                // if (windowScale > 0.5f) {
-                // mAnimationSetting |= ANIM_SETTING_OFF;
-                // }
-                // if (transitionScale > 0.5f) {
-                // Uncomment this if you want the screen-on animation.
-                // mAnimationSetting |= ANIM_SETTING_ON;
-                // }
+                if (transitionScale > 0.5f) {
+                    // Uncomment this if you want the screen-on animation.
+                    // mAnimationSetting |= ANIM_SETTING_ON;
+                }
             }
         }
     }
@@ -680,11 +669,10 @@ public class PowerManagerService extends IPowerManager.Stub
                         + Settings.System.NAME + "=?) or ("
                         + Settings.System.NAME + "=?) or ("
                         + Settings.System.NAME + "=?) or ("
-                        + Settings.System.NAME + "=?) or ("
                         + Settings.System.NAME + "=?)",
                 new String[]{STAY_ON_WHILE_PLUGGED_IN, SCREEN_OFF_TIMEOUT, DIM_SCREEN,
                         SCREEN_BRIGHTNESS_MODE, WINDOW_ANIMATION_SCALE, TRANSITION_ANIMATION_SCALE,
-                        Settings.System.CRT_OFF_ANIMATION, Settings.System.CRT_ON_ANIMATION},
+                        Settings.System.LIGHTS_CHANGED},
                 null);
         mSettings = new ContentQueryMap(settingsCursor, Settings.System.NAME, true, mHandler);
         SettingsObserver settingsObserver = new SettingsObserver();

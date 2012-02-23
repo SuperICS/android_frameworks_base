@@ -2513,22 +2513,6 @@ public final class Settings {
         @Deprecated
         public static final String WIFI_WATCHDOG_PING_TIMEOUT_MS =
             Secure.WIFI_WATCHDOG_PING_TIMEOUT_MS;
-
-        /**
-         * Whether to show CRT off animation
-         * 
-         * @hide
-         */
-        public static final String CRT_OFF_ANIMATION = "crt_off_animation";
-
-        /**
-         * Whether to show CRT on animation
-         * currently doesn't work
-         * 
-         * @hide
-         */
-        public static final String CRT_ON_ANIMATION = "crt_on_animation"; 
-
     }
 
     /**
