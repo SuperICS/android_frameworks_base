@@ -2351,6 +2351,7 @@ public class AudioService extends IAudioService.Stub {
                     mRingerModeAffectedStreams = ringerModeAffectedStreams;
                     setRingerModeInt(getRingerMode(), false);
                 }
+
                 boolean linkNotificationWithVolume = Settings.System.getInt(mContentResolver,
                         Settings.System.VOLUME_LINK_NOTIFICATION, 1) == 1;
                 if (linkNotificationWithVolume) {
