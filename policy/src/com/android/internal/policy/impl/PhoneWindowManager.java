@@ -511,8 +511,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     "fancy_rotation_anim"), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                   Settings.System.NAVIGATION_BAR_VISIBLE), false, this);
-            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.ACCELEROMETER_ROTATION_ANGLES), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.ENABLE_FAST_TORCH), false, this);
@@ -1016,11 +1014,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             if      (navBarOverride.equals("1")) mHasNavigationBar = false;
             else if (navBarOverride.equals("0")) mHasNavigationBar = true;
         }
-        // Allow user to override this if phone has hard keys (eg. nav bar is
-        // not enabled by default in the configuration)
-        if(!mHasNavigationBar) {
-            mHasNavigationBar = mUserNavigationBar;
-        }
+
         mNavigationBarHeight = mHasNavigationBar
                 ? mContext.getResources().getDimensionPixelSize(
                     com.android.internal.R.dimen.navigation_bar_height)
@@ -1113,8 +1107,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 updateRotation = true;
             }
         }
-        mUserNavigationBar = (Settings.System.getInt(resolver,
-            Settings.System.NAVIGATION_BAR_VISIBLE, 0) == 1);
         if (updateRotation) {
             updateRotation(true);
         }
@@ -2531,6 +2523,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     public int finishAnimationLw() {
         int changes = 0;
         boolean topIsFullscreen = false;
+
         final WindowManager.LayoutParams lp = (mTopFullscreenOpaqueWindowState != null)
                 ? mTopFullscreenOpaqueWindowState.getAttrs()
                 : null;
@@ -2554,10 +2547,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 // has the FLAG_FULLSCREEN set.  Not sure if there is another way that to be the
                 // case though.
                 if (topIsFullscreen) {
-                    if (mStatusBarCanHide ||
-                        (((mFocusedWindow != null) && (mFocusedWindow.getSystemUiVisibility() & View.SYSTEM_UI_FLAG_LOW_PROFILE) == 1) &&
-                         (Settings.System.getInt(mContext.getContentResolver(),
-                                                 Settings.System.COMBINED_BAR_AUTO_HIDE, 0) == 1))) {
+                    if (mStatusBarCanHide) {
                         if (DEBUG_LAYOUT) Log.v(TAG, "Hiding status bar");
                         if (mStatusBar.hideLw(true)) {
                             changes |= FINISH_LAYOUT_REDO_LAYOUT;
@@ -2570,13 +2560,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                                 }
                             }});
                         }
-                    }
-                    else if (((mFocusedWindow != null) && (mFocusedWindow.getSystemUiVisibility() & View.SYSTEM_UI_FLAG_LOW_PROFILE) == 0) &&
-                             (Settings.System.getInt(mContext.getContentResolver(),
-                                                     Settings.System.COMBINED_BAR_AUTO_HIDE, 0) == 1)) {
-                        if (mStatusBar.showLw(true)) changes |= FINISH_LAYOUT_REDO_LAYOUT;
-                    }
-                    else if (DEBUG_LAYOUT) {
+                    } else if (DEBUG_LAYOUT) {
                         Log.v(TAG, "Preventing status bar from hiding by policy");
                     }
                 } else {
