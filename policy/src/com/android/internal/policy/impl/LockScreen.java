@@ -23,10 +23,8 @@ import com.android.internal.widget.WaveView;
 import com.android.internal.widget.multiwaveview.MultiWaveView;
 
 import android.app.ActivityManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.view.KeyEvent;
@@ -36,7 +34,6 @@ import android.view.ViewGroup;
 import android.widget.*;
 import android.util.Log;
 import android.media.AudioManager;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.Settings;
 

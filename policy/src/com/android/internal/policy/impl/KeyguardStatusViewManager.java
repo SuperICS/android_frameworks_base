@@ -520,16 +520,8 @@ class KeyguardStatusViewManager implements OnClickListener {
                 }
                 break;
         }
-        
-        String customLabel = null;
-        customLabel = Settings.System.getString(getContext().getContentResolver(),
-                Settings.System.CUSTOM_CARRIER_LABEL);
-        
-        if(customLabel == null)        
-            setCarrierText(carrierText);
-        else
-            setCarrierText(customLabel);
-        
+
+        setCarrierText(carrierText);
         setCarrierHelpText(carrierHelpTextId);
         updateEmergencyCallButtonState(mPhoneState);
     }

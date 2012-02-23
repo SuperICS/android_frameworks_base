@@ -338,7 +338,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     int mLongPressOnPowerBehavior = -1;
     boolean mScreenOnEarly = false;
     boolean mScreenOnFully = false;
-    int mScreenOffReason;
     boolean mOrientationSensorEnabled = false;
     int mCurrentAppOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
     static final int DEFAULT_ACCELEROMETER_ROTATION = 0;
@@ -458,15 +457,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private boolean mVolumeUpKeyTriggered;
     private boolean mPowerKeyTriggered;
     private long mPowerKeyTime;
-    boolean mIsLongPress;
 
     ShortcutManager mShortcutManager;
     PowerManager.WakeLock mBroadcastWakeLock;
-    
-    public static final String INTENT_TORCH_ON = "com.android.systemui.INTENT_TORCH_ON";
-    public static final String INTENT_TORCH_OFF = "com.android.systemui.INTENT_TORCH_OFF";
-    boolean mFastTorchOn; // local state of torch
-    boolean mEnableQuickTorch; // System.Setting
 
     final KeyCharacterMap.FallbackAction mFallbackAction = new KeyCharacterMap.FallbackAction();
 
@@ -504,8 +497,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Settings.Secure.DEFAULT_INPUT_METHOD), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     "fancy_rotation_anim"), false, this);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.ENABLE_FAST_TORCH), false, this);
             updateSettings();
         }
 
@@ -627,26 +618,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mPendingPowerKeyUpCanceled = true;
         }
     }
-
-    Runnable mTorchOn = new Runnable() {
-        public void run() {
-            Intent i = new Intent(INTENT_TORCH_ON);
-            i.setAction(INTENT_TORCH_ON);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            mContext.startActivity(i);
-            mFastTorchOn = true;
-        };
-    };
-    
-    Runnable mTorchOff = new Runnable() {
-        public void run() {
-            Intent i = new Intent(INTENT_TORCH_OFF);
-            i.setAction(INTENT_TORCH_OFF);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            mContext.startActivity(i);
-            mFastTorchOn = false;
-        };
-    };
 
     private void interceptScreenshotChord() {
         if (mVolumeDownKeyTriggered && mPowerKeyTriggered && !mVolumeUpKeyTriggered) {
@@ -995,8 +966,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mUserRotation = Settings.System.getInt(resolver,
                     Settings.System.USER_ROTATION,
                     Surface.ROTATION_0);
-            mEnableQuickTorch = Settings.System.getInt(resolver, Settings.System.ENABLE_FAST_TORCH,
-                    0) == 1;
+
             if (mAccelerometerDefault != accelerometerDefault) {
                 mAccelerometerDefault = accelerometerDefault;
                 updateOrientationListenerLp();
@@ -2961,9 +2931,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 }
                 result &= ~ACTION_PASS_TO_USER;
                 if (down) {
-                    if(!isScreenOn && mEnableQuickTorch) {
-                        handleChangeTorchState(true);
-                    }
                     if (isScreenOn && !mPowerKeyTriggered
                             && (event.getFlags() & KeyEvent.FLAG_FALLBACK) == 0) {
                         mPowerKeyTriggered = true;
@@ -2993,8 +2960,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     interceptPowerKeyDown(!isScreenOn || hungUp
                             || mVolumeDownKeyTriggered || mVolumeUpKeyTriggered);
                 } else {
-                    handleChangeTorchState(false);
-
                     mPowerKeyTriggered = false;
                     cancelPendingScreenshotChordAction();
                     if (interceptPowerKeyUp(canceled || mPendingPowerKeyUpCanceled)) {
@@ -3084,15 +3049,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         return result;
     }
 
-    void handleChangeTorchState(boolean on) {
-        if (on) {
-            mHandler.postDelayed(mTorchOn, ViewConfiguration.getLongPressTimeout());
-        } else {
-            mHandler.removeCallbacks(mTorchOn);
-            mHandler.post(mTorchOff);
-        }
-    }
-
     class PassHeadsetKey implements Runnable {
         KeyEvent mKeyEvent;
 
@@ -3145,7 +3101,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         synchronized (mLock) {
             updateOrientationListenerLp();
             updateLockScreenTimeout();
-            mScreenOffReason = why;
         }
     }
 
