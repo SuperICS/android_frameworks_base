@@ -2515,6 +2515,63 @@ public final class Settings {
             Secure.WIFI_WATCHDOG_PING_TIMEOUT_MS;
 
         /**
+         * @hide
+         */
+        public static final String POWER_SAVER_MODE = "power_saver_mode";
+
+        /**
+         * @hide
+         */
+        public static final String POWER_SAVER_DATA_MODE = "power_saver_data_mode";
+
+        /**
+         * @hide
+         */
+        public static final String POWER_SAVER_ORIGINAL_NETWORK_ON = "power_saver_original_network_on";
+
+        /**
+         * @hide
+         */
+        public static final String POWER_SAVER_ORIGINAL_NETWORK_MODE = "power_saver_original_network_mode";
+
+        /**
+         * @hide
+         */
+        public static final String POWER_SAVER_SYNC_MODE = "power_saver_sync_mode";
+
+        /**
+         * @hide
+         */
+        public static final String POWER_SAVER_SYNC_INTERVAL = "power_saver_sync_interval";
+
+        /**
+         * @hide
+         */
+        public static final String POWER_SAVER_DATA_DELAY = "power_saver_data_delay";
+
+        /**
+         * @hide
+         */
+        public static final String POWER_DIALOG_SHOW_POWER_SAVER = "power_dialog_show_power_saver";
+
+        /**
+         * @hide
+         */
+        public static final String POWER_DIALOG_SHOW_TORCH_TOGGLE = "power_dialog_show_torch_toggle";
+
+        /**
+         * @hide
+         */
+        public static final String POWER_DIALOG_SHOW_SCREENSHOT = "power_dialog_show_screenshot";
+
+        /**
+         * Whether to enable torch by long pressing power from a screen-off state
+         * 
+         * @hide
+         */
+        public static final String ENABLE_FAST_TORCH = "enable_fast_torch";
+
+        /**
          * Whether to show CRT off animation
          * 
          * @hide
@@ -2527,8 +2584,21 @@ public final class Settings {
          * 
          * @hide
          */
-        public static final String CRT_ON_ANIMATION = "crt_on_animation"; 
+        public static final String CRT_ON_ANIMATION = "crt_on_animation";
 
+        /**
+         * whether to show the IME switcher when typing in the statusbar. Boolean value.
+         * 
+         * @hide
+         */
+        public static final String SHOW_STATUSBAR_IME_SWITCHER = "show_statusbar_ime_switcher";
+
+        /**
+         * custom carrier text to display
+         * 
+         * @hide
+         */
+        public static final String CUSTOM_CARRIER_LABEL = "custom_carrier_label";
     }
 
     /**
