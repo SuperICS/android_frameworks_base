@@ -697,7 +697,7 @@ public class NavigationBarView extends LinearLayout {
                 Settings.System.MENU_LOCATION, SHOW_RIGHT_MENU);
 
         currentVisibility = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.MENU_VISIBILITY, VISIBILITY_SYSTEM);
+                Settings.System.MENU_VISIBILITY, VISIBILITY_SYSTEM_AND_INVIZ);
 
         makeBar(userNavBarButtons);
 
