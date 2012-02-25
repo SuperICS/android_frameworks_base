@@ -94,7 +94,7 @@ public class NavigationBarView extends LinearLayout {
     public static final String DELIMITER = "|";
 
     private static final String STOCK_NAVBAR = NAV_BACK + DELIMITER + NAV_HOME + DELIMITER
-            + NAV_TASKS;
+            + NAV_TASKS + DELIMITER + NAV_MENU_BIG;
 
     private String userNavBarButtons = STOCK_NAVBAR;
 
