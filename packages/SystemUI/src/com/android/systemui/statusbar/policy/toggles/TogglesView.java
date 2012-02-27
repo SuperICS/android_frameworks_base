@@ -260,7 +260,7 @@ public class TogglesView extends LinearLayout {
 
         mBrightnessLocation = Settings.System.getInt(resolver,
                 Settings.System.STATUSBAR_TOGGLES_BRIGHTNESS_LOC,
-                BRIGHTNESS_LOC_BOTTON);
+                BRIGHTNESS_LOC_BOTTOM);
 
         useAltButtonLayout = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.STATUSBAR_TOGGLES_USE_BUTTONS, 1) == 1;

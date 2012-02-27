@@ -127,7 +127,7 @@ public class BatteryBarController extends LinearLayout {
         // set heights
         DisplayMetrics metrics = getContext().getResources().getDisplayMetrics();
         float dp = (float) Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.STATUSBAR_BATTERY_BAR_THICKNESS, 1);
+                Settings.System.STATUSBAR_BATTERY_BAR_THICKNESS, 2);
         int pixels = (int) ((metrics.density * dp) + 0.5);
 
         ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) getLayoutParams();
@@ -177,7 +177,7 @@ public class BatteryBarController extends LinearLayout {
     public void updateSettings() {
 
         mStyle = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.STATUSBAR_BATTERY_BAR_STYLE, 0);
+                Settings.System.STATUSBAR_BATTERY_BAR_STYLE, 1);
         mLocation = Settings.System.getInt(getContext().getContentResolver(),
                 Settings.System.STATUSBAR_BATTERY_BAR, 0);
 

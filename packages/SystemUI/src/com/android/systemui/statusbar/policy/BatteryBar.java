@@ -190,10 +190,10 @@ public class BatteryBar extends RelativeLayout implements Animatable {
         ContentResolver resolver = getContext().getContentResolver();
 
         int color = Settings.System.getInt(resolver,
-                Settings.System.STATUSBAR_BATTERY_BAR_COLOR, 0xFF33B5E5);
+                Settings.System.STATUSBAR_BATTERY_BAR_COLOR, 0xFFD1D1D1);
 
         shouldAnimateCharging = Settings.System.getInt(resolver,
-                Settings.System.STATUSBAR_BATTERY_BAR_ANIMATE, 0) == 1;
+                Settings.System.STATUSBAR_BATTERY_BAR_ANIMATE, 1) == 1;
 
         if (mBatteryCharging && mBatteryLevel < 100 && shouldAnimateCharging) {
             start();
