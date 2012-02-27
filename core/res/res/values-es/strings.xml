@@ -138,7 +138,7 @@
     <string name="screen_lock" msgid="799094655496098153">"Bloqueo de pantalla"</string>
     <string name="power_off" msgid="4266614107412865048">"Apagar"</string>
     <!-- Button to reboot the phone, within the Phone Options dialog -->
-    <string name="reboot_system">Reinicia teléfono</string>
+    <string name="reboot_system">Reiniciando teléfono</string>
     <!-- Button to reboot the tablet, within the Tablet Options dialog -->
     <string name="reboot_system" product="tablet">Reinicia tablet</string>
 
