@@ -256,7 +256,7 @@ public class TogglesView extends LinearLayout {
         addToggles(Settings.System.getString(resolver, Settings.System.STATUSBAR_TOGGLES));
 
         mToggleStyle = Settings.System.getInt(resolver, Settings.System.STATUSBAR_TOGGLES_STYLE,
-                STYLE_TEXT);
+                STYLE_ICON);
 
         mBrightnessLocation = Settings.System.getInt(resolver,
                 Settings.System.STATUSBAR_TOGGLES_BRIGHTNESS_LOC,
