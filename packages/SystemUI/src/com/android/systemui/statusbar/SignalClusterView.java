@@ -36,9 +36,11 @@ public class SignalClusterView
         extends LinearLayout 
         implements NetworkController.SignalCluster {
 
+    private static final int SIGNAL_CLUSTER_STYLE_NORMAL = 0;
+
     static final boolean DEBUG = false;
     static final String TAG = "SignalClusterView";
-    
+
     NetworkController mNC;
 
     private boolean mWifiVisible = false;
@@ -48,11 +50,32 @@ public class SignalClusterView
     private boolean mIsAirplaneMode = false;
     private String mWifiDescription, mMobileDescription, mMobileTypeDescription;
 
+    private int mSignalClusterStyle;
+
     ViewGroup mWifiGroup, mMobileGroup;
     ImageView mWifi, mMobile, mWifiActivity, mMobileActivity, mMobileType;
     View mSpacer;
     
     private boolean showingSignalText;
+
+    Handler mHandler;
+
+    class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_SIGNAL_TEXT), false, this);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            updateSettings();
+        }
+    }
 
     public SignalClusterView(Context context) {
         this(context, null);
@@ -64,6 +87,11 @@ public class SignalClusterView
 
     public SignalClusterView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+
+        mHandler = new Handler();
+
+        SettingsObserver settingsObserver = new SettingsObserver(mHandler);
+        settingsObserver.observe();
     }
 
     public void setNetworkController(NetworkController nc) {
@@ -170,6 +198,7 @@ public class SignalClusterView
 
         mMobileType.setVisibility(
                 !mWifiVisible ? View.VISIBLE : View.GONE);
+
         updateSettings();
     }
     
@@ -200,6 +229,18 @@ public class SignalClusterView
         
         if(mMobile != null)
             mMobile.setVisibility(showingSignalText ? View.GONE : View.VISIBLE);
+
+        updateSettings();
+    }
+
+    private void updateSignalClusterStyle() {
+        mMobileGroup.setVisibility(mSignalClusterStyle != SIGNAL_CLUSTER_STYLE_NORMAL ? View.GONE : View.VISIBLE);
+    }
+
+    private void updateSettings() {
+        ContentResolver resolver = mContext.getContentResolver();
+        mSignalClusterStyle = (Settings.System.getInt(resolver,
+                Settings.System.STATUS_BAR_SIGNAL_TEXT, SIGNAL_CLUSTER_STYLE_NORMAL));
+        updateSignalClusterStyle();
     }
 }
-
