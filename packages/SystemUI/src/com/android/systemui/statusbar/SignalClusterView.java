@@ -28,8 +28,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.android.systemui.R;
 import com.android.systemui.statusbar.policy.NetworkController;
+import com.android.systemui.R;
 
 // Intimately tied to the design of res/layout/signal_cluster_view.xml
 public class SignalClusterView
@@ -201,37 +201,6 @@ public class SignalClusterView
 
         updateSettings();
     }
-    
-    class SettingsObserver extends ContentObserver {
-        SettingsObserver(Handler handler) {
-            super(handler);
-        }
-
-        void observe() {
-            ContentResolver resolver = mContext.getContentResolver();
-            resolver.registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.STATUSBAR_SIGNAL_TEXT), false,
-                    this);
-            updateSettings();
-        }
-
-        @Override
-        public void onChange(boolean selfChange) {
-            updateSettings();
-        }
-    }
-
-    protected void updateSettings() {
-        ContentResolver resolver = mContext.getContentResolver();
-
-        showingSignalText = Settings.System.getInt(resolver,
-                Settings.System.STATUSBAR_SIGNAL_TEXT, 0) != 0;
-        
-        if(mMobile != null)
-            mMobile.setVisibility(showingSignalText ? View.GONE : View.VISIBLE);
-
-        updateSettings();
-    }
 
     private void updateSignalClusterStyle() {
         mMobileGroup.setVisibility(mSignalClusterStyle != SIGNAL_CLUSTER_STYLE_NORMAL ? View.GONE : View.VISIBLE);
@@ -244,3 +213,4 @@ public class SignalClusterView
         updateSignalClusterStyle();
     }
 }
+

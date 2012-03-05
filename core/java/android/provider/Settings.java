@@ -2206,7 +2206,7 @@ public final class Settings {
          * 2: show signal text numbers w/small dBm appended
          * @hide
          */
-        public static final String STATUS_BAR_CM_SIGNAL_TEXT = "status_bar_cm_signal";
+        public static final String STATUS_BAR_SIGNAL_TEXT = "status_bar_signal";
 
         /**
          * Whether to use a separate delay for "slide to unlock" and security
@@ -5336,3 +5336,4 @@ public final class Settings {
         return "android-" + Long.toHexString(androidId);
     }
 }
+

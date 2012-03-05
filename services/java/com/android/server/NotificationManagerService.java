@@ -399,13 +399,12 @@ public class NotificationManagerService extends INotificationManager.Stub
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_LIGHT_PULSE), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
-<<<<<<< HEAD
-                    Settings.System.NOTIFICATION_LIGHT_OFF), false, this);
+		            Settings.System.NOTIFICATION_LIGHT_OFF), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_LIGHT_ON), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_LIGHT_COLOR), false, this);
-=======
+            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_LIGHT_PULSE_DEFAULT_COLOR), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_LIGHT_PULSE_DEFAULT_LED_ON), false, this);
@@ -415,7 +414,6 @@ public class NotificationManagerService extends INotificationManager.Stub
                     Settings.System.NOTIFICATION_LIGHT_PULSE_CUSTOM_ENABLE), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_LIGHT_PULSE_CUSTOM_VALUES), false, this);
->>>>>>> 4a5d0ef2e505065ce29e36c1fd37b71606efd4cb
             update();
         }
 
@@ -427,13 +425,12 @@ public class NotificationManagerService extends INotificationManager.Stub
 
         public void update() {
             ContentResolver resolver = mContext.getContentResolver();
-<<<<<<< HEAD
             boolean pulseEnabled = Settings.System.getInt(resolver,
                     Settings.System.NOTIFICATION_LIGHT_PULSE, 0) != 0;
             if (mNotificationPulseEnabled != pulseEnabled) {
                 mNotificationPulseEnabled = pulseEnabled;
                 updateNotificationPulse();
-=======
+			}
             // LED enabled
             mNotificationPulseEnabled = Settings.System.getInt(resolver,
                     Settings.System.NOTIFICATION_LIGHT_PULSE, 0) != 0;
@@ -456,7 +453,6 @@ public class NotificationManagerService extends INotificationManager.Stub
                     Settings.System.NOTIFICATION_LIGHT_PULSE_CUSTOM_ENABLE, 0) != 0) {
                 parseNotificationPulseCustomValuesString(Settings.System.getString(resolver,
                         Settings.System.NOTIFICATION_LIGHT_PULSE_CUSTOM_VALUES));
->>>>>>> 4a5d0ef2e505065ce29e36c1fd37b71606efd4cb
             }
 
             Resources resources = mContext.getResources();
@@ -541,8 +537,6 @@ public class NotificationManagerService extends INotificationManager.Stub
         mNotificationLight = lights.getLight(LightsService.LIGHT_ID_NOTIFICATIONS);
         mAttentionLight = lights.getLight(LightsService.LIGHT_ID_ATTENTION);
 
-<<<<<<< HEAD
-=======
         Resources resources = mContext.getResources();
         mDefaultNotificationColor = resources.getColor(
                 com.android.internal.R.color.config_defaultNotificationColor);
@@ -553,7 +547,6 @@ public class NotificationManagerService extends INotificationManager.Stub
 
         mNotificationPulseCustomLedValues = new HashMap<String, NotificationLedValues>();
 
->>>>>>> 4a5d0ef2e505065ce29e36c1fd37b71606efd4cb
         // Don't start allowing notifications until the setup wizard has run once.
         // After that, including subsequent boots, init with notifications turned on.
         // This works on the first boot because the setup wizard will toggle this
@@ -870,15 +863,10 @@ public class NotificationManagerService extends INotificationManager.Stub
         }
 
         synchronized (mNotificationList) {
-<<<<<<< HEAD
-            NotificationRecord r = new NotificationRecord(pkg, tag, id,
-                    callingUid, callingPid,
-=======
             final boolean inQuietHours = inQuietHours();
 
             NotificationRecord r = new NotificationRecord(pkg, tag, id, 
                     callingUid, callingPid, 
->>>>>>> 4a5d0ef2e505065ce29e36c1fd37b71606efd4cb
                     priority,
                     notification);
             NotificationRecord old = null;
@@ -948,14 +936,9 @@ public class NotificationManagerService extends INotificationManager.Stub
                         .getSystemService(Context.AUDIO_SERVICE);
                 // sound
                 final boolean useDefaultSound =
-<<<<<<< HEAD
                         (notification.defaults & Notification.DEFAULT_SOUND) != 0;
-                if (useDefaultSound || notification.sound != null) {
-=======
-                    (notification.defaults & Notification.DEFAULT_SOUND) != 0;
                 if (!(inQuietHours && mQuietHoursMute)
                         && (useDefaultSound || notification.sound != null)) {
->>>>>>> 4a5d0ef2e505065ce29e36c1fd37b71606efd4cb
                     Uri uri;
                     if (useDefaultSound) {
                         uri = Settings.System.DEFAULT_NOTIFICATION_URI;
@@ -984,14 +967,9 @@ public class NotificationManagerService extends INotificationManager.Stub
 
                 // vibrate
                 final boolean useDefaultVibrate =
-<<<<<<< HEAD
                         (notification.defaults & Notification.DEFAULT_VIBRATE) != 0;
-                if ((useDefaultVibrate || notification.vibrate != null)
-=======
-                    (notification.defaults & Notification.DEFAULT_VIBRATE) != 0;
                 if (!(inQuietHours && mQuietHoursStill)
                         && (useDefaultVibrate || notification.vibrate != null)
->>>>>>> 4a5d0ef2e505065ce29e36c1fd37b71606efd4cb
                         && audioManager.shouldVibrate(AudioManager.VIBRATE_TYPE_NOTIFICATION)) {
                     mVibrateNotification = r;
 
@@ -1250,51 +1228,18 @@ public class NotificationManagerService extends INotificationManager.Stub
             }
         }
 
-<<<<<<< HEAD
         // Don't flash while we are in a call or screen is on
 				// Depending on ROMControl "Screen ON flash" flag
         if (mLedNotification == null || mInCall || (mScreenOn && !ledScreenOn)) {
-=======
-        boolean wasScreenOn = mWasScreenOn;
-        mWasScreenOn = false;
-
-        if (mLedNotification == null) {
-            mNotificationLight.turnOff();
-            return;
-        }
-
-        // We can assume that if the user turned the screen off while there was
-        // still an active notification then they wanted to keep the notification
-        // for later. In this case we shouldn't flash the notification light.
-        // For special notifications that automatically turn the screen on (such
-        // as missed calls), we use this flag to force the notification light
-        // even if the screen was turned off.
-        boolean forceWithScreenOff = (mLedNotification.notification.flags &
-                Notification.FLAG_FORCE_LED_SCREEN_OFF) != 0;
-
-        // Don't flash while we are in a call, screen is on or we are in quiet hours with light dimmed
-        if (mInCall || mScreenOn || (inQuietHours() && mQuietHoursDim) || (wasScreenOn && !forceWithScreenOff)) {
->>>>>>> 4a5d0ef2e505065ce29e36c1fd37b71606efd4cb
             mNotificationLight.turnOff();
         } else {
-            int ledARGB;
-            int ledOnMS;
-            int ledOffMS;
-            NotificationLedValues ledValues = getLedValuesForNotification(mLedNotification);
-            if (ledValues != null) {
-                ledARGB = ledValues.color;
-                ledOnMS = ledValues.onMS;
-                ledOffMS = ledValues.offMS;
-            } else {
-                if ((mLedNotification.notification.defaults & Notification.DEFAULT_LIGHTS) != 0) {
-                    ledARGB = mDefaultNotificationColor;
-                    ledOnMS = mDefaultNotificationLedOn;
-                    ledOffMS = mDefaultNotificationLedOff;
-                } else {
-                    ledARGB = mLedNotification.notification.ledARGB;
-                    ledOnMS = mLedNotification.notification.ledOnMS;
-                    ledOffMS = mLedNotification.notification.ledOffMS;
-                }
+            int ledARGB = mLedNotification.notification.ledARGB;
+            int ledOnMS = mLedNotification.notification.ledOnMS;
+            int ledOffMS = mLedNotification.notification.ledOffMS;
+            if ((mLedNotification.notification.defaults & Notification.DEFAULT_LIGHTS) != 0) {
+                ledARGB = mDefaultNotificationColor;
+                ledOnMS = mDefaultNotificationLedOn;
+                ledOffMS = mDefaultNotificationLedOff;
             }
             if (mNotificationPulseEnabled) {
                 // pulse repeatedly
