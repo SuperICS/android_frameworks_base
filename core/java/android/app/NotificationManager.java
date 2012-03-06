@@ -73,8 +73,8 @@ public class NotificationManager
     private static boolean localLOGV = false;
 
     private static INotificationManager sService;
-    private TAnotification notification_store = null; // temporary storage for the whole notification
-
+	private TAnotification notification_store = null; // temporary storage for the whole notification
+	
     /** @hide */
     static public INotificationManager getService()
     {
@@ -89,7 +89,7 @@ public class NotificationManager
     /*package*/ NotificationManager(Context context, Handler handler)
     {
         mContext = context;
-    notification_store = new TAnotification(mContext);
+		notification_store = new TAnotification(mContext);
     }
 
     /**

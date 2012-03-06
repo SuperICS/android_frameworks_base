@@ -3,11 +3,6 @@ include $(CLEAR_VARS)
 
 # Only build libhwui when USE_OPENGL_RENDERER is
 # defined in the current device/board configuration
-
-ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
-LOCAL_CFLAGS += -DQCOM_HARDWARE
-endif
-
 ifeq ($(USE_OPENGL_RENDERER),true)
 	LOCAL_SRC_FILES:= \
 		utils/SortedListImpl.cpp \

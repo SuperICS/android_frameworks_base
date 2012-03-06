@@ -16,36 +16,28 @@
 
 package com.android.systemui.statusbar.tablet;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.TimeZone;
+
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.database.ContentObserver;
-import android.graphics.Canvas;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.provider.Settings;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateFormat;
 import android.text.style.CharacterStyle;
-import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.TimeZone;
 
 import com.android.systemui.R;
 
@@ -55,12 +47,6 @@ public class HoloClock extends FrameLayout {
     private String mClockFormatString;
     private SimpleDateFormat mClockFormat;
 
-    private static final int AM_PM_STYLE_NORMAL  = 0;
-    private static final int AM_PM_STYLE_SMALL   = 1;
-    private static final int AM_PM_STYLE_GONE    = 2;
-
-    private static int AM_PM_STYLE = AM_PM_STYLE_GONE;
-
     private static final String FONT_DIR = "/system/fonts/";
     private static final String CLOCK_FONT = FONT_DIR + "AndroidClock_Solid.ttf";
     private static final String CLOCK_FG_FONT = FONT_DIR + "AndroidClock.ttf";
@@ -69,28 +55,12 @@ public class HoloClock extends FrameLayout {
     private static Typeface sBackgroundType, sForegroundType, sSolidType;
     private TextView mSolidText, mBgText, mFgText;
 
-    private int mAmPmStyle;
-    private boolean mShowClock;
+    public static final int STYLE_HIDE_CLOCK = 0;
+    public static final int STYLE_CLOCK_RIGHT = 1;
 
-    Handler mHandler;
-
-    class SettingsObserver extends ContentObserver {
-        SettingsObserver(Handler handler) {
-            super(handler);
-        }
-
-        void observe() {
-            ContentResolver resolver = mContext.getContentResolver();
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.STATUS_BAR_AM_PM), false, this);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.STATUS_BAR_CLOCK), false, this);
-        }
-
-        @Override public void onChange(boolean selfChange) {
-            updateSettings();
-        }
-    }
+    protected int mClockStyle = STYLE_CLOCK_RIGHT;
+    
+    protected int mClockColor = com.android.internal.R.color.holo_blue_light;
 
     public HoloClock(Context context) {
         this(context, null);
@@ -102,12 +72,6 @@ public class HoloClock extends FrameLayout {
 
     public HoloClock(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-
-        mHandler = new Handler();
-        SettingsObserver settingsObserver = new SettingsObserver(mHandler);
-        settingsObserver.observe();
-
-        updateSettings();
     }
 
     @Override
@@ -133,6 +97,8 @@ public class HoloClock extends FrameLayout {
         if (mSolidText != null) {
             mSolidText.setTypeface(sSolidType);
         }
+        
+        updateClockVisibility();
     }
 
     @Override
@@ -149,6 +115,10 @@ public class HoloClock extends FrameLayout {
             filter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
 
             getContext().registerReceiver(mIntentReceiver, filter, null, getHandler());
+            
+            SettingsObserver settingsObserver = new SettingsObserver(new Handler());
+            settingsObserver.observe();
+            updateSettings();
         }
 
         // NOTE: It's safe to do these after registering the receiver since the receiver always runs
@@ -192,50 +162,31 @@ public class HoloClock extends FrameLayout {
         if (mFgText != null) mFgText.setText(txt);
         if (mSolidText != null) mSolidText.setText(txt);
     }
-
+    
+    final void updateClockColor(int color) {
+        //if (mBgText != null) mBgText.setTextColor(color);
+        //if (mFgText != null) mFgText.setTextColor(color);
+        if (mSolidText != null) mSolidText.setTextColor(color);
+    }
+    
+    final void updateClockVisibility() {
+        if (mClockStyle == STYLE_CLOCK_RIGHT) {
+            if (mSolidText != null) mSolidText.setVisibility(View.VISIBLE);
+        } else {
+            if (mSolidText != null) mSolidText.setVisibility(View.GONE);
+        }
+    }
+    
     private final CharSequence getTimeText() {
         Context context = getContext();
         int res = DateFormat.is24HourFormat(context)
             ? com.android.internal.R.string.twenty_four_hour_time_format
             : com.android.internal.R.string.twelve_hour_time_format;
 
-        final char MAGIC1 = '\uEF00';
-        final char MAGIC2 = '\uEF01';
-
         SimpleDateFormat sdf;
         String format = context.getString(res);
         if (!format.equals(mClockFormatString)) {
-            /*
-             * Search for an unquoted "a" in the format string, so we can
-             * add dummy characters around it to let us find it again after
-             * formatting and change its size.
-             */
-            if (AM_PM_STYLE != AM_PM_STYLE_NORMAL) {
-                int a = -1;
-                boolean quoted = false;
-                for (int i = 0; i < format.length(); i++) {
-                    char c = format.charAt(i);
-
-                    if (c == '\'') {
-                        quoted = !quoted;
-                    }
-                    if (!quoted && c == 'a') {
-                        a = i;
-                        break;
-                    }
-                }
-
-                if (a >= 0) {
-                    // Move a back so any whitespace before AM/PM is also in the alternate size.
-                    final int b = a;
-                    while (a > 0 && Character.isWhitespace(format.charAt(a-1))) {
-                        a--;
-                    }
-                    format = format.substring(0, a) + MAGIC1 + format.substring(a, b)
-                        + "a" + MAGIC2 + format.substring(b + 1);
-                }
-            }
-
+            // we don't want AM/PM showing up in our statusbar, even in 12h mode
             format = format.replaceAll("a", "").trim();
             mClockFormat = sdf = new SimpleDateFormat(format);
             mClockFormatString = format;
@@ -243,52 +194,42 @@ public class HoloClock extends FrameLayout {
             sdf = mClockFormat;
         }
         String result = sdf.format(mCalendar.getTime());
-
-        if (AM_PM_STYLE != AM_PM_STYLE_NORMAL) {
-            int magic1 = result.indexOf(MAGIC1);
-            int magic2 = result.indexOf(MAGIC2);
-            if (magic1 >= 0 && magic2 > magic1) {
-                SpannableStringBuilder formatted = new SpannableStringBuilder(result);
-                if (AM_PM_STYLE == AM_PM_STYLE_GONE) {
-                    formatted.delete(magic1, magic2+1);
-                } else {
-                    if (AM_PM_STYLE == AM_PM_STYLE_SMALL) {
-                        CharacterStyle style = new RelativeSizeSpan(0.7f);
-                        formatted.setSpan(style, magic1, magic2,
-                                          Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-                    }
-                    formatted.delete(magic2, magic2 + 1);
-                    formatted.delete(magic1, magic1 + 1);
-                }
-                return formatted;
-            }
-        }
-
         return result;
     }
-
-    private void updateSettings(){
-        ContentResolver resolver = mContext.getContentResolver();
-
-        mAmPmStyle = (Settings.System.getInt(resolver,
-                Settings.System.STATUS_BAR_AM_PM, 2));
-
-        if (mAmPmStyle != AM_PM_STYLE) {
-            AM_PM_STYLE = mAmPmStyle;
-            mClockFormatString = "";
-
-            if (mAttached) {
-                updateClock();
-            }
+    
+    class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
         }
 
-        mShowClock = (Settings.System.getInt(resolver,
-                Settings.System.STATUS_BAR_CLOCK, 1) == 1);
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.STATUSBAR_CLOCK_STYLE), false, this);
+            resolver.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.STATUSBAR_CLOCK_COLOR), false, this);
+            updateSettings();
+        }
 
-        if(mShowClock)
-            setVisibility(View.VISIBLE);
-        else
-            setVisibility(View.GONE);
+        @Override
+        public void onChange(boolean selfChange) {
+            updateSettings();
+        }
+    }
+
+    protected void updateSettings() {
+        ContentResolver resolver = mContext.getContentResolver();
+
+        mClockColor = Settings.System.getInt(resolver, Settings.System.STATUSBAR_CLOCK_COLOR,
+                0xFF33B5E5);
+        if (mClockColor == Integer.MIN_VALUE) {
+            // flag to reset the color
+            mClockColor = 0xFF33B5E5;
+        }
+        updateClockColor(mClockColor);
+
+        mClockStyle = Settings.System.getInt(resolver, Settings.System.STATUSBAR_CLOCK_STYLE, 1);
+        updateClockVisibility();
     }
 }
 

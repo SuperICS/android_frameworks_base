@@ -41,11 +41,12 @@ import android.os.SystemProperties;
 import android.os.Vibrator;
 import android.os.storage.IMountService;
 import android.os.storage.IMountShutdownObserver;
-
-import com.android.internal.telephony.ITelephony;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.view.KeyEvent;
+
+import com.android.internal.telephony.ITelephony;
 
 public final class ShutdownThread extends Thread {
     // constants
@@ -107,6 +108,8 @@ public final class ShutdownThread extends Thread {
         final int resourceId = longPressBehavior == 2
                 ? com.android.internal.R.string.shutdown_confirm_question
                 : com.android.internal.R.string.shutdown_confirm;
+
+        Log.d(TAG, "Notifying thread to start shutdown longPressBehavior=" + longPressBehavior);
 
         if (confirm) {
             final AlertDialog dialog;

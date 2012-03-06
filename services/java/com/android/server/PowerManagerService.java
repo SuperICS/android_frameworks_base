@@ -16,10 +16,23 @@
 
 package com.android.server;
 
-import com.android.internal.app.IBatteryStats;
-import com.android.internal.app.ShutdownThread;
-import com.android.server.am.BatteryStatsService;
+import static android.provider.Settings.System.DIM_SCREEN;
+import static android.provider.Settings.System.SCREEN_BRIGHTNESS;
+import static android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE;
+import static android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC;
+import static android.provider.Settings.System.SCREEN_OFF_TIMEOUT;
+import static android.provider.Settings.System.STAY_ON_WHILE_PLUGGED_IN;
+import static android.provider.Settings.System.TRANSITION_ANIMATION_SCALE;
+import static android.provider.Settings.System.WINDOW_ANIMATION_SCALE;
 
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Observable;
+import java.util.Observer;
+
+import android.R;
 import android.app.ActivityManagerNative;
 import android.app.IActivityManager;
 import android.content.BroadcastReceiver;
@@ -54,25 +67,15 @@ import android.os.WorkSource;
 import android.os.SystemProperties;
 import android.provider.Settings.SettingNotFoundException;
 import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
 import android.util.EventLog;
 import android.util.Log;
 import android.util.Slog;
 import android.view.WindowManagerPolicy;
-import static android.provider.Settings.System.DIM_SCREEN;
-import static android.provider.Settings.System.SCREEN_BRIGHTNESS;
-import static android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE;
-import static android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC;
-import static android.provider.Settings.System.SCREEN_OFF_TIMEOUT;
-import static android.provider.Settings.System.STAY_ON_WHILE_PLUGGED_IN;
-import static android.provider.Settings.System.WINDOW_ANIMATION_SCALE;
-import static android.provider.Settings.System.TRANSITION_ANIMATION_SCALE;
 
-import java.io.FileDescriptor;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Observable;
-import java.util.Observer;
+import com.android.internal.app.IBatteryStats;
+import com.android.internal.app.ShutdownThread;
+import com.android.server.am.BatteryStatsService;
 
 public class PowerManagerService extends IPowerManager.Stub
         implements LocalPowerManager, Watchdog.Monitor {
@@ -256,6 +259,8 @@ public class PowerManagerService extends IPowerManager.Stub
     private int mWarningSpewThrottleCount;
     private long mWarningSpewThrottleTime;
     private int mAnimationSetting = ANIM_SETTING_OFF;
+    private boolean mAnimateCrtOff = false;
+    private boolean mAnimateCrtOn = false;
 
     // When using software auto-brightness, determines whether (true) button
     // and keyboard backlights should also be under automatic brightness
@@ -263,8 +268,6 @@ public class PowerManagerService extends IPowerManager.Stub
     // hard-coded brightness settings that timeout-to-off in subsequent screen
     // power states.
     private boolean mAutoBrightnessButtonKeyboard;
-    private boolean mAnimateCrtOff = false;
-    private boolean mAnimateCrtOn = false;
 
     // Must match with the ISurfaceComposer constants in C++.
     private static final int ANIM_SETTING_ON = 0x01;
@@ -682,7 +685,8 @@ public class PowerManagerService extends IPowerManager.Stub
                         + Settings.System.NAME + "=?) or ("
                         + Settings.System.NAME + "=?) or ("
                         + Settings.System.NAME + "=?)",
-                new String[]{STAY_ON_WHILE_PLUGGED_IN, SCREEN_OFF_TIMEOUT, DIM_SCREEN,
+                new String[] {
+                        STAY_ON_WHILE_PLUGGED_IN, SCREEN_OFF_TIMEOUT, DIM_SCREEN,
                         SCREEN_BRIGHTNESS_MODE, WINDOW_ANIMATION_SCALE, TRANSITION_ANIMATION_SCALE,
                         Settings.System.CRT_OFF_ANIMATION, Settings.System.CRT_ON_ANIMATION},
                 null);
@@ -2289,19 +2293,23 @@ public class PowerManagerService extends IPowerManager.Stub
             synchronized (mLocks) {
                 // we're turning off
                 final boolean turningOff = animating && targetValue == Power.BRIGHTNESS_OFF;
-                if (mAnimateScreenLights || !turningOff) {
+                final boolean crtAnimate = animating &&
+                        ((mAnimateCrtOff && targetValue == Power.BRIGHTNESS_OFF) ||
+                        (mAnimateCrtOn && (int) curValue == Power.BRIGHTNESS_OFF));
+
+                if (!crtAnimate && (mAnimateScreenLights || !turningOff)) {
                     long now = SystemClock.uptimeMillis();
                     boolean more = mScreenBrightness.stepLocked();
                     if (more) {
-                        mScreenOffHandler.postAtTime(this, now+(1000/60));
+                        mScreenOffHandler.postAtTime(this, now + (1000 / 60));
                     }
                 } else {
-                    // It's pretty scary to hold mLocks for this long, and we should
-                    // redesign this, but it works for now.
-                    nativeStartSurfaceFlingerAnimation(
-                            mScreenOffReason == WindowManagerPolicy.OFF_BECAUSE_OF_PROX_SENSOR
-                            ? 0 : mAnimationSetting);
-                    mScreenBrightness.jumpToTargetLocked();
+                        Slog.i(TAG, "animating: " + mAnimationSetting);
+                        // It's pretty scary to hold mLocks for this long, and we should
+                        // redesign this, but it works for now.
+                        nativeStartSurfaceFlingerAnimation(mScreenOffReason == WindowManagerPolicy.OFF_BECAUSE_OF_PROX_SENSOR
+                                ? 0 : mAnimationSetting);
+                        mScreenBrightness.jumpToTargetLocked(); 
                 }
             }
         }
