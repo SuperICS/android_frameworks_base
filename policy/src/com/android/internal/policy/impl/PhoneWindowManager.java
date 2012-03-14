@@ -512,10 +512,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     "fancy_rotation_anim"), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.ACCELEROMETER_ROTATION_ANGLES), false, this);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.ENABLE_FAST_TORCH), false, this);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.NAVIGATION_BAR_BUTTONS_HIDE), false, this);
             updateSettings();
         }
 
@@ -1055,16 +1051,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Surface.ROTATION_0);
             mUserRotationAngles = Settings.System.getInt(resolver,
                     Settings.System.ACCELEROMETER_ROTATION_ANGLES, -1);
-            mEnableQuickTorch = Settings.System.getInt(resolver, Settings.System.ENABLE_FAST_TORCH,
-                    0) == 1;
-            boolean hasNavBarChanged = Settings.System.getInt(resolver, Settings.System.NAVIGATION_BAR_BUTTONS_HIDE,
-                            0) == 0;
-            if (mHasNavigationBar != hasNavBarChanged) { 
-            	// NavBar setting has changed, need to reset screen.
-            	mHasNavigationBar = hasNavBarChanged;
-            	setInitialDisplaySize(mUnrestrictedScreenWidth,mUnrestrictedScreenHeight);
-            }
-
             if (mAccelerometerDefault != accelerometerDefault) {
                 mAccelerometerDefault = accelerometerDefault;
                 updateOrientationListenerLp();

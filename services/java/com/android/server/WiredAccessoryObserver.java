@@ -116,7 +116,8 @@ class WiredAccessoryObserver extends UEventObserver {
                            ((state == 1) ? BIT_HDMI_AUDIO : 0));
         } else if (name.equals("Headset")) {
             switchState = ((mHeadsetState & (BIT_HDMI_AUDIO|BIT_USB_HEADSET_ANLG|
-                                             BIT_USB_HEADSET_DGTL)) | (state &  (BIT_HEADSET|BIT_HEADSET_NO_MIC)));
+                                             BIT_USB_HEADSET_DGTL)) |
+                                             (state & (BIT_HEADSET|BIT_HEADSET_NO_MIC)));
         } else {
             switchState = ((mHeadsetState & (BIT_HDMI_AUDIO|BIT_USB_HEADSET_ANLG|
                                              BIT_USB_HEADSET_DGTL)) |
