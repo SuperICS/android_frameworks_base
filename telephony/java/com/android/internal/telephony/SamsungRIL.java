@@ -796,7 +796,8 @@ public class SamsungRIL extends RIL implements CommandsInterface {
         return response;
     }
 
-    @Override
+
+	    @Override
     protected Object
     responseSignalStrength(Parcel p) {
         int numInts = 12;
@@ -804,6 +805,15 @@ public class SamsungRIL extends RIL implements CommandsInterface {
 
         /* TODO: Add SignalStrength class to match RIL_SignalStrength */
         response = new int[numInts];
+		
+		if("SPH-D710".equals(SystemProperties.get("ro.product.device"))){
+			for(int i = 0 ; i < numInts ; i++){
+				response[i] = p.readInt();
+			}
+
+			return response;
+		}
+		
         for (int i = 0 ; i < 7 ; i++) {
             response[i] = p.readInt();
         }
@@ -811,8 +821,8 @@ public class SamsungRIL extends RIL implements CommandsInterface {
         for (int i = 7; i < numInts; i++) {
             response[i] = -1;
         }
-
-        if (mIsSamsungCdma)
+		
+		if (mIsSamsungCdma)
             // Framework takes care of the rest for us.
             return response;
 
