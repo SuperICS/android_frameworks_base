@@ -1230,7 +1230,6 @@
     <string name="global_action_screenshot">Beeldschermafdruk</string>
     <string name="reboot_reboot">Normaal herstarten</string>
     <string name="reboot_progress">Herstarten\u2026</string>
-    <string name="reboot_confirm">Uw telefoon zal worden herstart.</string>
     <string name="global_action_reboot">Herstarten</string>
     <string name="app_killed_message">App geforceerd afgesloten</string>
 </resources>

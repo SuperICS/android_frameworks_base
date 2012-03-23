@@ -2734,6 +2734,21 @@ public final class Settings {
         /**
          * @hide
          */
+        public static final String STATUSBAR_CLOCK_WEEKDAY = "statusbar_clock_weekday";
+
+        /**
+         * @hide
+         */
+        public static final String STATUS_BAR_TRANSPARENCY = "status_bar_transparency";
+
+        /**
+         * @hide
+         */
+        public static final String STATUS_BAR_LAYOUT = "status_bar_layout";
+
+        /**
+         * @hide
+         */
         public static final String POWER_DIALOG_SHOW_POWER_SAVER = "power_dialog_show_power_saver";
 
         /**
@@ -2828,6 +2843,13 @@ public final class Settings {
          */
         public static final String NAVIGATION_BAR_BUTTONS_HIDE = "navigation_bar_buttons_hide";
         
+		/**
+         * Order of phone navigation buttons
+         *
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_BUTTONS_SHOW = "navigation_bar_buttons_show";
+
         /**
          * launch a custom app for sms
          * 
@@ -2907,12 +2929,25 @@ public final class Settings {
          * @hide
          */
         public static final String VOLUME_MUSIC_CONTROLS = "volume_music_controls";
+
+        /**
+         * Setting to use lockscreen alongside secure lock
+         * @hide
+         */
+        public static final String SHOW_LOCK_BEFORE_UNLOCK = "show_lock_before_unlock";
+  
         
         /**
          * Setting to allow % on lockscreen always showing.
          * @hide
          */
         public static final String LOCKSCREEN_BATTERY = "lockscreen_battery";
+
+		/**
+         * custom lockscreen text color
+         * @hide
+         */
+        public static final String LOCKSCREEN_CUSTOM_TEXT_COLOR = "lockscreen_custom_text_color";
 
         /**
          * The action to take when long pressing home
@@ -2950,6 +2985,9 @@ public final class Settings {
          * 0 = stock
          * 1 = quad
          * 2 = octo
+         * 3 = aosp
+         * 4 = rotary
+         * 5 = ring
          * 
          * @hide
          */
@@ -3036,6 +3074,11 @@ public final class Settings {
          * @hide
          */
         public static final String WEATHER_SHOW_LOCATION = "weather_show_location";
+        
+        /**
+         * @hide
+         */
+        public static final String WEATHER_STATUSBAR_STYLE = "weather_statusbar_style";
 
         /**
          * Whether to enable torch by long pressing power from a screen-off state
@@ -3064,6 +3107,16 @@ public final class Settings {
          * @hide
          */
         public static final String STATUSBAR_HIDE_SIGNAL_BARS = "statusbar_hide_signal_bars";
+
+        /**
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_HEIGHT = "navigation_bar_height";
+
+        /**
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_WIDTH = "navigation_bar_width";
     }
 
     /**

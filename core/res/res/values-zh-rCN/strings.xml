@@ -147,7 +147,6 @@
     <string name="reboot_fastboot">"快速启动"</string>
     <string name="reboot_download">"下载"</string>
     <string name="reboot_progress">"正在重启..."</string>
-    <string name="reboot_confirm">"您的手机会重启。"</string>
     <!-- no translation found for silent_mode_silent (319298163018473078) -->
     <skip />
     <!-- no translation found for silent_mode_vibrate (7072043388581551395) -->
