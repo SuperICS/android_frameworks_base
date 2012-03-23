@@ -2836,6 +2836,15 @@ public final class Settings {
          *
          * @hide
          */
+<<<<<<< HEAD
+        public static final String NAVIGATION_BAR_BUTTONS_SHOW = "navigation_bar_buttons_show";
+        /**
+         * whether volume keys wake the screen. boolean value
+         * 
+         * @hide
+         */
+        public static final String VOLUME_WAKE_SCREEN = "volume_wake_screen";
+=======
         public static final String NAVIGATION_BAR_BUTTONS_HIDE = "navigation_bar_buttons_hide";
         
 		/**
@@ -2844,6 +2853,7 @@ public final class Settings {
          * @hide
          */
         public static final String NAVIGATION_BAR_BUTTONS_SHOW = "navigation_bar_buttons_show";
+>>>>>>> 021ca427f8cb2000aec0fff759f2dc2a61958608
 
         /**
          * launch a custom app for sms

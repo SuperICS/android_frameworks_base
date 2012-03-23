@@ -157,8 +157,6 @@
 
     <!-- Reboot Progress Dialog. This is shown if the user chooses to reboot the phone. -->
     <string name="reboot_progress">Neu starten\u2026</string>
-    <!-- Reboot Confirmation Dialog.  When the user chooses to reboot the phone, there will be a confirmation dialog.  This is the message. -->
-    <string name="reboot_confirm">Telefon wird neu gestartet.</string>
 
     <!-- no translation found for silent_mode_silent (319298163018473078) -->
     <skip />

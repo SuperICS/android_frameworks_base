@@ -140,7 +140,7 @@
     <string name="reboot_system">Επανεκκίνηση τηλεφώνου</string>
     <string name="reboot_reboot">Επανεκκίνηση</string>
     <string name="reboot_progress">Επανεκκίνηση\u2026</string>
-    <string name="reboot_confirm">Το τηλέφωνό σας θα επανεκκινηθεί.</string>
+
     <!-- no translation found for silent_mode_silent (319298163018473078) -->
     <skip />
     <!-- no translation found for silent_mode_vibrate (7072043388581551395) -->
