@@ -272,7 +272,7 @@ public class PowerManagerService extends IPowerManager.Stub
     // Must match with the ISurfaceComposer constants in C++.
     private static final int ANIM_SETTING_ON = 0x01;
     private static final int ANIM_SETTING_OFF = 0x10;
-
+    
     // Custom light housekeeping
     private long mLightSettingsTag = -1;
 
@@ -504,7 +504,7 @@ public class PowerManagerService extends IPowerManager.Stub
 
                 // DIM_SCREEN
                 //mDimScreen = getInt(DIM_SCREEN) != 0;
-
+                               
                 updateLightSettings();
 
                 // SCREEN_BRIGHTNESS_MODE, default to manual
@@ -684,10 +684,12 @@ public class PowerManagerService extends IPowerManager.Stub
                         + Settings.System.NAME + "=?) or ("
                         + Settings.System.NAME + "=?) or ("
                         + Settings.System.NAME + "=?) or ("
+                        + Settings.System.NAME + "=?) or ("
                         + Settings.System.NAME + "=?)",
                 new String[] {
                         STAY_ON_WHILE_PLUGGED_IN, SCREEN_OFF_TIMEOUT, DIM_SCREEN,
                         SCREEN_BRIGHTNESS_MODE, WINDOW_ANIMATION_SCALE, TRANSITION_ANIMATION_SCALE,
+                        Settings.System.LIGHTS_CHANGED,
                         Settings.System.CRT_OFF_ANIMATION, Settings.System.CRT_ON_ANIMATION},
                 null);
         mSettings = new ContentQueryMap(settingsCursor, Settings.System.NAME, true, mHandler);
@@ -2707,7 +2709,7 @@ public class PowerManagerService extends IPowerManager.Stub
                 int value = (int)mLightSensorValue;
                 mLightSensorValue = -1;
                 resetLastLightValues();
-                lightSensorChangedLocked(value);
+                lightSensorChangedLocked(value);   
                 lightFilterReset((int)mLightSensorValue);
             }
         }
@@ -2742,10 +2744,10 @@ public class PowerManagerService extends IPowerManager.Stub
             mLightSensorValue = value;
             if ((mPowerState & BATTERY_LOW_BIT) == 0) {
                 // use maximum light sensor value seen since screen went on for LCD to avoid flicker
-                // we only do this if we are undocked, since lighting should be stable when
+                // we only do this if we are docked, since lighting should be stable when
                 // stationary in a dock.
                 int lcdValue = getAutoBrightnessValue(
-                        (mIsDocked ? value : mHighestLightSensorValue),
+                        (!mIsDocked ? value : mHighestLightSensorValue),
                         mLastLcdValue,
                         (mCustomLightEnabled ? mCustomLightLevels : mAutoBrightnessLevels),
                         (mCustomLightEnabled ? mCustomLcdValues : mLcdBacklightValues));
@@ -3508,7 +3510,7 @@ public class PowerManagerService extends IPowerManager.Stub
                 if (mDebugLightSensor) {
                     Slog.d(TAG, "onSensorChanged: light value: " + value);
                 }
-
+                mHandler.removeCallbacks(mAutoBrightnessTask);
                 mLightFilterSample = value;
                 if (mAutoBrightessEnabled && mLightFilterEnabled) {
                     if (mLightFilterRunning && mLightSensorValue != -1) {
@@ -3544,18 +3546,12 @@ public class PowerManagerService extends IPowerManager.Stub
                     return;
                 }
 
-                if (mLightSensorValue == -1 ||
-                        milliseconds < mLastScreenOnTime + mLightSensorWarmupTime) {
-                    // process the value immediately if screen has just turned on
-                    mHandler.removeCallbacks(mAutoBrightnessTask);
-                    mLightSensorPendingDecrease = false;
-                    mLightSensorPendingIncrease = false;
-                    lightSensorChangedLocked(value);
-                } else {
-                    if ((value > mLightSensorValue && mLightSensorPendingDecrease) ||
-                            (value < mLightSensorValue && mLightSensorPendingIncrease) ||
-                            (value == mLightSensorValue) ||
-                            (!mLightSensorPendingDecrease && !mLightSensorPendingIncrease)) {
+                if (mLightSensorValue != value) {
+                    if (mLightSensorValue == -1 ||
+                            milliseconds < mLastScreenOnTime + mLightSensorWarmupTime) {
+                        // process the value immediately if screen has just turned on
+                        lightSensorChangedLocked(value);
+                    } else {
                         // delay processing to debounce the sensor
                         mHandler.removeCallbacks(mAutoBrightnessTask);
                         mLightSensorPendingDecrease = (value < mLightSensorValue);
@@ -3564,9 +3560,9 @@ public class PowerManagerService extends IPowerManager.Stub
                             mLightSensorPendingValue = value;
                             mHandler.postDelayed(mAutoBrightnessTask, LIGHT_SENSOR_DELAY);
                         }
-                    } else {
+                    }                    
+                } else {
                         mLightSensorPendingValue = value;
-                    }
                 }
             }
         }

@@ -17,6 +17,9 @@
 package com.android.systemui.statusbar.policy.toggles;
 
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.android.systemui.R;
 
@@ -29,20 +32,32 @@ public class SwaggerToggle extends Toggle {
         super(c);
 
         setLabel(R.string.toggle_swagger);
-        setIcon(R.drawable.toggle_swagger);
+        if (mToggle.isChecked())
+            setIcon(R.drawable.toggle_swagger);
+        else
+            setIcon(R.drawable.toggle_swagger_off);
 
     }
 
     @Override
     protected void onCheckChanged(boolean isChecked) {
-        if (isChecked)
+        if (isChecked) {
             swaggerOn = true;
+            mContext.sendBroadcast(new Intent("LEAK_BUTT3R"));
+            Log.e("SWAGGER", "CAUTION: Swagger has been turned on.");
+        }
         if (swaggerOn)
             mToggle.setChecked(true);
+
+        if (mToggle.isChecked())
+            setIcon(R.drawable.toggle_swagger);
+        else
+            setIcon(R.drawable.toggle_swagger_off);
     }
 
     @Override
     protected boolean onLongPress() {
+        Toast.makeText(mContext, "Swagga baby!", Toast.LENGTH_LONG).show();
         return true;
     }
 

@@ -249,9 +249,7 @@ public class NotificationManagerService extends INotificationManager.Stub
         public int offMS;
     }
 
-    private StatusBarManagerService.NotificationCallbacks mNotificationCallbacks
-            = new StatusBarManagerService.NotificationCallbacks() {
-
+    private StatusBarManagerService.NotificationCallbacks mNotificationCallbacks = new StatusBarManagerService.NotificationCallbacks() {
         public void onSetDisabled(int status) {
             synchronized (mNotificationList) {
                 mDisabledNotifications = status;
@@ -402,6 +400,12 @@ public class NotificationManagerService extends INotificationManager.Stub
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_LIGHT_PULSE), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
+		            Settings.System.NOTIFICATION_LIGHT_OFF), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_LIGHT_ON), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_LIGHT_COLOR), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_LIGHT_PULSE_DEFAULT_COLOR), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_LIGHT_PULSE_DEFAULT_LED_ON), false, this);
@@ -422,7 +426,12 @@ public class NotificationManagerService extends INotificationManager.Stub
 
         public void update() {
             ContentResolver resolver = mContext.getContentResolver();
-            
+            boolean pulseEnabled = Settings.System.getInt(resolver,
+                    Settings.System.NOTIFICATION_LIGHT_PULSE, 0) != 0;
+            if (mNotificationPulseEnabled != pulseEnabled) {
+                mNotificationPulseEnabled = pulseEnabled;
+                updateNotificationPulse();
+			}
             // LED enabled
             mNotificationPulseEnabled = Settings.System.getInt(resolver,
                     Settings.System.NOTIFICATION_LIGHT_PULSE, 0) != 0;
@@ -928,7 +937,7 @@ public class NotificationManagerService extends INotificationManager.Stub
                         .getSystemService(Context.AUDIO_SERVICE);
                 // sound
                 final boolean useDefaultSound =
-                    (notification.defaults & Notification.DEFAULT_SOUND) != 0;
+                        (notification.defaults & Notification.DEFAULT_SOUND) != 0;
                 if (!(inQuietHours && mQuietHoursMute)
                         && (useDefaultSound || notification.sound != null)) {
                     Uri uri;
@@ -959,7 +968,7 @@ public class NotificationManagerService extends INotificationManager.Stub
 
                 // vibrate
                 final boolean useDefaultVibrate =
-                    (notification.defaults & Notification.DEFAULT_VIBRATE) != 0;
+                        (notification.defaults & Notification.DEFAULT_VIBRATE) != 0;
                 if (!(inQuietHours && mQuietHoursStill)
                         && (useDefaultVibrate || notification.vibrate != null)
                         && audioManager.shouldVibrate(AudioManager.VIBRATE_TYPE_NOTIFICATION)) {
@@ -1220,45 +1229,18 @@ public class NotificationManagerService extends INotificationManager.Stub
             }
         }
 
-        boolean wasScreenOn = mWasScreenOn;
-        mWasScreenOn = false;
-
-        if (mLedNotification == null) {
-            mNotificationLight.turnOff();
-            return;
-        }
-
-        // We can assume that if the user turned the screen off while there was
-        // still an active notification then they wanted to keep the notification
-        // for later. In this case we shouldn't flash the notification light.
-        // For special notifications that automatically turn the screen on (such
-        // as missed calls), we use this flag to force the notification light
-        // even if the screen was turned off.
-        boolean forceWithScreenOff = (mLedNotification.notification.flags &
-                Notification.FLAG_FORCE_LED_SCREEN_OFF) != 0;
-
-        // Don't flash while we are in a call, screen is on or we are in quiet hours with light dimmed
-        if (mInCall || mScreenOn || (inQuietHours() && mQuietHoursDim) || (wasScreenOn && !forceWithScreenOff)) {
+        // Don't flash while we are in a call or screen is on
+				// Depending on ROMControl "Screen ON flash" flag
+        if (mLedNotification == null || mInCall || (mScreenOn && !ledScreenOn)) {
             mNotificationLight.turnOff();
         } else {
-            int ledARGB;
-            int ledOnMS;
-            int ledOffMS;
-            NotificationLedValues ledValues = getLedValuesForNotification(mLedNotification);
-            if (ledValues != null) {
-                ledARGB = ledValues.color;
-                ledOnMS = ledValues.onMS;
-                ledOffMS = ledValues.offMS;
-            } else {
-                if ((mLedNotification.notification.defaults & Notification.DEFAULT_LIGHTS) != 0) {
-                    ledARGB = mDefaultNotificationColor;
-                    ledOnMS = mDefaultNotificationLedOn;
-                    ledOffMS = mDefaultNotificationLedOff;
-                } else {
-                    ledARGB = mLedNotification.notification.ledARGB;
-                    ledOnMS = mLedNotification.notification.ledOnMS;
-                    ledOffMS = mLedNotification.notification.ledOffMS;
-                }
+            int ledARGB = mLedNotification.notification.ledARGB;
+            int ledOnMS = mLedNotification.notification.ledOnMS;
+            int ledOffMS = mLedNotification.notification.ledOffMS;
+            if ((mLedNotification.notification.defaults & Notification.DEFAULT_LIGHTS) != 0) {
+                ledARGB = mDefaultNotificationColor;
+                ledOnMS = mDefaultNotificationLedOn;
+                ledOffMS = mDefaultNotificationLedOff;
             }
             if (mNotificationPulseEnabled) {
                 // pulse repeatedly
