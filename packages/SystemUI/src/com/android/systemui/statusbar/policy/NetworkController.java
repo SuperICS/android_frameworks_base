@@ -959,7 +959,10 @@ public class NetworkController extends BroadcastReceiver {
                 combinedSignalIconId = mDataSignalIconId; // set by updateDataIcon()
                 mContentDescriptionCombinedSignal = mContentDescriptionDataType;
             }
+<<<<<<< HEAD
 >>>>>>> Stop showing "No internet connection" when there is one.
+=======
+>>>>>>> frameworks/base: SystemUI: fix merge error in NetworkController
         }
 
         if (mWifiConnected) {
