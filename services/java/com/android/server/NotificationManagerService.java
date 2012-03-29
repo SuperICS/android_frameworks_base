@@ -23,8 +23,12 @@ import android.app.IActivityManager;
 import android.app.INotificationManager;
 import android.app.ITransientNotification;
 import android.app.Notification;
+import android.app.NotificationGroup;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Profile;
+import android.app.ProfileGroup;
+import android.app.ProfileManager;
 import android.app.StatusBarManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -927,6 +931,16 @@ public class NotificationManagerService extends INotificationManager.Stub
                 }
             }
 
+            try {
+                final ProfileManager profileManager =
+                        (ProfileManager) mContext.getSystemService(Context.PROFILE_SERVICE);
+
+                ProfileGroup group = profileManager.getActiveProfileGroup(pkg);
+                notification = group.processNotification(notification);
+            } catch(Throwable th) {
+                Log.e(TAG, "An error occurred profiling the notification.", th);
+            }
+
             // If we're not supposed to beep, vibrate, etc. then don't.
             if (((mDisabledNotifications & StatusBarManager.DISABLE_NOTIFICATION_ALERTS) == 0)
                     && (!(old != null
@@ -1255,7 +1269,7 @@ public class NotificationManagerService extends INotificationManager.Stub
             return;
         }
 
-        for (String packageValuesString : customLedValuesString.split("|")) {
+        for (String packageValuesString : customLedValuesString.split("\\|")) {
             String[] packageValues = packageValuesString.split("=");
             if (packageValues.length != 2) {
                 Log.e(TAG, "Error parsing custom led values for unknown package");
