@@ -1253,12 +1253,6 @@
     <!-- Reboot Progress Dialog. This is shown if the user chooses to reboot the phone. -->
     <string name="reboot_progress">다시 시작하는 중\u2026</string>
 
-    <!-- Spoken description for ringer silent option. [CHAR LIMIT=NONE] -->
-    <string name="silent_mode_silent">소리 끄기</string>
-    <!-- Spoken description for ringer vibrate option. [CHAR LIMIT=NONE] -->
-    <string name="silent_mode_vibrate">진동 모드</string>
-    <!-- Spoken description for ringer normal option. [CHAR LIMIT=NONE] -->
-    <string name="silent_mode_ring">소리 켜기</string>
     <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
     <string name="permlab_preventpower">전원 버튼 작동 제한</string>
 
