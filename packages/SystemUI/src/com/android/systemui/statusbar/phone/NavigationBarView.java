@@ -75,7 +75,6 @@ public class NavigationBarView extends LinearLayout {
     boolean mHidden, mLowProfile, mShowMenu;
     int mDisabledFlags = 0;
 
-//<<<<<<< HEAD
     public final static int SHOW_LEFT_MENU = 1;
     public final static int SHOW_RIGHT_MENU = 0;
     public final static int SHOW_BOTH_MENU = 2;
@@ -113,7 +112,6 @@ public class NavigationBarView extends LinearLayout {
         return mCurrentView.findViewById(R.id.search);
     }
 
-//=======
     // workaround for LayoutTransitions leaving the nav buttons in a weird state (bug 5549288)
     final static boolean WORKAROUND_INVALID_LAYOUT = true;
     final static int MSG_CHECK_INVALID_LAYOUT = 8686;
@@ -143,7 +141,6 @@ public class NavigationBarView extends LinearLayout {
 
     private H mHandler = new H();
 
-//>>>>>>> caf1c3f6ee32b980eeee9eb16427efbaa199345f
     public View getRecentsButton() {
         return mCurrentView.findViewById(R.id.recent_apps);
     }
