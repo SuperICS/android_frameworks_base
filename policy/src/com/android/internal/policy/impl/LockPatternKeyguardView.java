@@ -735,6 +735,9 @@ public class LockPatternKeyguardView extends KeyguardViewBase implements Handler
     public void onRefreshWeatherInfo(Intent weatherIntent)
     {}
     @Override
+    public void onRefreshCalendarInfo()
+    {}
+    @Override
     public void onTimeChanged() {}
     @Override
     public void onRefreshCarrierInfo(CharSequence plmn, CharSequence spn) {}

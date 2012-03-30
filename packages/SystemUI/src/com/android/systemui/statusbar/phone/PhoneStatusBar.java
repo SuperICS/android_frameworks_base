@@ -62,6 +62,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
@@ -100,6 +101,7 @@ import com.android.systemui.statusbar.policy.LocationController;
 import com.android.systemui.statusbar.policy.NetworkController;
 import com.android.systemui.statusbar.policy.NotificationRowLayout;
 import com.android.systemui.statusbar.policy.toggles.TogglesView;
+import com.android.systemui.statusbar.policy.WeatherPanel;
 
 public class PhoneStatusBar extends StatusBar {
     static final String TAG = "PhoneStatusBar";
@@ -124,6 +126,7 @@ public class PhoneStatusBar extends StatusBar {
     private static final int MSG_HIDE_INTRUDER = 1003;
     private static final int MSG_OPEN_RECENTS_PANEL = 1020;
     private static final int MSG_CLOSE_RECENTS_PANEL = 1021;
+    private static final int MSG_SAMSUNG_MAGIC = 2000;
 
     // will likely move to a resource or other tunable param at some point
     private static final int INTRUDER_ALERT_DECAY_MS = 10000;
@@ -190,6 +193,9 @@ public class PhoneStatusBar extends StatusBar {
     RelativeLayout.LayoutParams mSettingswoClearParams;
 
     boolean mWeatherPanelEnabled;
+    WeatherPanel mWeatherPanel1;
+    WeatherPanel mWeatherPanel2;
+    
     TogglesView mQuickToggles;
     BrightnessController mBrightness;
 
@@ -251,6 +257,12 @@ public class PhoneStatusBar extends StatusBar {
     int mLinger = 0;
     Runnable mPostCollapseCleanup = null;
 
+    private int mIsBrightNessMode = 0;
+    private boolean mIsStatusBarBrightNess;
+    private boolean mIsAutoBrightNess;
+    private BrightNessContentObserver mBrightNessContentObs = new BrightNessContentObserver();
+    private Float mPropFactor;
+
     boolean mQuickTogglesHideAfterCollapse = true;
 
     LinearLayout mCenterClockLayout;
@@ -262,35 +274,6 @@ public class PhoneStatusBar extends StatusBar {
     int mSystemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE;
 
     DisplayMetrics mDisplayMetrics = new DisplayMetrics();
-
-    class SettingsObserver extends ContentObserver {
-        SettingsObserver(Handler handler) {
-            super(handler);
-        }
-
-        void observe() {
-            ContentResolver resolver = mContext.getContentResolver();
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.STATUS_BAR_BRIGHTNESS_CONTROL), false, this);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SCREEN_BRIGHTNESS_MODE), false, this);
-            update();
-        }
-
-        @Override
-        public void onChange(boolean selfChange) {
-            update();
-        }
-
-        public void update() {
-            ContentResolver resolver = mContext.getContentResolver();
-            mBrightnessControl = Settings.System.getInt(resolver,
-                    Settings.System.STATUS_BAR_BRIGHTNESS_CONTROL, 0) != 0;
-            mAutoBrightness = Settings.System.getInt(resolver,
-                    Settings.System.SCREEN_BRIGHTNESS_MODE, 0) ==
-                    Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC;
-        }
-    }
 
     private class ExpandedDialog extends Dialog {
         ExpandedDialog(Context context) {
@@ -411,6 +394,8 @@ public class PhoneStatusBar extends StatusBar {
         mSettingsButton.setOnLongClickListener(mSettingsLongClickListener);
         mSettingswoClearParams = (RelativeLayout.LayoutParams) mSettingsButton.getLayoutParams();
         mSettingswClearParams = new RelativeLayout.LayoutParams(mSettingswoClearParams);
+        mWeatherPanel1 = (WeatherPanel) expanded.findViewById(R.id.wp1);
+        mWeatherPanel2 = (WeatherPanel) expanded.findViewById(R.id.wp2);
 
         mScrollView = (ScrollView) expanded.findViewById(R.id.scroll);
 
@@ -444,6 +429,15 @@ public class PhoneStatusBar extends StatusBar {
                 mExpandedContents = mQuickToggles;
             }
 
+            if (layout_type == 2) {
+                expanded.addView(mQuickToggles);
+                expanded.addView(drawer_header_hr2);
+                expanded.addView(drawer_header);
+                expanded.addView(drawer_header_hr);
+                expanded.addView(notifications);
+                mExpandedContents = mQuickToggles;
+            }
+
         }
 
         mTicker = new MyTicker(context, sb);
@@ -457,9 +451,6 @@ public class PhoneStatusBar extends StatusBar {
         mCloseView.mService = this;
 
         mEdgeBorder = res.getDimensionPixelSize(R.dimen.status_bar_edge_ignore);
-
-        // set the inital view visibility
-        setAreThereNotifications();
 
         // Other icons
         mLocationController = new LocationController(mContext); // will post a
@@ -496,7 +487,56 @@ public class PhoneStatusBar extends StatusBar {
                 Settings.System.STATUSBAR_TOGGLES_VISIBILITY, 1) == 1 ? View.VISIBLE : View.GONE);
         mQuickToggles.setBar(this);
 
+        mIsStatusBarBrightNess = Settings.System.getInt(mStatusBarView.getContext()
+                .getContentResolver(),
+                Settings.System.STATUS_BAR_BRIGHTNESS_TOGGLE, 0) == 1;
+        if (mIsStatusBarBrightNess) {
+            mIsAutoBrightNess = checkAutoBrightNess();
+            mContext.getContentResolver().registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS_MODE), false,
+                    mBrightNessContentObs);
+            updatePropFactorValue();
+        }
+
         return sb;
+    }
+
+    private boolean checkAutoBrightNess() {
+        return Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.SCREEN_BRIGHTNESS_MODE,
+                Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC;
+    }
+
+    private void doBrightNess(MotionEvent e) {
+        int screenBrightness = checkMinMax(Float.valueOf((e.getRawX() * mPropFactor.floatValue()))
+                .intValue());
+        Settings.System.putInt(mContext.getContentResolver(), "screen_brightness", screenBrightness);
+        // Log.e(TAG, "Screen brightness: " + screenBrightness);
+        try {
+            IPowerManager pw = IPowerManager.Stub.asInterface(ServiceManager.getService("power"));
+            if (pw != null) {
+                pw.setBacklightBrightness(screenBrightness);
+            }
+        } catch (RemoteException e1) {
+        }
+    }
+
+    private int checkMinMax(int brightness) {
+        int min = 0;
+        int max = 255;
+
+        if (min > brightness) // brightness < 0x1E
+            return min;
+        else if (max < brightness) { // brightness > 0xFF
+            return max;
+        }
+
+        return brightness;
+    }
+
+    private void updatePropFactorValue() {
+        mPropFactor = Float.valueOf((float) android.os.Power.BRIGHTNESS_ON
+                / Integer.valueOf(mDisplay.getWidth()).floatValue());
     }
 
     protected WindowManager.LayoutParams getRecentsLayoutParams(LayoutParams layoutParams) {
@@ -724,7 +764,7 @@ public class PhoneStatusBar extends StatusBar {
         }
 
         // Recalculate the position of the sliding windows and the titles.
-        setAreThereNotifications();
+        reDrawHeader();
         updateExpandedViewPos(EXPANDED_LEAVE_ALONE);
     }
 
@@ -830,7 +870,7 @@ public class PhoneStatusBar extends StatusBar {
         }
 
         // Recalculate the position of the sliding windows and the titles.
-        setAreThereNotifications();
+        reDrawHeader();
         updateExpandedViewPos(EXPANDED_LEAVE_ALONE);
     }
 
@@ -850,7 +890,7 @@ public class PhoneStatusBar extends StatusBar {
             }
         }
 
-        setAreThereNotifications();
+        reDrawHeader();
     }
 
     @Override
@@ -1287,6 +1327,13 @@ public class PhoneStatusBar extends StatusBar {
                         mRecentsPanel.show(false, true);
                     }
                     break;
+                case MSG_SAMSUNG_MAGIC:
+                    if (mIsStatusBarBrightNess) {
+                        mIsBrightNessMode = 1;
+                        updateExpandedViewPos(0);
+                        performCollapse();
+                    }
+                    break;
             }
         }
     }
@@ -1630,6 +1677,14 @@ public class PhoneStatusBar extends StatusBar {
                 if (x >= edgeBorder && x < mDisplayMetrics.widthPixels - edgeBorder) {
                     prepareTracking(y, !mExpanded);// opening if we're not already fully visible
                     trackMovement(event);
+
+                    if (mIsStatusBarBrightNess) {
+                        mIsBrightNessMode = 0;
+                        if (!mIsAutoBrightNess) {
+                            mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_SAMSUNG_MAGIC),
+                                    ViewConfiguration.getGlobalActionKeyTimeout() * 2);
+                        }
+                    }
                 }
             }
         } else if (mTracking) {
@@ -1637,34 +1692,21 @@ public class PhoneStatusBar extends StatusBar {
             final int minY = statusBarSize + mCloseView.getHeight();
             if (action == MotionEvent.ACTION_MOVE) {
                 if (mAnimatingReveal && y < minY) {
-                    if (mBrightnessControl && !mAutoBrightness) {
-                        mVelocityTracker.computeCurrentVelocity(1000);
-                        float yVel = mVelocityTracker.getYVelocity();
-                        yVel = Math.abs(yVel);
-                        if (yVel < 50.0f) {
-                            if (mLinger > 20) {
-                                float x = (float) event.getRawX();
-                                int newBrightness = (int) Math.round(((x / mScreenWidth) * android.os.Power.BRIGHTNESS_ON));
-                                newBrightness = Math.min(newBrightness, android.os.Power.BRIGHTNESS_ON);
-                                newBrightness = Math.max(newBrightness, mMinBrightness);
-                                try {
-                                    IPowerManager power = IPowerManager.Stub.asInterface(ServiceManager.getService("power"));
-                                    if (power != null) {
-                                        power.setBacklightBrightness(newBrightness);
-                                        Settings.System.putInt(mContext.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS,
-                                                newBrightness);
-                                    }
-                                } catch (RemoteException e) {
-                                    Slog.w(TAG, "Setting Brightness failed: " + e);
-                                }
-                            } else {
-                                mLinger++;
-                            }
-                        } else {
-                            mLinger = 0;
-                        }
+                    // samsung brightness
+                    if (mIsStatusBarBrightNess && mIsBrightNessMode == 1) {
+                        doBrightNess(event);
                     }
                 } else {
+                    // remove brightness events from being posted, change mode
+                    if (mIsStatusBarBrightNess) {
+                        if (!mIsAutoBrightNess && mHandler.hasMessages(MSG_SAMSUNG_MAGIC)) {
+                            mHandler.removeMessages(MSG_SAMSUNG_MAGIC);
+                        }
+
+                        if (mIsBrightNessMode == 1) {
+                            mIsBrightNessMode = 2;
+                        }
+                    }
                     mAnimatingReveal = false;
                     updateExpandedViewPos(y + mViewDelta);
                 }
@@ -1697,6 +1739,10 @@ public class PhoneStatusBar extends StatusBar {
                 }
 
                 performFling(y + mViewDelta, vel, false);
+
+                if (mIsStatusBarBrightNess && mHandler.hasMessages(MSG_SAMSUNG_MAGIC)) {
+                    mHandler.removeMessages(MSG_SAMSUNG_MAGIC);
+                }
             }
 
         }
@@ -2485,12 +2531,27 @@ public class PhoneStatusBar extends StatusBar {
                     Settings.System.getUriFor(Settings.System.USE_WEATHER), false, this);
             resolver.registerContentObserver(
                     Settings.System.getUriFor(Settings.System.WEATHER_STATUSBAR_STYLE), false, this);
+            resolver.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.STATUS_BAR_BRIGHTNESS_TOGGLE), false, this);
         }
 
         @Override
         public void onChange(boolean selfChange) {
             updateSettings();
         }
+    }
+
+    private class BrightNessContentObserver extends ContentObserver {
+
+        public BrightNessContentObserver() {
+            super(new Handler());
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            mIsAutoBrightNess = checkAutoBrightNess();
+        }
+
     }
 
     boolean mDropdownSettingsDefualtBehavior = true;
@@ -2507,15 +2568,19 @@ public class PhoneStatusBar extends StatusBar {
         
         mWeatherPanelEnabled = (Settings.System.getInt(cr, Settings.System.WEATHER_STATUSBAR_STYLE, 0) == 1) &&
                 (Settings.System.getInt(cr, Settings.System.USE_WEATHER, 0) == 1);
-        
-        reDrawHeader(mWeatherPanelEnabled);
+
+        mIsStatusBarBrightNess = Settings.System.getInt(mStatusBarView.getContext()
+                .getContentResolver(),
+                Settings.System.STATUS_BAR_BRIGHTNESS_TOGGLE, 0) == 1;
+
+        reDrawHeader();
     }
     
-    private void reDrawHeader(boolean weatherOn) {
-        if (weatherOn) {
+    private void reDrawHeader() {
+        if (mWeatherPanelEnabled) {
             mTxtParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
             mTxtParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-            mTxtLayout.setPadding(0, 5, 0, 0);
+            mTxtLayout.setPadding(0, 1, 0, 0);
             mSettingswClearParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
             mSettingswClearParams.addRule(RelativeLayout.RIGHT_OF, 0);
             mSettingswClearParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
@@ -2524,7 +2589,8 @@ public class PhoneStatusBar extends StatusBar {
             mSettingswoClearParams.addRule(RelativeLayout.RIGHT_OF, 0);
             mClearParams.addRule(RelativeLayout.BELOW, R.id.settings_button);
             mClearParams.addRule(RelativeLayout.CENTER_VERTICAL, 0);
-            
+            mWeatherPanel1.setVisibility(View.VISIBLE);
+            mWeatherPanel2.setVisibility(View.VISIBLE);
         } else {
             mTxtParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
             mTxtParams.addRule(RelativeLayout.CENTER_HORIZONTAL, 0);
@@ -2537,9 +2603,11 @@ public class PhoneStatusBar extends StatusBar {
             mSettingswoClearParams.addRule(RelativeLayout.RIGHT_OF, R.id.txtlayout);
             mClearParams.addRule(RelativeLayout.BELOW, 0);
             mClearParams.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
+            mWeatherPanel1.setVisibility(View.GONE);
+            mWeatherPanel2.setVisibility(View.GONE);
         }
         View drawer_header_hr2 = mExpandedView.findViewById(R.id.drawer_header_hr2);
-        drawer_header_hr2.setVisibility(weatherOn ? View.VISIBLE : View.GONE);
+        drawer_header_hr2.setVisibility(mWeatherPanelEnabled ? View.VISIBLE : View.GONE);
         setAreThereNotifications();
         mTxtLayout.setLayoutParams(mTxtParams);
         mClearButton.setLayoutParams(mClearParams);

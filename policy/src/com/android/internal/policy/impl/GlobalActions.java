@@ -18,6 +18,7 @@
 package com.android.internal.policy.impl;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

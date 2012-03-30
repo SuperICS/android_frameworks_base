@@ -2656,6 +2656,13 @@ public final class Settings {
         public static final String SHOW_STATUSBAR_IME_SWITCHER = "show_statusbar_ime_switcher";
 
         /**
+         * Setting to enable volume options.
+         * 
+         * @hide
+         */
+        public static final String ENABLE_VOLUME_OPTIONS = "enable_volume_options";
+
+        /**
          * Which layout to use to display the navigation menu at the bottom.
          * 0 = default
          * 1 = default w/search
@@ -2865,55 +2872,6 @@ public final class Settings {
         public static final String VOLUME_WAKE_SCREEN = "volume_wake_screen";
 
         /**
-         * launch a custom app for sms
-         * 
-         * @hide
-         */
-        /** public static final String LOCKSCREEN_CUSTOM_SMS_INTENT = "lockscreen_custom_sms_intent";
-        
-        /**
-         * launch a custom app
-         * 
-         * @hide
-         */
-        public static final String LOCKSCREEN_CUSTOM_APP_INTENT_1 = "lockscreen_custom_app_intent_1";
-        
-        /**
-         * launch a custom app
-         * 
-         * @hide
-         */
-        public static final String LOCKSCREEN_CUSTOM_APP_INTENT_2 = "lockscreen_custom_app_intent_2";
-        
-        /**
-         * launch a custom app
-         * 
-         * @hide
-         */
-        public static final String LOCKSCREEN_CUSTOM_APP_INTENT_3 = "lockscreen_custom_app_intent_3";
-        
-        /**
-         * launch a custom app
-         * 
-         * @hide
-         */
-        public static final String LOCKSCREEN_CUSTOM_APP_INTENT_5 = "lockscreen_custom_app_intent_5";
-        
-        /**
-         * launch a custom app
-         * 
-         * @hide
-         */
-        public static final String LOCKSCREEN_CUSTOM_APP_INTENT_6 = "lockscreen_custom_app_intent_6";
-                     
-        /**
-         * launch a custom app
-         * 
-         * @hide
-         */
-        public static final String LOCKSCREEN_CUSTOM_APP_INTENT_7 = "lockscreen_custom_app_intent_7";
-
-        /**
          * Toggle to force multiwaveview lockscreen silent mode toggle even if
          * we have a camera.
          * 
@@ -2921,6 +2879,12 @@ public final class Settings {
          */
         public static final String LOCKSCREEN_STYLE_MULTIWAVEVIEW_SILENTMODE =
                 "lockscreen_style_multiwaveview_silentmode";
+        
+        /**
+         * App to launch with custom app toggle enabled
+         * @hide
+         */
+        public static final String LOCKSCREEN_CUSTOM_APP_ACTIVITY = "lockscreen_custom_app_activity";
 
         /**
          * Lockscreen custom app array 1 [0] - Left 2 [1] - Right 3 [2] - Top
@@ -2939,10 +2903,64 @@ public final class Settings {
         };
 
         /**
+         * Drawable URIs, each index needs to be matched up to LOCKSCREEN_CUSTOM_APP_ACTIVITIES
+         *
+         * OR ELSE
+         *
+         * @hide
+         */
+        public static final String[] LOCKSCREEN_CUSTOM_APP_ICONS = new String[] {
+                "lockscreen_custom_app_icon_0",
+                "lockscreen_custom_app_icon_1",
+                "lockscreen_custom_app_icon_2",
+                "lockscreen_custom_app_icon_3",
+                "lockscreen_custom_app_icon_4",
+                "lockscreen_custom_app_icon_5",
+                "lockscreen_custom_app_icon_6",
+                "lockscreen_custom_app_icon_7",
+        };
+
+        /**
          * Whether volume up/down can be long pressed to skip tracks
          * @hide
          */
         public static final String VOLUME_MUSIC_CONTROLS = "volume_music_controls";
+        
+        /**
+         * Setting to allow % on lockscreen always showing.
+         * @hide
+         */
+        public static final String LOCKSCREEN_BATTERY = "lockscreen_battery";
+        
+        /**
+         * 
+         * @hide
+         */
+        public static final String LOCKSCREEN_CALENDAR = "lockscreen_calendar";
+        
+        /**
+         * 
+         * @hide
+         */
+        public static final String LOCKSCREEN_CALENDAR_FLIP = "lockscreen_calendar_flip";
+        
+        /**
+         * 
+         * @hide
+         */
+        public static final String LOCKSCREEN_CALENDAR_SOURCES = "lockscreen_calendar_sources";
+        
+        /**
+         * 
+         * @hide
+         */
+        public static final String LOCKSCREEN_CALENDAR_RANGE = "lockscreen_calendar_range";
+        
+        /**
+         * 
+         * @hide
+         */
+        public static final String LOCKSCREEN_CALENDAR_HIDE_ONGOING = "lockscreen_calendar_hide_ongoing";
 
         /**
          * Setting to use lockscreen alongside secure lock
@@ -2950,12 +2968,13 @@ public final class Settings {
          */
         public static final String SHOW_LOCK_BEFORE_UNLOCK = "show_lock_before_unlock";
   
+        public static final String LOCKSCREEN_CALENDAR_USE_COLORS = "lockscreen_calendar_use_colors";
         
         /**
-         * Setting to allow % on lockscreen always showing.
+         * 
          * @hide
          */
-        public static final String LOCKSCREEN_BATTERY = "lockscreen_battery";
+        public static final String LOCKSCREEN_CALENDAR_INTERVAL = "lockscreen_calendar_interval";
         
 	/**
          * custom lockscreen text color
@@ -3000,12 +3019,19 @@ public final class Settings {
          * 1 = quad
          * 2 = octo
          * 3 = aosp
-         * 4 = rotary
-         * 5 = ring
+         * 4 = 4tab
+         * 5 = rotary
+         * 6 = ring
          * 
          * @hide
          */
 		public static final String LOCKSCREEN_LAYOUT = "lockscreen_layout";
+		
+		/**        
+         * 
+         * @hide
+         */
+		public static final String LOCKSCREEN_4TAB = "lockscreen_4tab";
 
 		/**
 		 * whether to hide the navigation bar on the lockscreen
@@ -3122,6 +3148,19 @@ public final class Settings {
          */
         public static final String STATUSBAR_HIDE_SIGNAL_BARS = "statusbar_hide_signal_bars";
 
+        /**
+         * Whether to show statusbar WiFi signal text
+         * 
+         * @hide
+         */
+        public static final String STATUSBAR_WIFI_SIGNAL_TEXT = "statusbar_wifi_signal_text";
+
+        /**
+         * statusbar WIFI signal text color
+         * 
+         * @hide
+         */
+        public static final String STATUSBAR_WIFI_SIGNAL_TEXT_COLOR = "statusbar_wifi_signal_text_color";
         /**
          * @hide
          */
@@ -4832,13 +4871,12 @@ public final class Settings {
         public static final String KILL_APP_LONGPRESS_BACK = "kill_app_longpress_back";
 
         /**
-         * The {@link ComponentName} string of the service to be used as the voice recognition
-         * service.
-         *
+         * The {@link ComponentName} string of the service to be used as the
+         * voice recognition service.
+         * 
          * @hide
          */
         public static final String VOICE_RECOGNITION_SERVICE = "voice_recognition_service";
-
 
         /**
          * The {@link ComponentName} string of the selected spell checker service which is
