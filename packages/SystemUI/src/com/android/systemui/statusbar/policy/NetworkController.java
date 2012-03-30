@@ -44,7 +44,6 @@ import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
 import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.util.Slog;
 import android.view.View;
 import android.widget.ImageView;
@@ -923,19 +922,6 @@ public class NetworkController extends BroadcastReceiver {
                     = context.getString(R.string.status_bar_settings_signal_meter_disconnected);
             }
 
-<<<<<<< HEAD
-            combinedLabel = mobileLabel;
-            combinedActivityIconId = mMobileActivityIconId;
-            combinedSignalIconId = mDataSignalIconId; // set by updateDataIcon()
-            mContentDescriptionCombinedSignal = mContentDescriptionDataType;
-        } else {
-<<<<<<< HEAD
-            mMobileActivityIconId = 0;
-=======
-            mobileLabel = mHasMobileDataFeature ?
-                context.getString(R.string.status_bar_settings_signal_meter_disconnected) : "";
->>>>>>> Always show appropriate mobile service label.
-=======
             // Now for things that should only be shown when actually using mobile data.
             if (mDataConnected) {
                 combinedSignalIconId = mDataSignalIconId;
@@ -959,10 +945,6 @@ public class NetworkController extends BroadcastReceiver {
                 combinedSignalIconId = mDataSignalIconId; // set by updateDataIcon()
                 mContentDescriptionCombinedSignal = mContentDescriptionDataType;
             }
-<<<<<<< HEAD
->>>>>>> Stop showing "No internet connection" when there is one.
-=======
->>>>>>> frameworks/base: SystemUI: fix merge error in NetworkController
         }
 
         if (mWifiConnected) {

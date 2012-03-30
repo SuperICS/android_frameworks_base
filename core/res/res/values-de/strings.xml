@@ -137,7 +137,6 @@
     <string name="turn_off_radio" msgid="8198784949987062346">"Funk ausschalten"</string>
     <string name="screen_lock" msgid="799094655496098153">"Display-Sperre"</string>
     <string name="power_off" msgid="4266614107412865048">"Ausschalten"</string>
-<<<<<<< HEAD
 
     <!-- Button to reboot the phone, within the Phone Options dialog -->
     <string name="reboot_system" product="tablet">Tablet neu starten</string>
@@ -165,11 +164,9 @@
     <skip />
     <!-- no translation found for silent_mode_ring (8592241816194074353) -->
     <skip />
-=======
     <string name="silent_mode_silent" msgid="319298163018473078">"Klingelton aus"</string>
     <string name="silent_mode_vibrate" msgid="7072043388581551395">"Klingeltonmodus \"Vibration\""</string>
     <string name="silent_mode_ring" msgid="8592241816194074353">"Klingelton ein"</string>
->>>>>>> Import revised translations.  DO NOT MERGE
     <string name="shutdown_progress" msgid="2281079257329981203">"Wird heruntergefahren..."</string>
     <string name="shutdown_confirm" product="tablet" msgid="3385745179555731470">"Ihr Tablet wird heruntergefahren."</string>
     <string name="shutdown_confirm" product="default" msgid="649792175242821353">"Telefon wird heruntergefahren."</string>
