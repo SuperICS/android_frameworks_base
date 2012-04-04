@@ -2566,7 +2566,7 @@ public class PhoneStatusBar extends StatusBar {
         mQuickTogglesHideAfterCollapse = Settings.System.getInt(cr,
                 Settings.System.STATUSBAR_QUICKTOGGLES_AUTOHIDE, 0) == 1;
         
-        mWeatherPanelEnabled = (Settings.System.getInt(cr, Settings.System.WEATHER_STATUSBAR_STYLE, 0) == 1) &&
+        mWeatherPanelEnabled = (Settings.System.getInt(cr, Settings.System.WEATHER_STATUSBAR_STYLE, 1) == 1) &&
                 (Settings.System.getInt(cr, Settings.System.USE_WEATHER, 0) == 1);
 
         mIsStatusBarBrightNess = Settings.System.getInt(mStatusBarView.getContext()

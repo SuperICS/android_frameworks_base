@@ -1363,11 +1363,11 @@ private NetworkStateTracker makeWimaxStateTracker() {
     int defaultConnected;
     try
     {
-      defaultConnected = SystemProperties.getInt("ro.data.on", 0);
+      defaultConnected = SystemProperties.getInt("ro.data.on", 1);
     }
     catch(NumberFormatException ne)
     {
-      defaultConnected = 0;
+      defaultConnected = 1;
     }
 
         boolean retVal = Settings.Secure.getInt(mContext.getContentResolver(),
