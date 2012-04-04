@@ -5,11 +5,6 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES:= \
     AudioParameter.cpp
 
-ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
-    LOCAL_CFLAGS += -DQCOM_HARDWARE
-endif
-
-
 LOCAL_MODULE:= libmedia_helper
 LOCAL_MODULE_TAGS := optional
 

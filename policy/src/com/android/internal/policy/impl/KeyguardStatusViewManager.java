@@ -476,7 +476,7 @@ class KeyguardStatusViewManager implements OnClickListener {
                     int dateWidth = (int) (findViewById(R.id.time).getWidth() * 1.2);
 
                     for (EventBundle e : mCalendarEvents) {
-                        String title = e.title + (e.dayString.isEmpty() ? "" : ",");
+                        String title = e.title + (e.dayString.isEmpty() ? " " : ", ");
                         String details = e.dayString
                                 + ((e.allDay) ? " all-day " : " at " + DateFormat.format(
                                         DateFormat.is24HourFormat(getContext()) ? "kk:mm"
@@ -488,17 +488,14 @@ class KeyguardStatusViewManager implements OnClickListener {
                             cEntry.setColor(e.color);
                         mCalendarView.addView(cEntry);
                     }
-                    mCalendarView.setFlipInterval(interval);
-                    mCalendarView.setVisibility(View.VISIBLE);
-                    mCalendarView.bringChildToFront(mCalendarView.getChildAt(0));
                     if (!multipleEventsEnabled || mCalendarEvents.size() <= 1) {
                         mCalendarView.stopFlipping();
                     } else {
-                        Log.d(TAG, "multiple events, flipping");
+                        mCalendarView.setFlipInterval(interval);
                         mCalendarView.startFlipping();
                     }
+                    mCalendarView.setVisibility(View.VISIBLE);
                 } else {
-                    Log.d(TAG, "hide calendar");
                     mCalendarView.setVisibility(View.GONE);
                 }
             }
