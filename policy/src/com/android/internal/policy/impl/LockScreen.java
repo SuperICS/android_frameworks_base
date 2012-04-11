@@ -915,7 +915,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
         ContentResolver resolver = mContext.getContentResolver();
 
         mLockscreenTargets = Settings.System.getInt(resolver,
-                Settings.System.LOCKSCREEN_LAYOUT, LAYOUT_STOCK);
+                Settings.System.LOCKSCREEN_LAYOUT, LAYOUT_HONEY);
         
         int mLockscreenColor = Settings.System.getInt(resolver,
                 Settings.System.LOCKSCREEN_CUSTOM_TEXT_COLOR, COLOR_WHITE);
