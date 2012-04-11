@@ -51,6 +51,7 @@ import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemProperties;
 import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
 import android.provider.Settings.System;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -204,6 +205,24 @@ public class AudioService extends IAudioService.Stub {
         AudioSystem.STREAM_VOICE_CALL, // STREAM_DTMF
         AudioSystem.STREAM_MUSIC, // STREAM_TTS
         AudioSystem.STREAM_FM
+    };
+
+    private static final String[] STREAM_VOLUME_HEADSET_SETTINGS = new String[] {
+        "AudioService.SAVED_VOICE_CALL_HEADSET_VOL",
+        "AudioService.SAVED_SYSTEM_HEADSET_VOL",
+        "AudioService.SAVED_RING_HEADSET_VOL",
+        "AudioService.SAVED_MUSIC_HEADSET_VOL",
+        "AudioService.SAVED_ALARM_HEADSET_VOL",
+        "AudioService.SAVED_NOTIFICATION_HEADSET_VOL",
+    };
+
+    private static final String[] STREAM_VOLUME_SPEAKER_SETTINGS = new String[] {
+        "AudioService.SAVED_VOICE_CALL_SPEAKER_VOL",
+        "AudioService.SAVED_SYSTEM_SPEAKER_VOL",
+        "AudioService.SAVED_RING_SPEAKER_VOL",
+        "AudioService.SAVED_MUSIC_SPEAKER_VOL",
+        "AudioService.SAVED_ALARM_SPEAKER_VOL",
+        "AudioService.SAVED_NOTIFICATION_SPEAKER_VOL",
     };
 
     private AudioSystem.ErrorCallback mAudioSystemCallback = new AudioSystem.ErrorCallback() {
@@ -2544,6 +2563,36 @@ public class AudioService extends IAudioService.Stub {
                 int state = intent.getIntExtra("state", 0);
                 int microphone = intent.getIntExtra("microphone", 0);
 
+                //Save and restore volumes for headset and speaker
+                int lastVolume;
+                if (state == 1) {
+                    for (int stream = 0; stream < STREAM_VOLUME_HEADSET_SETTINGS.length; stream++) {
+                        try {
+                            lastVolume = System.getInt(mContentResolver,
+                                    STREAM_VOLUME_HEADSET_SETTINGS[stream]);
+                        } catch (SettingNotFoundException e) {
+                            lastVolume = -1;
+                        }
+                        System.putInt(mContentResolver, STREAM_VOLUME_SPEAKER_SETTINGS[stream],
+                                getStreamVolume(stream));
+                        if (lastVolume >= 0)
+                            setStreamVolume(stream, lastVolume, 0);
+                    }
+                } else {
+                    for (int stream = 0; stream < STREAM_VOLUME_SPEAKER_SETTINGS.length; stream++) {
+                        try {
+                            lastVolume = System.getInt(mContentResolver,
+                                    STREAM_VOLUME_SPEAKER_SETTINGS[stream]);
+                        } catch (SettingNotFoundException e) {
+                            lastVolume = -1;
+                        }
+                        System.putInt(mContentResolver, STREAM_VOLUME_HEADSET_SETTINGS[stream],
+                                getStreamVolume(stream));
+                        if (lastVolume >= 0)
+                            setStreamVolume(stream, lastVolume, 0);
+                    }
+                }
+
                 synchronized (mConnectedDevices) {
                     if (microphone != 0) {
                         boolean isConnected =
@@ -2592,12 +2641,17 @@ public class AudioService extends IAudioService.Stub {
                                                         "");
                         mConnectedDevices.remove(AudioSystem.DEVICE_OUT_ANLG_DOCK_HEADSET);
                     } else if (state == 1 && !isConnected)  {
-                        AudioSystem.setDeviceConnectionState(
+                        // Only Route the Audio if enabled in Dock Settings
+                        if (Settings.System.getInt(mContentResolver,Settings.System.DOCK_USB_AUDIO_ENABLED, 0) == 1) {
+                            AudioSystem.setDeviceConnectionState(
                                                         AudioSystem.DEVICE_OUT_ANLG_DOCK_HEADSET,
                                                         AudioSystem.DEVICE_STATE_AVAILABLE,
                                                         "");
-                        mConnectedDevices.put(
+                            mConnectedDevices.put(
                                 new Integer(AudioSystem.DEVICE_OUT_ANLG_DOCK_HEADSET), "");
+                        } else {
+                            Log.v(TAG, "Broadcast Receiver: Not using USB audio by request");
+                        }
                     }
                 }
             } else if (action.equals(Intent.ACTION_HDMI_AUDIO_PLUG)) {

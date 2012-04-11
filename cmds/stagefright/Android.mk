@@ -50,10 +50,6 @@ LOCAL_CFLAGS += -Wno-multichar
 
 LOCAL_MODULE_TAGS := debug
 
-ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
-	LOCAL_CFLAGS += -DQCOM_HARDWARE
-endif
-
 LOCAL_MODULE:= record
 
 include $(BUILD_EXECUTABLE)
@@ -106,10 +102,6 @@ LOCAL_C_INCLUDES:= \
 LOCAL_CFLAGS += -Wno-multichar
 
 LOCAL_MODULE_TAGS := debug
-
-ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
-	LOCAL_CFLAGS += -DQCOM_HARDWARE
-endif
 
 LOCAL_MODULE:= audioloop
 
