@@ -18,13 +18,25 @@
 
 #include "utils/Log.h"
 
+#ifdef CUSTOM_PANEL_AMLOGIC
+#include <stdlib.h>
+#include <cutils/properties.h>
+#endif
 #include <gui/Sensor.h>
 #include <gui/SensorManager.h>
 #include <gui/SensorEventQueue.h>
 
 #include "jni.h"
 #include "JNIHelp.h"
-
+#ifdef CUSTOM_PANEL_AMLOGIC
+namespace {
+    uint32_t tweak_axes;
+}
+#define FLIP_XY		(1 << 0)
+#define INVERT_X	(1 << 1)
+#define INVERT_Y	(1 << 2)
+#define INVERT_Z	(1 << 3)
+#endif
 
 namespace android {
 
@@ -106,6 +118,42 @@ sensors_enable_sensor(JNIEnv *env, jclass clazz,
 {
     sp<SensorEventQueue> queue(reinterpret_cast<SensorEventQueue *>(nativeQueue));
     if (queue == 0) return JNI_FALSE;
+#ifdef CUSTOM_PANEL_AMLOGIC
+    char propBuf[PROPERTY_VALUE_MAX];
+    property_get("accelerometer.flip_xy", propBuf, "0");
+    bool flip_xy = (atoi(propBuf) != 0);
+    property_get("accelerometer.invert_x", propBuf, "0");
+    bool invert_x = (atoi(propBuf) != 0);
+    property_get("accelerometer.invert_y", propBuf, "0");
+    bool invert_y = (atoi(propBuf) != 0);
+    property_get("accelerometer.invert_z", propBuf, "0");
+    bool invert_z = (atoi(propBuf) != 0);
+    property_get("accelerometer.hwrotation", propBuf, "0");
+    int hwrotation = (atoi(propBuf) / 90) % 4;
+
+    if (hwrotation) {
+        if (hwrotation % 2) {
+            bool b = invert_x;
+            invert_x = invert_y;
+            invert_y = b;
+            flip_xy = !flip_xy;
+        }
+        if (hwrotation <= 2)
+            invert_x = !invert_x;
+        if (hwrotation >= 2)
+            invert_y = !invert_y;
+    }
+
+    tweak_axes = 0;
+    if (flip_xy)
+        tweak_axes |= FLIP_XY;
+    if (invert_x)
+        tweak_axes |= INVERT_X;
+    if (invert_y)
+        tweak_axes |= INVERT_Y;
+    if (invert_z)
+        tweak_axes |= INVERT_Z;
+#endif
     status_t res;
     if (delay >= 0) {
         res = queue->enableSensor(sensor, delay);
@@ -134,6 +182,21 @@ sensors_data_poll(JNIEnv *env, jclass clazz, jint nativeQueue,
     }
     if (res < 0)
         return -1;
+#ifdef CUSTOM_PANEL_AMLOGIC
+    if (event.type == ASENSOR_TYPE_ACCELEROMETER) {
+        if (tweak_axes & FLIP_XY) {
+            float f = event.acceleration.x;
+            event.acceleration.x = event.acceleration.y;
+            event.acceleration.y = f;
+        }
+        if (tweak_axes & INVERT_X)
+            event.acceleration.x = -event.acceleration.x;
+        if (tweak_axes & INVERT_Y)
+            event.acceleration.y = -event.acceleration.y;
+        if (tweak_axes & INVERT_Z)
+            event.acceleration.z = -event.acceleration.z;
+    }
+#endif
 
     jint accuracy = event.vector.status;
     env->SetFloatArrayRegion(values, 0, 3, event.vector.v);

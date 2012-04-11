@@ -670,7 +670,7 @@ public class MediaRecorder
      * @throws IllegalStateException if it is called before
      * prepare().
      */
-    public native void native_start() throws IllegalStateException;
+    public native void start() throws IllegalStateException;
 
     /**
      * Stops recording. Call this after start(). Once recording is stopped,
@@ -684,43 +684,7 @@ public class MediaRecorder
      *
      * @throws IllegalStateException if it is called before start()
      */
-    public native void native_stop() throws IllegalStateException;
-
-    public void start() throws IllegalStateException {
-        if (SystemProperties.QCOM_HARDWARE) {
-            try {
-                Application application = ActivityThread.currentApplication();
-                if (application != null) {
-                    Intent ioBusyVoteIntent = new Intent(IOBUSY_VOTE);
-                    // Vote for io_is_busy to be turned off.
-                    ioBusyVoteIntent.putExtra("com.android.server.CpuGovernorService.voteType", 0);
-                    application.sendBroadcast(ioBusyVoteIntent);
-                }
-            } catch (Exception exception) {
-                Log.e(TAG, "Unable to vote to turn io_is_busy off.");
-            }
-        }
-
-        native_start();
-    }
-
-    public void stop() throws IllegalStateException {
-        if (SystemProperties.QCOM_HARDWARE) {
-            try {
-                Application application = ActivityThread.currentApplication();
-                if (application != null) {
-                    Intent ioBusyUnVoteIntent = new Intent(IOBUSY_UNVOTE);
-                    // Remove vote for io_is_busy to be turned off.
-                    ioBusyUnVoteIntent.putExtra("com.android.server.CpuGovernorService.voteType", 0);
-                    application.sendBroadcast(ioBusyUnVoteIntent);
-                }
-            } catch (Exception exception) {
-                Log.e(TAG, "Unable to withdraw io_is_busy off vote.");
-            }
-        }
-
-        native_stop();
-    }
+    public native void stop() throws IllegalStateException;
 
     /**
      * Restarts the MediaRecorder to its idle state. After calling

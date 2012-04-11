@@ -184,7 +184,7 @@ public class BatteryBar extends RelativeLayout implements Animatable {
                 0xFFD1D1D1);
 
         shouldAnimateCharging = Settings.System.getInt(resolver,
-                Settings.System.STATUSBAR_BATTERY_BAR_ANIMATE, 1) == 1;
+                Settings.System.STATUSBAR_BATTERY_BAR_ANIMATE, 0) == 1;
 
         if (mBatteryCharging && mBatteryLevel < 100 && shouldAnimateCharging) {
             start();
