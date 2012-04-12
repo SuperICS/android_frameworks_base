@@ -63,6 +63,7 @@ LOCAL_C_INCLUDES := \
 LOCAL_C_INCLUDES += hardware/libhardware/modules/gralloc
 
 ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
+ifneq ($(BOARD_USES_LEGACY_QCOM),true)
 ifeq ($(TARGET_HAVE_BYPASS),true)
     LOCAL_CFLAGS += -DBUFFER_COUNT_SERVER=3
 else
@@ -74,6 +75,7 @@ LOCAL_SHARED_LIBRARIES += \
 LOCAL_C_INCLUDES += hardware/qcom/display/libqcomui
 ifeq ($(TARGET_QCOM_HDMI_OUT),true)
 LOCAL_CFLAGS += -DQCOM_HDMI_OUT
+endif
 endif
 endif
 
