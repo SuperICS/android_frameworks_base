@@ -180,7 +180,7 @@ public class BatteryBarController extends LinearLayout {
         mStyle = Settings.System.getInt(getContext().getContentResolver(),
                 Settings.System.STATUSBAR_BATTERY_BAR_STYLE, 0);
         mLocation = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.STATUSBAR_BATTERY_BAR, 1);
+                Settings.System.STATUSBAR_BATTERY_BAR, 2);
 
         if (isLocationValid(mLocation)) {
             removeBars();

@@ -123,7 +123,7 @@ public class BatteryController extends LinearLayout {
         mPlugged = plugged;
         ContentResolver cr = mContext.getContentResolver();
         mBatteryStyle = Settings.System.getInt(cr,
-                Settings.System.STATUSBAR_BATTERY_ICON, 3);
+                Settings.System.STATUSBAR_BATTERY_ICON, 5);
         int icon;
         if (mBatteryStyle == STYLE_ICON_CIRCLE) {
             icon = plugged ? R.drawable.stat_sys_battery_charge_circle
@@ -201,7 +201,7 @@ public class BatteryController extends LinearLayout {
         // Slog.i(TAG, "updated settings values");
         ContentResolver cr = mContext.getContentResolver();
         mBatteryStyle = Settings.System.getInt(cr,
-                Settings.System.STATUSBAR_BATTERY_ICON, 3);
+                Settings.System.STATUSBAR_BATTERY_ICON, 5);
 
         switch (mBatteryStyle) {
             case STYLE_ICON_ONLY:
