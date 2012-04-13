@@ -88,11 +88,11 @@ public class BrightnessController implements ToggleSlider.Listener {
             setBrightness(val);
             if (!tracking) {
                 AsyncTask.execute(new Runnable() {
-                        public void run() {
-                            Settings.System.putInt(mContext.getContentResolver(), 
-                                    Settings.System.SCREEN_BRIGHTNESS, val);
-                        }
-                    });
+                    public void run() {
+                        Settings.System.putInt(mContext.getContentResolver(),
+                                Settings.System.SCREEN_BRIGHTNESS, val);
+                    }
+                });
             }
         }
     }
