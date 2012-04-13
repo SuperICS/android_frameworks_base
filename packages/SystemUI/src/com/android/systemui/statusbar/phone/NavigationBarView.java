@@ -106,11 +106,11 @@ public class NavigationBarView extends LinearLayout {
 
     public final static int StockButtonsQty = 4;
     public final static String[] StockClickActions = {
-            "**back**", "**home**", "**recents**", "**menu**", "**null**", "**null**"
+            "**back**", "**home**", "**recents**", "**menu**", "**null**"
     };
 
     public final static String[] StockLongpress = {
-            "**null**", "**null**", "**null**", "**null**", "**null**", "**null**"
+            "**null**", "**null**", "**null**", "**null**", "**null**"
     };
 
     public final static int SHOW_LEFT_MENU = 1;
