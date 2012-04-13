@@ -16,6 +16,8 @@
 
 package com.android.systemui.statusbar;
 
+import java.util.ArrayList;
+
 import android.app.ActivityManager;
 import android.app.Service;
 import android.content.Context;
@@ -25,8 +27,8 @@ import android.graphics.PixelFormat;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.ServiceManager;
-import android.util.Slog;
 import android.util.Log;
+import android.util.Slog;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
@@ -34,15 +36,12 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.WindowManagerImpl;
 
-import java.util.ArrayList;
-
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.internal.statusbar.StatusBarIconList;
 import com.android.internal.statusbar.StatusBarNotification;
-
-import com.android.systemui.SystemUI;
 import com.android.systemui.R;
+import com.android.systemui.SystemUI;
 
 import android.provider.Settings;
 

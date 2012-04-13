@@ -81,19 +81,19 @@ public class AutoRotateController implements CompoundButton.OnCheckedChangeListe
     private void setAutoRotation(final boolean autorotate) {
         mAutoRotation = autorotate;
         AsyncTask.execute(new Runnable() {
-                public void run() {
-                    try {
-                        IWindowManager wm = IWindowManager.Stub.asInterface(
-                                ServiceManager.getService(Context.WINDOW_SERVICE));
-                        if (autorotate) {
-                            wm.thawRotation();
-                        } else {
-                            wm.freezeRotation(-1);
-                        }
-                    } catch (RemoteException exc) {
-                        Log.w(TAG, "Unable to save auto-rotate setting");
+            public void run() {
+                try {
+                    IWindowManager wm = IWindowManager.Stub.asInterface(
+                            ServiceManager.getService(Context.WINDOW_SERVICE));
+                    if (autorotate) {
+                        wm.thawRotation();
+                    } else {
+                        wm.freezeRotation(-1);
                     }
+                } catch (RemoteException exc) {
+                    Log.w(TAG, "Unable to save auto-rotate setting");
                 }
-            });
+            }
+        });
     }
 }
