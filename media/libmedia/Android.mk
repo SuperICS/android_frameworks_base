@@ -61,6 +61,10 @@ ifeq ($(BOARD_USE_YAMAHAPLAYER),true)
     LOCAL_CFLAGS += -DYAMAHAPLAYER
 endif
 
+ifeq ($(BOARD_USES_AMLOGICPLAYER),true)
+    LOCAL_CFLAGS += -DAMLOGICPLAYER
+endif
+
 LOCAL_SHARED_LIBRARIES := \
 	libui libcutils libutils libbinder libsonivox libicuuc libexpat \
         libcamera_client libstagefright_foundation \

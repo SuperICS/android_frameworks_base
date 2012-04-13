@@ -114,6 +114,9 @@ class Metadata {
     // TODO: add more as needed to handle other types.
     bool appendBool(Type key, bool val);
     bool appendInt32(Type key, int32_t val);
+#ifdef AMLOGICPLAYER
+    bool appendCString(Type key, const char* val);
+#endif
 
   private:
     Metadata(const Metadata&);

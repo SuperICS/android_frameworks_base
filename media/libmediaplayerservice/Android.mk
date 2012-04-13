@@ -1,5 +1,6 @@
 LOCAL_PATH:= $(call my-dir)
 
+ifneq ($(BOARD_USES_AMLOGICPLAYER),true)
 #
 # libmediaplayerservice
 #
@@ -46,6 +47,7 @@ LOCAL_C_INCLUDES :=                                                 \
 LOCAL_MODULE:= libmediaplayerservice
 
 include $(BUILD_SHARED_LIBRARY)
+endif
 
 include $(call all-makefiles-under,$(LOCAL_PATH))
 

@@ -128,6 +128,32 @@ bool Metadata::appendInt32(int key, int32_t val)
     return ok;
 }
 
+#ifdef AMLOGICPLAYER
+bool Metadata::appendCString(int key, const char* val)
+{
+    if (!checkKey(key)) {
+        return false;
+    }
+
+    const size_t begin = mData->dataPosition();
+    bool ok = true;
+
+    // 3 int32s: size, key, type
+    size_t len = 3 * sizeof(int32_t);
+    // and 1 String16: value.
+    len += sizeof(int32_t); // writeInt32()
+    len += ((String16(val).size() + 1) * sizeof(char16_t) + 3) & ~3; // writeInplace()
+    ok = ok && mData->writeInt32(len) == OK;
+    ok = ok && mData->writeInt32(key) == OK;
+    ok = ok && mData->writeInt32(STRING_VAL) == OK;
+    ok = ok && mData->writeString16(String16(val)) == OK;
+    if (!ok) {
+        mData->setDataPosition(begin);
+    }
+    return ok;
+}
+#endif
+
 // Check the key (i.e metadata id) is valid if it is a system one.
 // Loop over all the exiting ones in the Parcel to check for duplicate
 // (not allowed).
