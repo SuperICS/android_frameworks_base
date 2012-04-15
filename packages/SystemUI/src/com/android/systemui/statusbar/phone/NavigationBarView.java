@@ -106,11 +106,11 @@ public class NavigationBarView extends LinearLayout {
 
     public final static int StockButtonsQty = 4;
     public final static String[] StockClickActions = {
-            "**back**", "**home**", "**recents**", "**menu**", "**null**", "**null**"
+            "**back**", "**home**", "**recents**", "**menu**", "**null**"
     };
 
     public final static String[] StockLongpress = {
-            "**null**", "**null**", "**null**", "**null**", "**null**", "**null**"
+            "**null**", "**null**", "**null**", "**null**", "**null**"
     };
 
     public final static int SHOW_LEFT_MENU = 1;
@@ -241,7 +241,7 @@ public class NavigationBarView extends LinearLayout {
 
                 if (j == (mNumberOfButtons - 1)) {
                     // which to skip
-                } else if (mNumberOfButtons == 3) {
+                } else if (mNumberOfButtons == 4) {
                     // add separator view here
                     View separator = new View(mContext);
                     separator.setLayoutParams(getSeparatorLayoutParams(landscape));
