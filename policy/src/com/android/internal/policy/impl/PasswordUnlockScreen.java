@@ -35,15 +35,18 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
 import android.text.method.TextKeyListener;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Space;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
@@ -182,8 +185,8 @@ public class PasswordUnlockScreen extends LinearLayout implements KeyguardScreen
                 }
                 if (mQuickUnlock) {
                     String entry = mPasswordEntry.getText().toString();
-                    if (entry.length() > MINIMUM_PASSWORD_LENGTH_BEFORE_REPORT &&
-                            mLockPatternUtils.checkPassword(entry)) {
+                    if (entry.length() > MINIMUM_PASSWORD_LENGTH_BEFORE_REPORT) {
+                        if (mLockPatternUtils.checkPassword(entry)) {
                             mCallback.keyguardDone(true);
                             mCallback.reportSuccessfulUnlockAttempt();
                         } else {
