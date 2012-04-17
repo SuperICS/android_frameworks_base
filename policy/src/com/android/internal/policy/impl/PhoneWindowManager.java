@@ -40,6 +40,7 @@ import android.database.ContentObserver;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -1088,7 +1089,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Surface.ROTATION_0);
             mUserRotationAngles = Settings.System.getInt(resolver,
                     Settings.System.ACCELEROMETER_ROTATION_ANGLES, -1);
-
             mEnableQuickTorch = Settings.System.getInt(resolver, Settings.System.ENABLE_FAST_TORCH,
                     0) == 1;
             boolean hasNavBarChanged = Settings.System.getInt(resolver, Settings.System.NAVIGATION_BAR_BUTTONS_SHOW,
@@ -3030,36 +3030,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         // Handle special keys.
         switch (keyCode) {
-            case KeyEvent.KEYCODE_ENDCALL: {
-                result &= ~ACTION_PASS_TO_USER;
-                if (down) {
-                    ITelephony telephonyService = getTelephonyService();
-                    boolean hungUp = false;
-                    if (telephonyService != null) {
-                        try {
-                            hungUp = telephonyService.endCall();
-                        } catch (RemoteException ex) {
-                            Log.w(TAG, "ITelephony threw RemoteException", ex);
-                        }
-                    }
-                    interceptPowerKeyDown(!isScreenOn || hungUp);
-                } else {
-                    if (interceptPowerKeyUp(canceled)) {
-                        if ((mEndcallBehavior
-                                & Settings.System.END_BUTTON_BEHAVIOR_HOME) != 0) {
-                            if (goHome()) {
-                                break;
-                            }
-                        }
-                        if ((mEndcallBehavior
-                                & Settings.System.END_BUTTON_BEHAVIOR_SLEEP) != 0) {
-                            result = (result & ~ACTION_POKE_USER_ACTIVITY) | ACTION_GO_TO_SLEEP;
-                        }
-                    }
-                }
-                break;
-            }
-
             case KeyEvent.KEYCODE_VOLUME_DOWN:
             case KeyEvent.KEYCODE_VOLUME_UP:
             case KeyEvent.KEYCODE_VOLUME_MUTE: {
@@ -3153,35 +3123,38 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         }
                         break;
                     }
-
                 }
-                if (isMusicActive() && (result & ACTION_PASS_TO_USER) == 0) {
-                    if (mVolBtnMusicControls && down && (keyCode != KeyEvent.KEYCODE_VOLUME_MUTE)) {
-                        mIsLongPress = false;
-                        handleVolumeLongPress(keyCode);
-                        break;
-                    } else {
-                        if (mVolBtnMusicControls && !down) {
-                            handleVolumeLongPressAbort();
-                            if (mIsLongPress) {
+                break;
+            }
+
+            case KeyEvent.KEYCODE_ENDCALL: {
+                result &= ~ACTION_PASS_TO_USER;
+                if (down) {
+                    ITelephony telephonyService = getTelephonyService();
+                    boolean hungUp = false;
+                    if (telephonyService != null) {
+                        try {
+                            hungUp = telephonyService.endCall();
+                        } catch (RemoteException ex) {
+                            Log.w(TAG, "ITelephony threw RemoteException", ex);
+                        }
+                    }
+                    interceptPowerKeyDown(!isScreenOn || hungUp);
+                } else {
+                    if (interceptPowerKeyUp(canceled)) {
+                        if ((mEndcallBehavior
+                                & Settings.System.END_BUTTON_BEHAVIOR_HOME) != 0) {
+                            if (goHome()) {
                                 break;
                             }
                         }
-                        if (!isScreenOn && !mVolumeWakeScreen) {
-                            handleVolumeKey(AudioManager.STREAM_MUSIC, keyCode);
+                        if ((mEndcallBehavior
+                                & Settings.System.END_BUTTON_BEHAVIOR_SLEEP) != 0) {
+                            result = (result & ~ACTION_POKE_USER_ACTIVITY) | ACTION_GO_TO_SLEEP;
                         }
                     }
                 }
-                if (isScreenOn || !mVolumeWakeScreen) {
-                    break;
-                } else if (keyguardActive) {
-                    keyCode = KeyEvent.KEYCODE_POWER;
-                    mKeyguardMediator.onWakeKeyWhenKeyguardShowingTq(keyCode,
-                            mDockMode != Intent.EXTRA_DOCK_STATE_UNDOCKED);
-                } else {
-                    result |= ACTION_POKE_USER_ACTIVITY;
-                    break;
-                }
+                break;
             }
 
             case KeyEvent.KEYCODE_POWER: {
@@ -3223,6 +3196,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                             || mVolumeDownKeyTriggered || mVolumeUpKeyTriggered);
                 } else {
                     handleChangeTorchState(false);
+					mHandler.post(mTorchOff);
 
                     mPowerKeyTriggered = false;
                     cancelPendingScreenshotChordAction();

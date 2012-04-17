@@ -109,7 +109,6 @@ public class NotificationManagerService extends INotificationManager.Stub
     private Vibrator mVibrator = new Vibrator();
 
     // for enabling and disabling notification pulse behavior
-    private boolean mWasScreenOn = false;
     private boolean mScreenOn = true;
     private boolean mInCall = false;
     private boolean mNotificationPulseEnabled;
@@ -254,6 +253,7 @@ public class NotificationManagerService extends INotificationManager.Stub
     }
 
     private StatusBarManagerService.NotificationCallbacks mNotificationCallbacks = new StatusBarManagerService.NotificationCallbacks() {
+
         public void onSetDisabled(int status) {
             synchronized (mNotificationList) {
                 mDisabledNotifications = status;
@@ -393,8 +393,8 @@ public class NotificationManagerService extends INotificationManager.Stub
         }
     };
 
-    class LEDSettingsObserver extends ContentObserver {
-        LEDSettingsObserver(Handler handler) {
+    class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
             super(handler);
         }
 
@@ -403,7 +403,7 @@ public class NotificationManagerService extends INotificationManager.Stub
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_LIGHT_PULSE), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
-		            Settings.System.NOTIFICATION_LIGHT_OFF), false, this);
+                    Settings.System.NOTIFICATION_LIGHT_OFF), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_LIGHT_ON), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -533,8 +533,8 @@ public class NotificationManagerService extends INotificationManager.Stub
         IntentFilter sdFilter = new IntentFilter(Intent.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE);
         mContext.registerReceiver(mIntentReceiver, sdFilter);
 
-        LEDSettingsObserver ledObserver = new LEDSettingsObserver(mHandler);
-        ledObserver.observe();
+        SettingsObserver observer = new SettingsObserver(mHandler);
+        observer.observe();
         QuietHoursSettingsObserver qhObserver = new QuietHoursSettingsObserver(mHandler);
         qhObserver.observe();
     }

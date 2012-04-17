@@ -201,11 +201,9 @@ class ServerThread extends Thread {
                 Slog.e(TAG, "Failure starting Account Manager", e);
             }
 
-
             Slog.i(TAG, "Content Manager");
             ContentService.main(context,
                     factoryTest == SystemServer.FACTORY_TEST_LOW_LEVEL);
-
 
             Slog.i(TAG, "System Content Providers");
             ActivityManagerService.installSystemProviders();

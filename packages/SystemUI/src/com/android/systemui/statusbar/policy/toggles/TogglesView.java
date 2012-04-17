@@ -39,7 +39,7 @@ public class TogglesView extends LinearLayout {
     public static final int BRIGHTNESS_LOC_BOTTOM = 2;
     public static final int BRIGHTNESS_LOC_NONE = 3;
 
-    private int mBrightnessLocation = BRIGHTNESS_LOC_NONE;
+    private int mBrightnessLocation = BRIGHTNESS_LOC_TOP;
 
     private static final String TOGGLE_AUTOROTATE = "ROTATE";
     private static final String TOGGLE_BLUETOOTH = "BT";
@@ -268,8 +268,7 @@ public class TogglesView extends LinearLayout {
                 STYLE_ICON);
 
         mBrightnessLocation = Settings.System.getInt(resolver,
-                Settings.System.STATUSBAR_TOGGLES_BRIGHTNESS_LOC,
-                BRIGHTNESS_LOC_BOTTOM);
+                Settings.System.STATUSBAR_TOGGLES_BRIGHTNESS_LOC, BRIGHTNESS_LOC_TOP);
 
         useAltButtonLayout = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.STATUSBAR_TOGGLES_USE_BUTTONS, 1) == 1;
