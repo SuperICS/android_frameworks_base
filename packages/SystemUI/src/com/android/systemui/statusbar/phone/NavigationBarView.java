@@ -97,7 +97,7 @@ public class NavigationBarView extends LinearLayout {
     final static String ACTION_KILL = "**kill**";
     final static String ACTION_NULL = "**null**";
 
-    int mNumberOfButtons = 4;
+    int mNumberOfButtons = 3;
 
     public String[] mClickActions = new String[5];
     public String[] mLongpressActions = new String[5];
@@ -241,7 +241,7 @@ public class NavigationBarView extends LinearLayout {
 
                 if (j == (mNumberOfButtons - 1)) {
                     // which to skip
-                } else if (mNumberOfButtons == 4) {
+                } else if (mNumberOfButtons == 3) {
                     // add separator view here
                     View separator = new View(mContext);
                     separator.setLayoutParams(getSeparatorLayoutParams(landscape));

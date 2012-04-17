@@ -1527,7 +1527,6 @@ public final class Settings {
          */
         public static final String LIGHT_FILTER_INTERVAL = "light_filter_interval";
 
-
         /**
          * Control whether the process CPU usage meter should be shown.
          */
@@ -2736,6 +2735,7 @@ public final class Settings {
          * @hide
          */
         public static final String STATUSBAR_QUICKTOGGLES_AUTOHIDE = "statusbar_quicktoggles_autohide";
+
         /**
          * Whether to control brightness from status bar
          * 
@@ -3058,13 +3058,11 @@ public final class Settings {
          * @hide
          */
         public static final String LOCKSCREEN_CALENDAR_HIDE_ONGOING = "lockscreen_calendar_hide_ongoing";
-
+        
         /**
-         * Setting to use lockscreen alongside secure lock
+         * 
          * @hide
          */
-        public static final String SHOW_LOCK_BEFORE_UNLOCK = "show_lock_before_unlock";
-  
         public static final String LOCKSCREEN_CALENDAR_USE_COLORS = "lockscreen_calendar_use_colors";
         
         /**
@@ -3073,7 +3071,13 @@ public final class Settings {
          */
         public static final String LOCKSCREEN_CALENDAR_INTERVAL = "lockscreen_calendar_interval";
         
-	/**
+        /**
+         * Setting to use lockscreen alongside secure lock
+         * @hide
+         */
+        public static final String SHOW_LOCK_BEFORE_UNLOCK = "show_lock_before_unlock";
+        
+        /**
          * custom lockscreen text color
          * @hide
          */

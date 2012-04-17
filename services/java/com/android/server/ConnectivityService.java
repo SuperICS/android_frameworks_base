@@ -1367,7 +1367,7 @@ private NetworkStateTracker makeWimaxStateTracker() {
     }
     catch(NumberFormatException ne)
     {
-      defaultConnected = 1;
+      defaultConnected = 0;
     }
 
         boolean retVal = Settings.Secure.getInt(mContext.getContentResolver(),
