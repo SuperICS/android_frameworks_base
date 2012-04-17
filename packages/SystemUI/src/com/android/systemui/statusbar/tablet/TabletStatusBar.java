@@ -143,9 +143,9 @@ public class TabletStatusBar extends StatusBar implements
     public String[] mLongpressActions = new String[5];
     public String[] mPortraitIcons = new String[5];
 
-    public final static int StockButtonsQty = 3;
+    public final static int StockButtonsQty = 4;
     public final static String[] StockClickActions = {
-            "**back**", "**home**", "**recents**", "**null**", "**null**"
+            "**back**", "**home**", "**recents**", "**menu**", "**null**"
     };
 
     public final static String[] StockLongpress = {
