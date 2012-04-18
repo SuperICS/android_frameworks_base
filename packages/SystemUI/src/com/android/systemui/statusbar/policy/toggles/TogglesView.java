@@ -266,7 +266,7 @@ public class TogglesView extends LinearLayout {
                 Settings.System.STATUSBAR_TOGGLES_BRIGHTNESS_LOC, BRIGHTNESS_LOC_TOP);
 
         useAltButtonLayout = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.STATUSBAR_TOGGLES_USE_BUTTONS, 1) == 1;
+                Settings.System.STATUSBAR_TOGGLES_USE_BUTTONS, 0) == 1;
 
         // mWidgetsPerRow = Settings.System.getInt(resolver,
         // Settings.System.STATUSBAR_TOGGLES_NUMBER_PER_ROW,

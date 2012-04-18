@@ -52,7 +52,7 @@ public abstract class Toggle implements OnCheckedChangeListener {
         mContext = context;
 
         boolean useAltButtonLayout = Settings.System.getInt(context.getContentResolver(),
-                Settings.System.STATUSBAR_TOGGLES_USE_BUTTONS, 1) == 1;
+                Settings.System.STATUSBAR_TOGGLES_USE_BUTTONS, 0) == 1;
 
         mView = View.inflate(mContext, useAltButtonLayout ? R.layout.toggle_button
                 : R.layout.toggle, null);
