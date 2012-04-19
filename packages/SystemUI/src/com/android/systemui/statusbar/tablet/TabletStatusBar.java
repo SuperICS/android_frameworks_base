@@ -138,7 +138,7 @@ public class TabletStatusBar extends StatusBar implements
     final static String ACTION_KILL = "**kill**";
     final static String ACTION_NULL = "**null**";
 
-    int mNumberOfButtons = 3;
+    int mNumberOfButtons = 4;
 
     public String[] mClickActions = new String[5];
     public String[] mLongpressActions = new String[5];
@@ -202,7 +202,6 @@ public class TabletStatusBar extends StatusBar implements
     ViewGroup mPile;
 
     HeightReceiver mHeightReceiver;
-
 //    BatteryController mBatteryController;
     DockBatteryController mDockBatteryController;
     BluetoothController mBluetoothController;
