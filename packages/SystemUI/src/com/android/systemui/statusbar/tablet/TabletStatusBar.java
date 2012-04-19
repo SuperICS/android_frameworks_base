@@ -89,6 +89,7 @@ import com.android.systemui.statusbar.NotificationData;
 import com.android.systemui.statusbar.SignalClusterView;
 import com.android.systemui.statusbar.StatusBar;
 import com.android.systemui.statusbar.StatusBarIconView;
+import com.android.systemui.statusbar.policy.DockBatteryController;
 import com.android.systemui.statusbar.policy.BluetoothController;
 import com.android.systemui.statusbar.policy.CompatModeButton;
 import com.android.systemui.statusbar.policy.LocationController;
@@ -201,10 +202,14 @@ public class TabletStatusBar extends StatusBar implements
     ViewGroup mPile;
 
     HeightReceiver mHeightReceiver;
+
 //    BatteryController mBatteryController;
+    DockBatteryController mDockBatteryController;
     BluetoothController mBluetoothController;
     LocationController mLocationController;
     NetworkController mNetworkController;
+
+    private boolean mHasDockBattery;
 
     ViewGroup mBarContents;
 
@@ -259,6 +264,9 @@ public class TabletStatusBar extends StatusBar implements
         mQuickToggles.setVisibility(View.VISIBLE);
         mQuickToggles.setBar(this);
         
+        if (mHasDockBattery) {
+            mDockBatteryController.addIconView((ImageView)mNotificationPanel.findViewById(R.id.dock_battery));
+        }
         // Bt
         mBluetoothController.addIconView(
                 (ImageView)mNotificationPanel.findViewById(R.id.bluetooth));
@@ -549,6 +557,14 @@ public class TabletStatusBar extends StatusBar implements
 
 //        mBatteryController = new BatteryController(mContext);
 //        mBatteryController.addIconView((ImageView)sb.findViewById(R.id.battery));
+        mHasDockBattery = mContext.getResources().getBoolean(
+                com.android.internal.R.bool.config_hasDockBattery);
+
+        if (mHasDockBattery) {
+            mDockBatteryController = new DockBatteryController(mContext);
+            mDockBatteryController.addIconView((ImageView)sb.findViewById(R.id.dock_battery));
+        }
+
         mBluetoothController = new BluetoothController(mContext);
         mBluetoothController.addIconView((ImageView)sb.findViewById(R.id.bluetooth));
 
@@ -2045,11 +2061,6 @@ public class TabletStatusBar extends StatusBar implements
                         Settings.System.getUriFor(Settings.System.NAVIGATION_CUSTOM_APP_ICONS[j]),
                         false,
                         this);
-                resolver.registerContentObserver(
-                        Settings.System
-                                .getUriFor(Settings.System.NAVIGATION_LANDSCAPE_APP_ICONS[j]),
-                        false,
-                        this);
             }
             updateSettings();
         }
@@ -2064,21 +2075,36 @@ public class TabletStatusBar extends StatusBar implements
         ContentResolver resolver = mContext.getContentResolver();
 
         mNumberOfButtons = Settings.System.getInt(resolver,
-                Settings.System.NAVIGATION_BAR_BUTTONS_QTY, StockButtonsQty);
+                Settings.System.NAVIGATION_BAR_BUTTONS_QTY, 0);
+        if (mNumberOfButtons == 0){
+        	mNumberOfButtons = StockButtonsQty;
+        	Settings.System.putInt(resolver,
+            		Settings.System.NAVIGATION_BAR_BUTTONS_QTY, StockButtonsQty);    	
+        }
 
         for (int j = 0; j < mNumberOfButtons; j++) {
             mClickActions[j] = Settings.System.getString(resolver,
                     Settings.System.NAVIGATION_CUSTOM_ACTIVITIES[j]);
-            if (mClickActions[j] == null)
+            if (mClickActions[j] == null){
                 mClickActions[j] = StockClickActions[j];
+                Settings.System.putString(resolver,
+                		Settings.System.NAVIGATION_CUSTOM_ACTIVITIES[j], mClickActions[j]);
+            }
 
             mLongpressActions[j] = Settings.System.getString(resolver,
                     Settings.System.NAVIGATION_LONGPRESS_ACTIVITIES[j]);
-            if (mLongpressActions[j] == null)
+            if (mLongpressActions[j] == null) {
                 mLongpressActions[j] = StockLongpress[j];
-
+                Settings.System.putString(resolver,
+                		Settings.System.NAVIGATION_LONGPRESS_ACTIVITIES[j], mLongpressActions[j]);
+            }
             mPortraitIcons[j] = Settings.System.getString(resolver,
                     Settings.System.NAVIGATION_CUSTOM_APP_ICONS[j]);
+            if (mPortraitIcons[j] == null) {
+                mPortraitIcons[j] = "";
+                Settings.System.putString(resolver,
+                		Settings.System.NAVIGATION_CUSTOM_APP_ICONS[j], "");
+            }
         }
         makeNavBar();
 

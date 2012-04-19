@@ -97,12 +97,11 @@ public class NavigationBarView extends LinearLayout {
     final static String ACTION_KILL = "**kill**";
     final static String ACTION_NULL = "**null**";
 
-    int mNumberOfButtons = 3;
+    int mNumberOfButtons = 4;
 
     public String[] mClickActions = new String[5];
     public String[] mLongpressActions = new String[5];
     public String[] mPortraitIcons = new String[5];
-    public String[] mLandscapeIcons = new String[5];
 
     public final static int StockButtonsQty = 4;
     public final static String[] StockClickActions = {
@@ -233,7 +232,7 @@ public class NavigationBarView extends LinearLayout {
                 ExtensibleKeyButtonView v = null;
 
                 v = generateKey(landscape, mClickActions[j], mLongpressActions[j],
-                        landscape ? mPortraitIcons[j] : mLandscapeIcons[j]);
+                         mPortraitIcons[j]);
                 v.setTag((landscape ? "key_land_" : "key_") + j);
 
                 addButton(navButtonLayout, v, landscape);
@@ -241,7 +240,7 @@ public class NavigationBarView extends LinearLayout {
 
                 if (j == (mNumberOfButtons - 1)) {
                     // which to skip
-                } else if (mNumberOfButtons == 3) {
+                } else if (mNumberOfButtons == 4) {
                     // add separator view here
                     View separator = new View(mContext);
                     separator.setLayoutParams(getSeparatorLayoutParams(landscape));
@@ -719,11 +718,6 @@ public class NavigationBarView extends LinearLayout {
                         Settings.System.getUriFor(Settings.System.NAVIGATION_CUSTOM_APP_ICONS[j]),
                         false,
                         this);
-                resolver.registerContentObserver(
-                        Settings.System
-                                .getUriFor(Settings.System.NAVIGATION_LANDSCAPE_APP_ICONS[j]),
-                        false,
-                        this);
             }
             updateSettings();
         }
@@ -747,24 +741,36 @@ public class NavigationBarView extends LinearLayout {
                 Settings.System.MENU_VISIBILITY, VISIBILITY_SYSTEM);
 
         mNumberOfButtons = Settings.System.getInt(resolver,
-                Settings.System.NAVIGATION_BAR_BUTTONS_QTY, StockButtonsQty);
+                Settings.System.NAVIGATION_BAR_BUTTONS_QTY, 0);
+        if (mNumberOfButtons == 0){
+        	mNumberOfButtons = StockButtonsQty;
+        	Settings.System.putInt(resolver,
+            		Settings.System.NAVIGATION_BAR_BUTTONS_QTY, StockButtonsQty);    	
+        }
 
         for (int j = 0; j < mNumberOfButtons; j++) {
             mClickActions[j] = Settings.System.getString(resolver,
                     Settings.System.NAVIGATION_CUSTOM_ACTIVITIES[j]);
-            if (mClickActions[j] == null)
+            if (mClickActions[j] == null){
                 mClickActions[j] = StockClickActions[j];
+                Settings.System.putString(resolver,
+                		Settings.System.NAVIGATION_CUSTOM_ACTIVITIES[j], mClickActions[j]);
+            }
 
             mLongpressActions[j] = Settings.System.getString(resolver,
                     Settings.System.NAVIGATION_LONGPRESS_ACTIVITIES[j]);
-            if (mLongpressActions[j] == null)
+            if (mLongpressActions[j] == null) {
                 mLongpressActions[j] = StockLongpress[j];
-
+                Settings.System.putString(resolver,
+                		Settings.System.NAVIGATION_LONGPRESS_ACTIVITIES[j], mLongpressActions[j]);
+            }
             mPortraitIcons[j] = Settings.System.getString(resolver,
                     Settings.System.NAVIGATION_CUSTOM_APP_ICONS[j]);
-
-            mLandscapeIcons[j] = Settings.System.getString(resolver,
-                    Settings.System.NAVIGATION_CUSTOM_APP_ICONS[j]);
+            if (mPortraitIcons[j] == null) {
+                mPortraitIcons[j] = "";
+                Settings.System.putString(resolver,
+                		Settings.System.NAVIGATION_CUSTOM_APP_ICONS[j], "");
+            }
         }
         makeBar();
 

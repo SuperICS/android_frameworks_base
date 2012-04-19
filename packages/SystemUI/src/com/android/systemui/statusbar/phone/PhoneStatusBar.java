@@ -466,6 +466,7 @@ public class PhoneStatusBar extends StatusBar {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
         filter.addAction(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+        filter.addAction(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         context.registerReceiver(mBroadcastReceiver, filter);
 
@@ -499,10 +500,15 @@ public class PhoneStatusBar extends StatusBar {
     }
 
     private void doBrightNess(MotionEvent e) {
-        int screenBrightness = checkMinMax(Float.valueOf((e.getRawX() * mPropFactor.floatValue()))
-                .intValue());
-        Settings.System.putInt(mContext.getContentResolver(), "screen_brightness", screenBrightness);
-        // Log.e(TAG, "Screen brightness: " + screenBrightness);
+        int screenBrightness;
+        try {
+            screenBrightness = checkMinMax(Float.valueOf((e.getRawX() * mPropFactor.floatValue()))
+                    .intValue());
+            Settings.System.putInt(mContext.getContentResolver(), "screen_brightness",
+                    screenBrightness);
+        } catch (NullPointerException e2) {
+            return;
+        }
         try {
             IPowerManager pw = IPowerManager.Stub.asInterface(ServiceManager.getService("power"));
             if (pw != null) {
@@ -2604,7 +2610,7 @@ public class PhoneStatusBar extends StatusBar {
         mQuickTogglesHideAfterCollapse = Settings.System.getInt(cr,
                 Settings.System.STATUSBAR_QUICKTOGGLES_AUTOHIDE, 0) == 1;
         
-        mWeatherPanelEnabled = (Settings.System.getInt(cr, Settings.System.WEATHER_STATUSBAR_STYLE, 0) == 1) &&
+        mWeatherPanelEnabled = (Settings.System.getInt(cr, Settings.System.WEATHER_STATUSBAR_STYLE, 1) == 1) &&
                 (Settings.System.getInt(cr, Settings.System.USE_WEATHER, 0) == 1);
 
         mIsStatusBarBrightNess = Settings.System.getInt(mStatusBarView.getContext()
@@ -2674,10 +2680,20 @@ public class PhoneStatusBar extends StatusBar {
                     }
                 }
                 animateCollapse(excludeRecents);
+                if(Intent.ACTION_SCREEN_OFF.equals(action)) {
+                    // Explicitly hide the expanded dialog. Otherwise it
+                    // causes continuous buffer updates to SurfaceTexture
+                    // even when SCREEN is turned off (while In-Call).
+                    // This keeps the power consumption to a minimum
+                    // in such a scenario.
+                    mExpandedDialog.hide();
+                }
             }
             else if (Intent.ACTION_CONFIGURATION_CHANGED.equals(action)) {
                 repositionNavigationBar();
                 updateResources();
+            } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
+                mExpandedDialog.show();
             }
         }
     };
