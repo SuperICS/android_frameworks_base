@@ -348,7 +348,7 @@ public class NotificationManagerService extends INotificationManager.Stub
             boolean queryRestart = false;
 
             boolean ledScreenOn = Settings.Secure.getInt(mContext.getContentResolver(),
-                    Settings.Secure.LED_SCREEN_ON, 0) == 1;
+                    Settings.Secure.LED_SCREEN_ON, 1) == 1;
 
             if (action.equals(Intent.ACTION_PACKAGE_REMOVED)
                     || action.equals(Intent.ACTION_PACKAGE_RESTARTED)
