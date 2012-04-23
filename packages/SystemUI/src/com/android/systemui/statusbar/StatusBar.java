@@ -22,8 +22,8 @@ import android.app.ActivityManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.PixelFormat;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.ServiceManager;
@@ -165,6 +165,21 @@ public abstract class StatusBar extends SystemUI implements CommandQueue.Callbac
         }
 
         mDoNotDisturb = new DoNotDisturb(mContext);
+
+        // refresh weather here (after 10s) in case systemui was restarted or somehow crashed
+        Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                refreshWeather();
+            }
+        }, 10000);
+    }
+
+    private void refreshWeather() {
+        Intent weatherintent = new Intent("com.aokp.romcontrol.INTENT_WEATHER_REQUEST");
+        weatherintent.putExtra(android.content.Intent.EXTRA_TEXT, "updateweather");
+        mContext.sendBroadcast(weatherintent);
     }
 
     protected View updateNotificationVetoButton(View row, StatusBarNotification n) {
