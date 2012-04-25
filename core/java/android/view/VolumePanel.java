@@ -16,19 +16,16 @@
 
 package android.view;
 
-import java.util.HashMap;
 import com.android.internal.R;
 
 import android.app.Dialog;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
-import android.database.ContentObserver;
 import android.media.AudioManager;
 import android.media.AudioService;
 import android.media.AudioSystem;
@@ -46,6 +43,8 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+
+import java.util.HashMap;
 
 /**
  * Handle the volume up and down keys.
@@ -251,7 +250,7 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
         mVoiceCapable = context.getResources().getBoolean(R.bool.config_voice_capable);
 
         // get the users preference
-        int choosenStyle = Settings.System.getInt(context.getContentResolver(),Settings.System.MODE_VOLUME_OVERLAY, Settings.System.VOLUME_OVERLAY_SINGLE);
+        int choosenStyle = Settings.System.getInt(context.getContentResolver(),Settings.System.MODE_VOLUME_OVERLAY, -1);
         // by default -1 is expected - deal with choosing the right default
         if (choosenStyle == -1) {
             if (mVoiceCapable) {
