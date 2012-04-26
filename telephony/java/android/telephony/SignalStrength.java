@@ -460,7 +460,7 @@ public class SignalStrength implements Parcelable {
         else if (cdmaEcio >= -150) levelEcio = SIGNAL_STRENGTH_POOR;
         else levelEcio = SIGNAL_STRENGTH_NONE_OR_UNKNOWN;
 
-        int level = ((levelDbm < levelEcio) || (SystemProperties.get("ro.ril.samsung_cdma").equals("true"))) ? levelDbm : levelEcio;
+        int level = (levelDbm < levelEcio) ? levelDbm : levelEcio;
         if (DBG) log("getCdmaLevel=" + level);
         return level;
     }
