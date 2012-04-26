@@ -36,9 +36,6 @@
     <string name="defaultMsisdnAlphaTag" msgid="2850889754919584674">"MSISDN1"</string>
     <string name="mmiError" msgid="5154499457739052907">"Se ha producido un problema de conexión o el código MMI no es válido."</string>
 
-    <!-- label for item that opens the profile choosing dialog -->
-    <string name="global_action_choose_profile">Perfiles</string>
-
     <!-- Names of default profiles. -->
     <string name="profileNameDefault">Normal</string>
     <string name="profileNameWork">Trabajo</string>
@@ -57,17 +54,6 @@
     <string name="wildcardProfile">Otros</string>
 
     <string name="mmiFdnError" msgid="5224398216385316471">"La operación solo es válida para números de marcación fija."</string>
-    <string name="profileNameDefault">"Predeterminado"</string>
-    <string name="profileNameWork">"Trabajo"</string>
-    <string name="profileNameHome">"Casa"</string>
-    <string name="profileNameSilent">"Silencio"</string>
-    <string name="profileNameNight">"Noche"</string>
-    <string name="profileGroupPhone">"Teléfono"</string>
-    <string name="profileGroupCalendar">"Calendario"</string>
-    <string name="profileGroupGmail">"Gmail"</string>
-    <string name="profileGroupEmail">"Email"</string>
-    <string name="profileGroupSMS">SMS</string>
-    <string name="wildcardProfile">Otro</string>
     <string name="serviceEnabled" msgid="8147278346414714315">"El servicio se ha habilitado."</string>
     <string name="serviceEnabledFor" msgid="6856228140453471041">"Se ha habilitado el servicio para:"</string>
     <string name="serviceDisabled" msgid="1937553226592516411">"El servicio se ha inhabilitado."</string>
