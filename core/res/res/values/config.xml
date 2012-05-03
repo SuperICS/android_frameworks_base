@@ -792,23 +792,16 @@
     </integer-array>
 
     <!-- CM CHANGES START HERE -->
-    <!-- LUN file to be used by legacy USB manager.
-          The existence of this file will be used to determine in the
-          legacy USB manager should be started. -->
-    <string name="config_legacyUmsLunFile">/sys/devices/platform/usb_mass_storage/lun0/file</string>    
 
-	<!-- Workaround for devices with broken keyboards -->
+    <!-- LUN file to be used by legacy USB manager.
+         The existence of this file will be used to determine in the
+         legacy USB manager should be started. -->
+    <string name="config_legacyUmsLunFile">/sys/devices/platform/usb_mass_storage/lun0/file</string>
+
+    <!-- Workaround for devices with broken keyboards -->
     <bool name="config_forceDisableHardwareKeyboard">false</bool>
 
     <!-- Asus dock compatibility disabled by default -->
     <bool name="config_hasDockBattery">false</bool>
 
-    <!-- If this value is true, we handle Samsung CDMA's message ID method -->
-
-    <!-- Array of OEM specific USB mode override config.
-         OEM can override a certain USB mode depending on ro.bootmode.
-         Specify an array of below items to set override rule.
-         [bootmode]:[original USB mode]:[USB mode used]-->
-    <integer-array translatable="false" name="config_oemUsbModeOverride">
-    </integer-array>
 </resources>
