@@ -109,6 +109,7 @@ public class NotificationManagerService extends INotificationManager.Stub
 
     // for enabling and disabling notification pulse behaviour
     private boolean mScreenOn = true;
+    private boolean mWasScreenOn = false;
     private boolean mInCall = false;
     private boolean mNotificationPulseEnabled;
     private HashMap<String, NotificationLedValues> mNotificationPulseCustomLedValues;
@@ -381,6 +382,8 @@ public class NotificationManagerService extends INotificationManager.Stub
                 mScreenOn = true;
             } else if (action.equals(Intent.ACTION_SCREEN_OFF)) {
                 mScreenOn = false;
+                mWasScreenOn = true;
+                updateLightsLocked();
             } else if (action.equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
                 mInCall = (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(
                         TelephonyManager.EXTRA_STATE_OFFHOOK));
@@ -1221,6 +1224,9 @@ public class NotificationManagerService extends INotificationManager.Stub
             }
         }
 
+        boolean wasScreenOn = mWasScreenOn;
+        mWasScreenOn = false;
+
         if (mLedNotification == null) {
             mNotificationLight.turnOff();
             return;
@@ -1236,7 +1242,7 @@ public class NotificationManagerService extends INotificationManager.Stub
                 Notification.FLAG_FORCE_LED_SCREEN_OFF) != 0;
 
         // Don't flash while we are in a call, screen is on or we are in quiet hours with light dimmed
-        if (mInCall || (mScreenOn && !ledScreenOn) || (inQuietHours() && mQuietHoursDim)) {
+        if (mInCall || mScreenOn || (inQuietHours() && mQuietHoursDim) || (wasScreenOn && !forceWithScreenOff)) {
             mNotificationLight.turnOff();
         } else {
             int ledARGB;
