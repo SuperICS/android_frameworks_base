@@ -298,14 +298,14 @@ public class StatusBarIconView extends AnimatedImageView {
                     this);
             setAlpha(Settings.System.getFloat(mContext
                     .getContentResolver(), Settings.System.STATUS_BAR_ICON_TRANSPARENCY,
-                    0.55f));
+                    0.80f));
         }
 
         @Override
         public void onChange(boolean selfChange) {
             setAlpha(Settings.System.getFloat(mContext
                     .getContentResolver(), Settings.System.STATUS_BAR_ICON_TRANSPARENCY,
-                    0.55f));
+                    0.80f));
         }
     }
 }
