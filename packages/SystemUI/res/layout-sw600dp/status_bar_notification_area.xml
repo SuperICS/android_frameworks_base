@@ -116,7 +116,7 @@
             android:orientation="horizontal"
             android:gravity="center"
             >
-            <include layout="@layout/signal_cluster_view" 
+            <include layout="@layout/signal_cluster_view"
                 android:id="@+id/signal_cluster"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -133,11 +133,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 />
-            <ImageView
-                android:id="@+id/dock_battery"
+            <include layout="@layout/dock_cluster_view"
+                android:id="@+id/dock_cluster"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:paddingLeft="4dip"
+                android:visibility="gone"
                 />
         </LinearLayout>
     </LinearLayout>

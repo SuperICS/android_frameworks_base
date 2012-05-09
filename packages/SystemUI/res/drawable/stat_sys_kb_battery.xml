@@ -27,4 +27,3 @@
     <item android:maxLevel="90" android:drawable="@drawable/stat_sys_kb_battery_85" />
     <item android:maxLevel="100" android:drawable="@drawable/stat_sys_kb_battery_100" />
 </level-list>
-

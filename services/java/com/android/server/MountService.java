@@ -370,6 +370,7 @@ class MountService extends IMountService.Stub
                     if (DEBUG_UNMOUNT) Slog.i(TAG, "H_UNMOUNT_PM_UPDATE");
                     UnmountCallBack ucb = (UnmountCallBack) msg.obj;
                     if (!mUpdatingStatus && !isExternalStorage(ucb.path)) {
+<<<<<<< HEAD
                         // If PM isn't already updating, and this isn't an ASEC
                         // mount, then go ahead and do the unmount immediately.
                         if (DEBUG_UNMOUNT) Slog.i(TAG, " skipping PackageManager for " + ucb.path);
@@ -377,6 +378,15 @@ class MountService extends IMountService.Stub
                         break;
                     }
                     mForceUnmounts.add(ucb);
+=======
+		        // If PM isn't already updating, and this isn't an ASEC
+			// mount, then go ahead and do the unmount immediately.
+			if (DEBUG_UNMOUNT) Slog.i(TAG, " skipping PackageManager for " + ucb.path);
+			ucb.handleFinished();
+			break;
+		    }
+		    mForceUnmounts.add(ucb);
+>>>>>>> 3a53e87b4bbb95b6be18fb71d48db1cab8336f88
                     if (DEBUG_UNMOUNT) Slog.i(TAG, " registered = " + mUpdatingStatus);
                     // Register only if needed.
                     if (!mUpdatingStatus) {
@@ -595,9 +605,15 @@ class MountService extends IMountService.Stub
             // Update state on PackageManager, but only of real events
             if (!mEmulateExternalStorage) {
                 if (Environment.MEDIA_UNMOUNTED.equals(state)) {
+<<<<<<< HEAD
                     if (isExternalStorage(path)) {
                         mPms.updateExternalMediaStatus(false, false);
                     }
+=======
+		    if (isExternalStorage(path)) {
+			mPms.updateExternalMediaStatus(false, false);
+		    }
+>>>>>>> 3a53e87b4bbb95b6be18fb71d48db1cab8336f88
 
                     /*
                      * Some OBBs might have been unmounted when this volume was
@@ -607,9 +623,15 @@ class MountService extends IMountService.Stub
                     mObbActionHandler.sendMessage(mObbActionHandler.obtainMessage(
                             OBB_FLUSH_MOUNT_STATE, path));
                 } else if (Environment.MEDIA_MOUNTED.equals(state)) {
+<<<<<<< HEAD
                     if (isExternalStorage(path)) {
                         mPms.updateExternalMediaStatus(true, false);
                     }
+=======
+		    if (isExternalStorage(path)) {
+			mPms.updateExternalMediaStatus(true, false);
+		    }
+>>>>>>> 3a53e87b4bbb95b6be18fb71d48db1cab8336f88
                 }
             }
         }
@@ -918,9 +940,15 @@ class MountService extends IMountService.Stub
         Runtime.getRuntime().gc();
 
         // Redundant probably. But no harm in updating state again.
+<<<<<<< HEAD
         if (isExternalStorage(path)) {
             mPms.updateExternalMediaStatus(false, false);
         }
+=======
+	if (isExternalStorage(path)) {
+	    mPms.updateExternalMediaStatus(false, false);
+	}
+>>>>>>> 3a53e87b4bbb95b6be18fb71d48db1cab8336f88
         try {
             String arg = removeEncryption
                     ? " force_and_revert"
@@ -1020,6 +1048,7 @@ class MountService extends IMountService.Stub
             mSendUmsConnectedOnBoot = avail;
         }
 
+<<<<<<< HEAD
         final ArrayList<String> volumes = getShareableVolumes();
         boolean mediaShared = false;
         for (String path : volumes) {
@@ -1027,6 +1056,15 @@ class MountService extends IMountService.Stub
                 mediaShared = true;
         }
         if (avail == false && mediaShared) {
+=======
+	final ArrayList<String> volumes = getShareableVolumes();
+	boolean mediaShared = false;
+	for (String path : volumes) {
+	    if (getVolumeState(path).equals(Environment.MEDIA_SHARED))
+		mediaShared = true;
+	}
+	if (avail == false && mediaShared) {
+>>>>>>> 3a53e87b4bbb95b6be18fb71d48db1cab8336f88
             /*
              * USB mass storage disconnected while enabled
              */
@@ -1036,6 +1074,7 @@ class MountService extends IMountService.Stub
                     try {
                         int rc;
                         Slog.w(TAG, "Disabling UMS after cable disconnect");
+<<<<<<< HEAD
                         for (String path : volumes) {
                             if (getVolumeState(path).equals(Environment.MEDIA_SHARED)) {
                                 doShareUnshareVolume(path, "ums", false);
@@ -1045,6 +1084,17 @@ class MountService extends IMountService.Stub
                                                     path, rc));
                                 }
                             }
+=======
+			for (String path : volumes) {
+			    if (getVolumeState(path).equals(Environment.MEDIA_SHARED)) {
+				doShareUnshareVolume(path, "ums", false);
+				if ((rc = doMountVolume(path)) != StorageResultCode.OperationSucceeded) {
+				    Slog.e(TAG, String.format(
+					    "Failed to remount {%s} on UMS enabled-disconnect (%d)",
+						    path, rc));
+				}
+			     }
+>>>>>>> 3a53e87b4bbb95b6be18fb71d48db1cab8336f88
                         }
                     } catch (Exception ex) {
                         Slog.w(TAG, "Failed to mount media on UMS enabled-disconnect", ex);
@@ -1382,6 +1432,7 @@ class MountService extends IMountService.Stub
     }
 
     private boolean isExternalStorage(String path) {
+<<<<<<< HEAD
         return Environment.getExternalStorageDirectory().getPath().equals(path);
     }
 
@@ -1398,12 +1449,30 @@ class MountService extends IMountService.Stub
         return volumesToMount;
     }
 
+=======
+	return Environment.getExternalStorageDirectory().getPath().equals(path);
+    }
+
+    private ArrayList<String> getShareableVolumes() {
+	// Sharable volumes have android:allowMassStorage="true" in storage_list.xml
+	ArrayList<String> volumesToMount = new ArrayList<String>();
+	synchronized (mVolumes) {
+	    for (StorageVolume v : mVolumes) {
+		if (v.allowMassStorage()) {
+		    volumesToMount.add(v.getPath());
+		}
+	    }
+	}
+	return volumesToMount;
+    }
+>>>>>>> 3a53e87b4bbb95b6be18fb71d48db1cab8336f88
     public void setUsbMassStorageEnabled(boolean enable) {
         waitForReady();
         validatePermission(android.Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS);
 
         // TODO: Add support for multiple share methods
         for (String path : getShareableVolumes()) {
+<<<<<<< HEAD
             /*
              * If the volume is mounted and we're enabling then unmount it
              */
@@ -1431,18 +1500,56 @@ class MountService extends IMountService.Stub
                      * broadcasts.
                      */
                 }
+=======
+	    /*
+	     * If the volume is mounted and we're enabling then unmount it
+	     */
+	    String vs = getVolumeState(path);
+	    String method = "ums";
+	    if (enable && vs.equals(Environment.MEDIA_MOUNTED)) {
+	        // Override for isUsbMassStorageEnabled()
+	        setUmsEnabling(enable);
+	        UmsEnableCallBack umscb = new UmsEnableCallBack(path, method, true);
+	        mHandler.sendMessage(mHandler.obtainMessage(H_UNMOUNT_PM_UPDATE, umscb));
+	        // Clear override
+	        setUmsEnabling(false);
+	    }
+	    /*
+	     * If we disabled UMS then mount the volume
+	     */
+	    if (!enable) {
+	        doShareUnshareVolume(path, method, enable);
+	        if (doMountVolume(path) != StorageResultCode.OperationSucceeded) {
+		    Slog.e(TAG, "Failed to remount " + path +
+			    " after disabling share method " + method);
+		    /*
+		     * Even though the mount failed, the unshare didn't so don't indicate an error.
+		     * The mountVolume() call will have set the storage state and sent the necessary
+		     * broadcasts.
+		     */
+	        }
+>>>>>>> 3a53e87b4bbb95b6be18fb71d48db1cab8336f88
             }
         }
     }
 
     public boolean isUsbMassStorageEnabled() {
         waitForReady();
+<<<<<<< HEAD
         for (String path : getShareableVolumes()) {
             if (doGetVolumeShared(path, "ums"))
                 return true;
         }
         // no volume is shared
         return false;
+=======
+	for (String path : getShareableVolumes()) {
+	    if (doGetVolumeShared(path, "ums"))
+		return true;
+	}
+	// no volume is shared
+	return false;
+>>>>>>> 3a53e87b4bbb95b6be18fb71d48db1cab8336f88
     }
 
     /**

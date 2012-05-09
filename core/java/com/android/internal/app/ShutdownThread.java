@@ -114,6 +114,7 @@ public final class ShutdownThread extends Thread {
 
         if (confirm) {
             final AlertDialog dialog;
+	    mRebootReason = "";
             // Set different dialog message based on whether or not we're rebooting
             if (mReboot) {
                 dialog = new AlertDialog.Builder(context)
@@ -121,12 +122,12 @@ public final class ShutdownThread extends Thread {
                         .setTitle(com.android.internal.R.string.reboot_system)
                         .setSingleChoiceItems(com.android.internal.R.array.shutdown_reboot_options, 0, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                if (which < 0)
+                                if (which < 1)
                                     return;
 
                                 String actions[] = context.getResources().getStringArray(com.android.internal.R.array.shutdown_reboot_actions);
 
-                                if (actions != null && which < actions.length)
+                                if (which < actions.length)
                                     mRebootReason = actions[which];
                             }
                         })

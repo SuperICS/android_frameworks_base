@@ -1294,4 +1294,7 @@
     <string name="launchBrowserDefault" msgid="2057951947297614725">"¿Iniciar el navegador?"</string>
     <string name="SetupCallDefault" msgid="6870275517518479651">"¿Aceptar la llamada?"</string>
     <string name="app_killed_message">"Aplicación finalizada"</string>
+    <string name="toggle_navbar">Alterna barra de navegación</string>
+    <string name="notifications_off_title">Notificationes off</string>
+    <string name="notifications_off_text">Pulse aquí para activar las notificaciones de nuevo.</string>
 </resources>
