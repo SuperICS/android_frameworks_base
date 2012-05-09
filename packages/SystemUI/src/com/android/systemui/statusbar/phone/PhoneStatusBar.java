@@ -20,6 +20,7 @@ import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import android.animation.ObjectAnimator;
 import android.app.ActivityManager;
 import android.app.ActivityManagerNative;
 import android.app.Dialog;
@@ -266,10 +267,6 @@ public class PhoneStatusBar extends StatusBar {
     boolean mQuickTogglesHideAfterCollapse = true;
 
     LinearLayout mCenterClockLayout;
-    // last theme that was applied in order to detect theme change (as opposed
-    // to some other configuration change).
-    CustomTheme mCurrentTheme;
-    private boolean mRecreating = false;
 
     // last theme that was applied in order to detect theme change (as opposed
     // to some other configuration change).
@@ -387,11 +384,6 @@ public class PhoneStatusBar extends StatusBar {
         mIcons = (LinearLayout) sb.findViewById(R.id.icons);
         mCenterClockLayout = (LinearLayout) sb.findViewById(R.id.center_clock_layout);
         mTickerView = sb.findViewById(R.id.ticker);
-
-        /* Destroy the old widget before recreating the expanded dialog
-           to make sure there are no context issues */
-        //if (mRecreating)
-        //    mPowerWidget.destroyWidget();
 
         mExpandedDialog = new ExpandedDialog(context);
         mExpandedView = expanded;

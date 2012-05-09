@@ -76,7 +76,6 @@ import android.view.WindowManager;
 import android.view.WindowManagerImpl;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.RemoteViews;
@@ -92,7 +91,6 @@ import com.android.systemui.statusbar.NotificationData;
 import com.android.systemui.statusbar.SignalClusterView;
 import com.android.systemui.statusbar.StatusBar;
 import com.android.systemui.statusbar.StatusBarIconView;
-import com.android.systemui.statusbar.policy.DockBatteryController;
 import com.android.systemui.statusbar.policy.BluetoothController;
 import com.android.systemui.statusbar.policy.CompatModeButton;
 import com.android.systemui.statusbar.policy.LocationController;
@@ -205,14 +203,10 @@ public class TabletStatusBar extends StatusBar implements
     ViewGroup mPile;
 
     HeightReceiver mHeightReceiver;
-
 //    BatteryController mBatteryController;
-    DockBatteryController mDockBatteryController;
     BluetoothController mBluetoothController;
     LocationController mLocationController;
     NetworkController mNetworkController;
-
-    private boolean mHasDockBattery;
 
     ViewGroup mBarContents;
 
@@ -272,6 +266,7 @@ public class TabletStatusBar extends StatusBar implements
         mQuickToggles = (TogglesView) mNotificationPanel.findViewById(R.id.quick_toggles);
         mQuickToggles.setVisibility(View.VISIBLE);
         mQuickToggles.setBar(this);
+
         // Bt
         mBluetoothController.addIconView(
                 (ImageView)mNotificationPanel.findViewById(R.id.bluetooth));
@@ -635,14 +630,6 @@ public class TabletStatusBar extends StatusBar implements
 
 //        mBatteryController = new BatteryController(mContext);
 //        mBatteryController.addIconView((ImageView)sb.findViewById(R.id.battery));
-        mHasDockBattery = mContext.getResources().getBoolean(
-                com.android.internal.R.bool.config_hasDockBattery);
-
-        if (mHasDockBattery) {
-            mDockBatteryController = new DockBatteryController(mContext);
-            mDockBatteryController.addIconView((ImageView)sb.findViewById(R.id.dock_battery));
-        }
-
         mBluetoothController = new BluetoothController(mContext);
         mBluetoothController.addIconView((ImageView)sb.findViewById(R.id.bluetooth));
 
