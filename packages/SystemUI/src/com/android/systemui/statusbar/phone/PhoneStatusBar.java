@@ -387,9 +387,8 @@ public class PhoneStatusBar extends StatusBar {
 
         mExpandedDialog = new ExpandedDialog(context);
         mExpandedView = expanded;
-        mPile = (NotificationRowLayout)expanded.findViewById(R.id.latestItems);
-        mExpandedContents = mPile; // was: expanded.findViewById(R.id.notificationLinearLayout);
-        mNoNotificationsTitle = (TextView)expanded.findViewById(R.id.noNotificationsTitle);
+        mPile = (NotificationRowLayout) expanded.findViewById(R.id.latestItems);
+        mNoNotificationsTitle = (TextView) expanded.findViewById(R.id.noNotificationsTitle);
         mNoNotificationsTitle.setVisibility(View.GONE); // disabling for now
 
         mTxtLayout = (LinearLayout) expanded.findViewById(R.id.txtlayout);
@@ -398,7 +397,7 @@ public class PhoneStatusBar extends StatusBar {
         mClearButton = expanded.findViewById(R.id.clear_all_button);
         mClearParams = (RelativeLayout.LayoutParams) mClearButton.getLayoutParams();
         mClearButton.setOnClickListener(mClearButtonListener);
-        mClearButton.setAlpha(0f);
+        mClearButton.setEnabled(false);
         mClearButton.setVisibility(View.GONE);
         mDateView = (DateView) expanded.findViewById(R.id.date);
         mSettingsButton = expanded.findViewById(R.id.settings_button);
@@ -463,9 +462,6 @@ public class PhoneStatusBar extends StatusBar {
         mCloseView.mService = this;
 
         mEdgeBorder = res.getDimensionPixelSize(R.dimen.status_bar_edge_ignore);
-
-        // set the inital view visibility
-        setAreThereNotifications();
 
         // Other icons
         mLocationController = new LocationController(mContext); // will post a
@@ -807,7 +803,7 @@ public class PhoneStatusBar extends StatusBar {
         }
 
         // Recalculate the position of the sliding windows and the titles.
-        setAreThereNotifications();
+        reDrawHeader();
         updateExpandedViewPos(EXPANDED_LEAVE_ALONE);
     }
 
@@ -915,7 +911,7 @@ public class PhoneStatusBar extends StatusBar {
         }
 
         // Recalculate the position of the sliding windows and the titles.
-        setAreThereNotifications();
+        reDrawHeader();
         updateExpandedViewPos(EXPANDED_LEAVE_ALONE);
     }
 
@@ -936,7 +932,7 @@ public class PhoneStatusBar extends StatusBar {
             }
         }
 
-        setAreThereNotifications();
+        reDrawHeader();
     }
 
     @Override
@@ -1232,31 +1228,18 @@ public class PhoneStatusBar extends StatusBar {
                     + " any=" + any + " clearable=" + clearable);
         }
 
-        if (mClearButton.isShown()) {
-            if (clearable != (mClearButton.getAlpha() == 1.0f)) {
-                ObjectAnimator.ofFloat(mClearButton, "alpha",
-                        clearable ? 1.0f : 0.0f)
-                    .setDuration(250)
-                    .start();
-            }
-        } else {
-            mClearButton.setAlpha(clearable ? 1.0f : 0.0f);
-        }
+        mClearButton.setVisibility(clearable ? View.VISIBLE : View.GONE);
+        mSettingsButton.setLayoutParams(clearable ? mSettingswClearParams : mSettingswoClearParams);
         mClearButton.setEnabled(clearable);
 
         /*
-        if (mNoNotificationsTitle.isShown()) {
-            if (any != (mNoNotificationsTitle.getAlpha() == 0.0f)) {
-                ObjectAnimator a = ObjectAnimator.ofFloat(mNoNotificationsTitle, "alpha",
-                            (any ? 0.0f : 0.75f));
-                a.setDuration(any ? 0 : 500);
-                a.setStartDelay(any ? 250 : 1000);
-                a.start();
-            }
-        } else {
-            mNoNotificationsTitle.setAlpha(any ? 0.0f : 0.75f);
-        }
-        */
+         * if (mNoNotificationsTitle.isShown()) { if (any !=
+         * (mNoNotificationsTitle.getAlpha() == 0.0f)) { ObjectAnimator a =
+         * ObjectAnimator.ofFloat(mNoNotificationsTitle, "alpha", (any ? 0.0f :
+         * 0.75f)); a.setDuration(any ? 0 : 500); a.setStartDelay(any ? 250 :
+         * 1000); a.start(); } } else { mNoNotificationsTitle.setAlpha(any ?
+         * 0.0f : 0.75f); }
+         */
     }
 
     public void showClock(boolean show) {
@@ -2455,6 +2438,7 @@ public class PhoneStatusBar extends StatusBar {
         final int mini(int a, int b) {
             return (b>a?a:b);
         }
+
         public void onClick(View v) {
             synchronized (mNotificationData) {
                 // animate-swipe all dismissable notifications, then animate the shade closed
