@@ -1367,7 +1367,8 @@ private NetworkStateTracker makeWimaxStateTracker() {
     {
       defaultConnected = 0;
     }
-	  boolean retVal = Settings.Secure.getInt(mContext.getContentResolver(),
+	enforceAccessPermission();
+	boolean retVal = Settings.Secure.getInt(mContext.getContentResolver(),
                 Settings.Secure.MOBILE_DATA, defaultConnected) == 1;
         if (VDBG) log("getMobileDataEnabled returning " + retVal);
         return retVal;
