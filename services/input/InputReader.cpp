@@ -49,6 +49,10 @@
 #include <limits.h>
 #include <math.h>
 
+#ifdef CUSTOM_PANEL_AMLOGIC
+#include <cutils/properties.h>
+#endif
+
 #define INDENT "  "
 #define INDENT2 "    "
 #define INDENT3 "      "
@@ -199,7 +203,7 @@ static void synthesizeButtonKeys(InputReaderContext* context, int32_t action,
 
 
 // --- InputReaderConfiguration ---
-
+#ifndef CUSTOM_PANEL_AMLOGIC
 bool InputReaderConfiguration::getDisplayInfo(int32_t displayId, bool external,
         int32_t* width, int32_t* height, int32_t* orientation) const {
     if (displayId == 0) {
@@ -219,6 +223,33 @@ bool InputReaderConfiguration::getDisplayInfo(int32_t displayId, bool external,
     }
     return false;
 }
+#else
+bool InputReaderConfiguration::getDisplayInfo(int32_t displayId, bool external,
+        int32_t* width, int32_t* height, int32_t* orientation) const {
+    bool result = false;
+    char propBuf[PROPERTY_VALUE_MAX];
+    int32_t hwrotation = 0;
+    property_get("input.hwrotation", propBuf, "0");
+    hwrotation = (atoi(propBuf) / 90) % 4;
+ 
+    if (displayId == 0) {
+        const DisplayInfo& info = external ? mExternalDisplay : mInternalDisplay;
+        if (info.width > 0 && info.height > 0) {
+            if (width) {
+                *width = (hwrotation % 2) ? info.height : info.width;
+            }
+            if (height) {
+                *height = (hwrotation % 2) ? info.width : info.height;
+            }
+            if (orientation) {
+                *orientation = (info.orientation + hwrotation) % 4;
+            }
+            result = true;
+        }
+    }
+    return result;
+}
+#endif
 
 void InputReaderConfiguration::setDisplayInfo(int32_t displayId, bool external,
         int32_t width, int32_t height, int32_t orientation) {

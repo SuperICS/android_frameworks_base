@@ -62,6 +62,10 @@ ifeq ($(BOARD_USE_SAMSUNG_SEPARATEDSTREAM),true)
     LOCAL_CFLAGS += -DUSE_SAMSUNG_SEPARATEDSTREAM
 endif
 
+ifeq ($(BOARD_USES_AMLOGICPLAYER),true)
+    LOCAL_CFLAGS += -DAMLOGICPLAYER
+endif
+
 LOCAL_SHARED_LIBRARIES := \
     libui libcutils libutils libbinder libsonivox libicuuc libexpat \
     libcamera_client libstagefright_foundation \
