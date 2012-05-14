@@ -15,7 +15,6 @@
 
 package com.android.server;
 
-import com.android.internal.app.ThemeUtils;
 import com.android.internal.content.PackageMonitor;
 import com.android.internal.os.AtomicFile;
 import com.android.internal.os.HandlerCaller;
@@ -39,7 +38,6 @@ import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -146,7 +144,6 @@ public class InputMethodManagerService extends IInputMethodManager.Stub
     private static final String TAG_TRY_SUPPRESSING_IME_SWITCHER = "TrySuppressingImeSwitcher";
 
     final Context mContext;
-    private Context mUiContext;
     final Resources mRes;
     final Handler mHandler;
     final InputMethodSettings mSettings;
@@ -627,13 +624,6 @@ public class InputMethodManagerService extends IInputMethodManager.Stub
                         mContext.getSystemService(Context.KEYGUARD_SERVICE);
                 mNotificationManager = (NotificationManager)
                         mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-                ThemeUtils.registerThemeChangeReceiver(mContext, new BroadcastReceiver() {
-                    @Override
-                    public void onReceive(Context context, Intent intent) {
-                        mUiContext = null;
-                    }
-                });
-
                 mStatusBar = statusBar;
                 statusBar.setIconVisibility("ime", false);
                 updateImeWindowStatusLocked();
@@ -2115,13 +2105,6 @@ public class InputMethodManagerService extends IInputMethodManager.Stub
         }
     }
 
-    private Context getUiContext() {
-        if (mUiContext == null) {
-            mUiContext = ThemeUtils.createUiContext(mContext);
-        }
-        return mUiContext != null ? mUiContext : mContext;
-    }
-
     // ----------------------------------------------------------------------
 
     private void showInputMethodMenu() {
@@ -2154,7 +2137,7 @@ public class InputMethodManagerService extends IInputMethodManager.Stub
     private void showInputMethodMenuInternal(boolean showSubtypes) {
         if (DEBUG) Slog.v(TAG, "Show switching menu");
 
-        final Context context = getUiContext();
+        final Context context = mContext;
         final PackageManager pm = context.getPackageManager();
         final boolean isScreenLocked = mKeyguardManager != null
                 && mKeyguardManager.isKeyguardLocked() && mKeyguardManager.isKeyguardSecure();
