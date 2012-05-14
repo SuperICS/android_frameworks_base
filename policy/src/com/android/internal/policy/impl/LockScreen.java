@@ -28,6 +28,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ActivityNotFoundException;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -335,11 +336,41 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
         }
 
         public void onTrigger(View v, int target) {
-            if (DBG)
-                Log.v(TAG, "onTrigger: target = " + target);
-            if (DBG)
-                Log.v(TAG, "onTrigger: Orientation = " + mCreationOrientation);
-            targetController.getTarget(target).doAction();
+            if (mStoredTargets == null) {
+                if (target == 0 || target == 1) { // 0 = unlock/portrait, 1 = unlock/landscape
+                    mCallback.goToUnlockScreen();
+                } else if (target == 2 || target == 3) { // 2 = alt/portrait, 3 = alt/landscape
+                    if (!mCameraDisabled) {
+                        // Start the Camera
+                        Intent intent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(intent);
+                        mCallback.goToUnlockScreen();
+                    } else {
+                        toggleRingMode();
+                        mUnlockWidgetMethods.updateResources();
+                        mCallback.pokeWakelock();
+                    }
+                }
+            } else {
+                final boolean isLand = mCreationOrientation == Configuration.ORIENTATION_LANDSCAPE;
+                if ((target == 0 && (mIsScreenLarge || !isLand)) || (target == 2 && !mIsScreenLarge && isLand)) {
+                    mCallback.goToUnlockScreen();
+                } else {
+                    target -= 1 + mTargetOffset;
+                    if (target < mStoredTargets.length && mStoredTargets[target] != null) {
+                        try {
+                            Intent tIntent = Intent.parseUri(mStoredTargets[target], 0);
+                            tIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            mContext.startActivity(tIntent);
+                            mCallback.goToUnlockScreen();
+                            return;
+                        } catch (URISyntaxException e) {
+                        } catch (ActivityNotFoundException e) {
+                        }
+                    }
+                }
+            }
         }
 
         public void onGrabbedStateChange(View v, int handle) {
@@ -975,3 +1006,4 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
 		}
 	}
 }
+
