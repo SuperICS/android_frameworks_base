@@ -1355,21 +1355,9 @@ private NetworkStateTracker makeWimaxStateTracker() {
     public boolean getMobileDataEnabled() {
         // TODO: This detail should probably be in DataConnectionTracker's
         //       which is where we store the value and maybe make this
-    /* CML: Ahora se controla si por defecto está habilitado o no desde    
-     * El build.properties del device
-     */
-    int defaultConnected;
-    try
-    {
-      defaultConnected = SystemProperties.getInt("ro.data.on", 1);
-    }
-    catch(NumberFormatException ne)
-    {
-      defaultConnected = 0;
-    }
 	enforceAccessPermission();
 	boolean retVal = Settings.Secure.getInt(mContext.getContentResolver(),
-                Settings.Secure.MOBILE_DATA, defaultConnected) == 1;
+                Settings.Secure.MOBILE_DATA, 0) == 1;
         if (VDBG) log("getMobileDataEnabled returning " + retVal);
         return retVal;
     }

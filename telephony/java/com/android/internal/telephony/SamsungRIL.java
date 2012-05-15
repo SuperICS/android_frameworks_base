@@ -86,7 +86,9 @@ public class SamsungRIL extends RIL implements CommandsInterface {
     setRadioPower(boolean on, Message result) {
         RILRequest rr = RILRequest.obtain(RIL_REQUEST_RADIO_POWER, result);
 
-        if (on) {
+        //samsung crap for airplane mode
+        if (on)
+        {
             rr.mp.writeInt(1);
             rr.mp.writeInt(1);
         } else {
@@ -103,6 +105,7 @@ public class SamsungRIL extends RIL implements CommandsInterface {
     protected void
     processSolicited (Parcel p) {
         int serial, error;
+        boolean found = false;
 
         serial = p.readInt();
         error = p.readInt();
