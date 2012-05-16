@@ -853,6 +853,7 @@ status_t SurfaceTexture::setScalingMode(int mode) {
 status_t SurfaceTexture::updateTexImage(bool isComposition) {
 #else
 status_t SurfaceTexture::updateTexImage() {
+#endif
     ST_LOGV("updateTexImage");
     Mutex::Autolock lock(mMutex);
 
