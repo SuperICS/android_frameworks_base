@@ -849,11 +849,8 @@ status_t SurfaceTexture::setScalingMode(int mode) {
     return OK;
 }
 
-#if defined(QCOM_HARDWARE) && !defined(LEGACY_QCOM)
-status_t SurfaceTexture::updateTexImage(bool isComposition) {
-#else
+
 status_t SurfaceTexture::updateTexImage() {
-#endif
     ST_LOGV("updateTexImage");
     Mutex::Autolock lock(mMutex);
 
