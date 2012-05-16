@@ -66,7 +66,6 @@ import com.google.android.collect.Lists;
 
 import com.android.internal.app.ThemeUtils;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 /**
@@ -150,12 +149,10 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
     public void showDialog(boolean keyguardShowing, boolean isDeviceProvisioned) {
         mKeyguardShowing = keyguardShowing;
         mDeviceProvisioned = isDeviceProvisioned;
+
         if (mDialog != null && mUiContext == null) {
             mDialog.dismiss();
             mDialog = null;
-        }
-        if (mDialog == null) {
-            mDialog = createDialog();
         }
         //always update the PowerMenu dialog
         mDialog = createDialog();
