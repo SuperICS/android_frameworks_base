@@ -22,8 +22,14 @@ public class AirplaneModeToggle extends Toggle {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
         context.registerReceiver(mBroadcastReceiver, filter);
-        setLabel(R.string.toggle_airplane);
+
         updateState();
+        setLabel(R.string.toggle_airplane);
+//        if (mToggle.isChecked())
+        	setIcon(R.drawable.toggle_airplane);
+//        else
+//        	setIcon(R.drawable.toggle_airplane_off);
+
     }
 
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -42,8 +48,7 @@ public class AirplaneModeToggle extends Toggle {
 
     private boolean getAirplaneMode() {
         ContentResolver cr = mContext.getContentResolver();
-        return 0 != Settings.System.getInt(cr,
-                Settings.System.AIRPLANE_MODE_ON, 0);
+        return 0 != Settings.System.getInt(cr, Settings.System.AIRPLANE_MODE_ON, 0);
     }
 
     // TODO: Fix this racy API by adding something better to TelephonyManager or
@@ -51,8 +56,10 @@ public class AirplaneModeToggle extends Toggle {
     private void unsafe(final boolean enabled) {
         AsyncTask.execute(new Runnable() {
             public void run() {
-                Settings.System.putInt(mContext.getContentResolver(),
-                        Settings.System.AIRPLANE_MODE_ON, enabled ? 1 : 0);
+                Settings.System.putInt(
+                        mContext.getContentResolver(),
+                        Settings.System.AIRPLANE_MODE_ON,
+                        enabled ? 1 : 0);
                 Intent intent = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
                 intent.addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
                 intent.putExtra("state", enabled);
@@ -62,14 +69,13 @@ public class AirplaneModeToggle extends Toggle {
     }
 
     @Override
-    protected boolean updateInternalToggleState() {
+    protected void updateInternalToggleState() {
         mAirplaneMode = getAirplaneMode();
         mToggle.setChecked(mAirplaneMode);
-        if (mToggle.isChecked())
-            setIcon(R.drawable.toggle_airplane);
-        else
-            setIcon(R.drawable.toggle_airplane_off);
-        return mToggle.isChecked();
+//        if (mToggle.isChecked())
+//        	setIcon(R.drawable.toggle_airplane);
+//        else
+//        	setIcon(R.drawable.toggle_airplane_off);
     }
 
     @Override
@@ -78,15 +84,17 @@ public class AirplaneModeToggle extends Toggle {
             mAirplaneMode = checked;
             unsafe(checked);
         }
-        updateState();
+//        if (checked)
+        	 setIcon(R.drawable.toggle_airplane);
+//        else
+//        	 setIcon(R.drawable.toggle_airplane_off);
     }
-
+    
     @Override
     protected boolean onLongPress() {
-        Intent intent = new Intent(
-                android.provider.Settings.ACTION_AIRPLANE_MODE_SETTINGS);
+    	Intent intent = new Intent(android.provider.Settings.ACTION_AIRPLANE_MODE_SETTINGS);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(intent);
-        return true;
+    	return true;
     }
 }

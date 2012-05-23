@@ -39,6 +39,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.os.SystemProperties;
 import android.provider.Settings;
 import android.provider.Telephony;
 import android.telephony.PhoneStateListener;
@@ -507,7 +508,6 @@ public class NetworkController extends BroadcastReceiver {
             }
         }
     }
-
 
     private final void updateDataNetType() {
         if (mIsWimaxEnabled && mWimaxConnected) {
@@ -978,7 +978,6 @@ public class NetworkController extends BroadcastReceiver {
                 }
             }
 
-            mDataTypeIconId = 0;
             combinedActivityIconId = mWifiActivityIconId;
             combinedLabel = wifiLabel;
             combinedSignalIconId = mWifiIconId; // set by updateWifiIcons()

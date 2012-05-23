@@ -62,14 +62,12 @@ public class TorchToggle extends Toggle implements
     }
 
     @Override
-    protected boolean updateInternalToggleState() {
+    protected void updateInternalToggleState() {
         mToggle.setChecked(mIsTorchOn);
         if (mToggle.isChecked()) {
             setIcon(R.drawable.toggle_torch);
-            return true;
         } else {
             setIcon(R.drawable.toggle_torch_off);
-            return false;
         }
     }
 

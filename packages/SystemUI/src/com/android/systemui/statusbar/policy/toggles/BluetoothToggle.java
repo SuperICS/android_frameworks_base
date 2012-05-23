@@ -41,14 +41,16 @@ public class BluetoothToggle extends Toggle {
         context.registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                mAdapterState = intent.getIntExtra(
-                        BluetoothAdapter.EXTRA_STATE,
+                mAdapterState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
                         BluetoothAdapter.STATE_OFF);
                 updateState();
             }
         }, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
         setLabel(R.string.toggle_bt);
-        updateState();
+//        if (mToggle.isChecked())
+        	setIcon(R.drawable.toggle_bluetooth);
+//        else
+//        	setIcon(R.drawable.toggle_bluetooth_off);
     }
 
     @Override
@@ -57,16 +59,18 @@ public class BluetoothToggle extends Toggle {
         if (adapter != null) {
             if (isChecked) {
                 adapter.enable();
-            } else {
-                adapter.disable();
+//                setIcon(R.drawable.toggle_bluetooth);
             }
-            updateState();
+            else {
+                adapter.disable();
+//                setIcon(R.drawable.toggle_bluetooth_off);
+            }
         }
 
     }
 
     @Override
-    protected boolean updateInternalToggleState() {
+    protected void updateInternalToggleState() {
         switch (mAdapterState) {
             case BluetoothAdapter.STATE_ON:
                 mToggle.setChecked(true);
@@ -86,19 +90,17 @@ public class BluetoothToggle extends Toggle {
                 mToggle.setEnabled(true);
                 break;
         }
-        if (mToggle.isChecked())
-            setIcon(R.drawable.toggle_bluetooth);
-        else
-            setIcon(R.drawable.toggle_bluetooth_off);
-        return mToggle.isChecked();
+//        if (mToggle.isChecked())
+//        	setIcon(R.drawable.toggle_bluetooth);
+//        else
+//        	setIcon(R.drawable.toggle_bluetooth_off);
     }
 
     @Override
     protected boolean onLongPress() {
-        Intent intent = new Intent(
-                android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+    	Intent intent = new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(intent);
-        return true;
+    	return true;
     }
 }

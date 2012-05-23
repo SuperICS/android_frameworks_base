@@ -2187,6 +2187,7 @@ public class RIL extends BaseCommands implements CommandsInterface {
     protected void
     processSolicited (Parcel p) {
         int serial, error;
+        boolean found = false;
 
         serial = p.readInt();
         error = p.readInt();

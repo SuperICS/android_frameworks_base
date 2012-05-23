@@ -44,8 +44,6 @@ public class SwaggerToggle extends Toggle {
         }
         if (swaggerOn)
             mToggle.setChecked(true);
-        updateState();
-
     }
 
     @Override
@@ -55,12 +53,6 @@ public class SwaggerToggle extends Toggle {
     }
 
     @Override
-    protected boolean updateInternalToggleState() {
-        if (mToggle.isChecked()) {
-            setIcon(R.drawable.toggle_swagger);
-        } else {
-            setIcon(R.drawable.toggle_swagger_off);
-        }
-        return mToggle.isChecked();
+    protected void updateInternalToggleState() {
     }
 }

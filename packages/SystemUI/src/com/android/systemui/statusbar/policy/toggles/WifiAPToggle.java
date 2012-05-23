@@ -38,13 +38,12 @@ public class WifiAPToggle extends Toggle {
     public WifiAPToggle(Context context) {
         super(context);
 
-        IntentFilter wifiFilter = new IntentFilter(
-                WifiManager.WIFI_AP_STATE_CHANGED_ACTION);
+        IntentFilter wifiFilter = new IntentFilter(WifiManager.WIFI_AP_STATE_CHANGED_ACTION);
         wifiFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
         mContext.registerReceiver(mBroadcastReceiver, wifiFilter);
 
         setLabel(R.string.toggle_wifiap);
-        updateState();
+        setIcon(R.drawable.toggle_wifi_ap);
     }
 
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -52,8 +51,8 @@ public class WifiAPToggle extends Toggle {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            mWifiApState = intent.getIntExtra(WifiManager.EXTRA_WIFI_AP_STATE,
-                    -1);
+            mWifiApState = intent
+                    .getIntExtra(WifiManager.EXTRA_WIFI_AP_STATE, -1);
             updateState();
 
         }
@@ -97,7 +96,7 @@ public class WifiAPToggle extends Toggle {
     }
 
     @Override
-    protected boolean updateInternalToggleState() {
+    protected void updateInternalToggleState() {
         WifiManager wifiManager = (WifiManager) mContext
                 .getSystemService(Context.WIFI_SERVICE);
 
@@ -126,12 +125,7 @@ public class WifiAPToggle extends Toggle {
                 mToggle.setEnabled(false);
                 break;
         }
-        if (mToggle.isChecked()) {
-            setIcon(R.drawable.toggle_wifi_ap);
-        } else {
-            setIcon(R.drawable.toggle_wifi_ap_off);
-        }
-        return mToggle.isChecked();
+
     }
 
     @Override
@@ -139,12 +133,12 @@ public class WifiAPToggle extends Toggle {
         if (isChecked != mIsApOn) {
             changeWifiState(isChecked);
         }
+
     }
 
     @Override
     protected boolean onLongPress() {
-        Intent intent = new Intent(
-                android.provider.Settings.ACTION_WIRELESS_SETTINGS);
+        Intent intent = new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(intent);
         return true;

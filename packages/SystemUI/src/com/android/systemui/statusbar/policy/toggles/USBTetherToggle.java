@@ -128,11 +128,10 @@ public class USBTetherToggle extends Toggle {
     @Override
     protected void onCheckChanged(boolean isChecked) {
         setUsbTethering(isChecked);
-        updateState();
     }
 
     @Override
-    protected boolean updateInternalToggleState() {
+    protected void updateInternalToggleState() {
         ConnectivityManager cm =
                 (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -141,12 +140,6 @@ public class USBTetherToggle extends Toggle {
         String[] errored = cm.getTetheringErroredIfaces();
         updateUsbState(available, tethered, errored);
 
-        if (mToggle.isChecked()) {
-            setIcon(R.drawable.toggle_tether);
-        } else {
-            setIcon(R.drawable.toggle_tether_off);
-        }
-        return mToggle.isChecked();
     }
 
     @Override
