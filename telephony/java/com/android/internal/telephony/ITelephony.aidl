@@ -42,7 +42,7 @@ interface ITelephony {
      * @param number the number to be called.
      */
     void call(String number);
-    
+
     /**
     * Toggle between 3G and LTE (NT_MODE_CDMA, NT_MODE_GLOBAL)
 	* @param boolean to turn on and off LTE
@@ -290,5 +290,7 @@ interface ITelephony {
      * or {@link PHone#LTE_ON_CDMA_TRUE}
      */
     int getLteOnCdmaMode();
+
+    int getLteOnGsmMode();
 }
 
