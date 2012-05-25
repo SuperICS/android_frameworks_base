@@ -635,7 +635,7 @@ public class PowerSaverService extends BroadcastReceiver {
     private boolean isValidNetwork(int networkType) {
         isCdma = (telephony.getCurrentPhoneType() == Phone.PHONE_TYPE_CDMA);
 
-        switch (networkType) {
+ /*       switch (networkType) {
             case Phone.NT_MODE_CDMA:
             case Phone.NT_MODE_CDMA_NO_EVDO:
             case Phone.NT_MODE_EVDO_NO_CDMA:
@@ -647,6 +647,22 @@ public class PowerSaverService extends BroadcastReceiver {
             case Phone.NT_MODE_WCDMA_ONLY:
             case Phone.NT_MODE_WCDMA_PREF:
                 return (!isCdma);
+        }
+        return false;
+    }*/
+
+        switch (networkType) {
+            case Phone.NT_MODE_WCDMA_PREF:
+            case Phone.NT_MODE_WCDMA_ONLY:
+            case Phone.NT_MODE_GSM_UMTS:
+            case Phone.NT_MODE_GSM_ONLY:
+                Slog.d(TAG, "Unexpected network mode (" + networkType + ")");
+                return (!isCdma);
+            case Phone.NT_MODE_CDMA:
+            case Phone.NT_MODE_CDMA_NO_EVDO:
+            case Phone.NT_MODE_EVDO_NO_CDMA:
+            case Phone.NT_MODE_GLOBAL:
+                return (isCdma);
         }
         return false;
     }
