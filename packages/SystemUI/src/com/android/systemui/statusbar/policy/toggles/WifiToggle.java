@@ -38,11 +38,12 @@ public class WifiToggle extends Toggle {
     public WifiToggle(Context context) {
         super(context);
 
-        IntentFilter wifiFilter = new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        IntentFilter wifiFilter = new IntentFilter(
+                WifiManager.WIFI_STATE_CHANGED_ACTION);
         mContext.registerReceiver(mBroadcastReceiver, wifiFilter);
 
         setLabel(R.string.toggle_wifi);
-        setIcon(R.drawable.toggle_wifi);
+        updateState();
     }
 
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -53,8 +54,7 @@ public class WifiToggle extends Toggle {
                     .getAction())) {
                 return;
             }
-            mWifiState = intent
-                    .getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1);
+            mWifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1);
             updateState();
 
         }
@@ -98,11 +98,10 @@ public class WifiToggle extends Toggle {
     }
 
     @Override
-    protected void updateInternalToggleState() {
-        // WifiManager wifiManager = (WifiManager) mContext
-        // .getSystemService(Context.WIFI_SERVICE);
-        //
-        // mWifiState = wifiManager.getWifiApState();
+    protected boolean updateInternalToggleState() {
+        final WifiManager wifiManager = (WifiManager) mContext
+                .getSystemService(Context.WIFI_SERVICE);
+        mWifiState = wifiManager.getWifiState();
 
         switch (mWifiState) {
             case WifiManager.WIFI_STATE_ENABLED:
@@ -131,6 +130,12 @@ public class WifiToggle extends Toggle {
                 mToggle.setEnabled(false);
                 break;
         }
+        if (mToggle.isChecked()) {
+            setIcon(R.drawable.toggle_wifi);
+        } else {
+            setIcon(R.drawable.toggle_wifi_off);
+        }
+        return mToggle.isChecked();
     }
 
     @Override
@@ -138,11 +143,13 @@ public class WifiToggle extends Toggle {
         if (isChecked != mIsWifiOn) {
             changeWifiState(isChecked);
         }
+        updateState();
     }
 
     @Override
     protected boolean onLongPress() {
-        Intent intent = new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS);
+        Intent intent = new Intent(
+                android.provider.Settings.ACTION_WIFI_SETTINGS);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(intent);
         return true;

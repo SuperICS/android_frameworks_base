@@ -33,12 +33,19 @@ public class FChargeToggle extends Toggle {
     }
 
     @Override
-    protected void updateInternalToggleState() {
+    protected boolean updateInternalToggleState() {
+        mToggle.setChecked(isFastChargeOn());
+        if (mToggle.isChecked())
+            setIcon(R.drawable.toggle_fcharge);
+        else
+            setIcon(R.drawable.toggle_fcharge_off);
+        return mToggle.isChecked();
     }
 
     @Override
     protected void onCheckChanged(boolean isChecked) {
         updateFastCharge(isChecked);
+        updateState();
     }
 
     @Override
