@@ -2076,7 +2076,6 @@ public class PhoneStatusBar extends StatusBar {
         if (mNavigationBarView == null) {
             pw.println("null");
         } else {
-            mNavigationBarView.dump(fd, pw, args);
         }
 
         if (DUMPTRUCK) {
@@ -2382,6 +2381,10 @@ public class PhoneStatusBar extends StatusBar {
         mHandler.sendEmptyMessage(msg);
     }
 
+    public void toggleWidgetView() {
+        mNavigationBarView.toggleWidgetView();
+    }
+
     /**
      * The LEDs are turned o)ff when the notification panel is shown, even just
      * a little bit. This was added last-minute and is inconsistent with the way
@@ -2659,7 +2662,7 @@ public class PhoneStatusBar extends StatusBar {
 
         mIsStatusBarBrightNess = Settings.System.getInt(mStatusBarView.getContext()
                 .getContentResolver(),
-                Settings.System.STATUS_BAR_BRIGHTNESS_TOGGLE, 0) == 1;
+                Settings.System.STATUS_BAR_BRIGHTNESS_TOGGLE, 1) == 1;
 
         loadDimens();
         fontSize = Settings.System.getInt(cr, Settings.System.STATUSBAR_FONT_SIZE, 16) ;

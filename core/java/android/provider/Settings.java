@@ -2853,6 +2853,12 @@ public final class Settings {
         public static final String STATUS_BAR_LAYOUT = "status_bar_layout";
 
         /**
+        * AutoHide CombinedBar on tablets.
+        * @hide
+        */
+        public static final String COMBINED_BAR_AUTO_HIDE = "combined_bar_auto_hide";
+
+        /**
          * @hide
          */
         public static final String POWER_DIALOG_SHOW_POWER_SAVER = "power_dialog_show_power_saver";
@@ -3154,6 +3160,12 @@ public final class Settings {
         public static final String STATUSBAR_BATTERY_BAR_COLOR = "statusbar_battery_bar_color";
 
         /**
+         * Show the pending notification counts as overlays on the status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_NOTIF_COUNT = "status_bar_notif_count";
+
+        /**
          * Last state of the quick toggles, to restore on boot
          * @hide
          */
@@ -3337,6 +3349,11 @@ public final class Settings {
          * @hide
          */
         public static final String NAVIGATION_BAR_GLOW_TINT = "navigation_bar_glow_tint";
+
+        /**
+         * Widgets to show, should be separated by |
+         */
+        public static final String NAVIGATION_BAR_WIDGETS = "navigation_bar_widgets";
     }
 
     /**

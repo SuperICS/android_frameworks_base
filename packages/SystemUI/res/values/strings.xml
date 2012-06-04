@@ -401,4 +401,7 @@
     <string name="weatherpanel_slash">/</string>
     
     <string name="toggle_navbar">Toggle NavBar</string>
-    </resources>
+
+
+    <string name="widgets">Widgets</string>
+</resources>
