@@ -509,6 +509,7 @@ public class NetworkController extends BroadcastReceiver {
         }
     }
 
+
     private final void updateDataNetType() {
         if (mIsWimaxEnabled && mWimaxConnected) {
             // wimax is a special 4g network not handled by telephony
@@ -978,6 +979,7 @@ public class NetworkController extends BroadcastReceiver {
                 }
             }
 
+            mDataTypeIconId = 0;
             combinedActivityIconId = mWifiActivityIconId;
             combinedLabel = wifiLabel;
             combinedSignalIconId = mWifiIconId; // set by updateWifiIcons()

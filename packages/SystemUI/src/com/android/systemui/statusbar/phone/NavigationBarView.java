@@ -96,20 +96,21 @@ public class NavigationBarView extends LinearLayout {
     final static String ACTION_BACK = "**back**";
     final static String ACTION_SEARCH = "**search**";
     final static String ACTION_MENU = "**menu**";
+    final static String ACTION_WIDGETS = "**widgets**";
     final static String ACTION_POWER = "**power**";
     final static String ACTION_RECENTS = "**recents**";
     final static String ACTION_KILL = "**kill**";
     final static String ACTION_NULL = "**null**";
 
-    int mNumberOfButtons = 4;
+    int mNumberOfButtons = 3;
 
     public String[] mClickActions = new String[5];
     public String[] mLongpressActions = new String[5];
     public String[] mPortraitIcons = new String[5];
 
-    public final static int StockButtonsQty = 4;
+    public final static int StockButtonsQty = 3;
     public final static String[] StockClickActions = {
-            "**back**", "**home**", "**recents**", "**menu**", "**null**"
+            "**back**", "**home**", "**recents**", "**null**", "**null**"
     };
 
     public final static String[] StockLongpress = {
@@ -251,7 +252,7 @@ public class NavigationBarView extends LinearLayout {
                 addButton(navButtonLayout, v, landscape);
                 addLightsOutButton(lightsOut, v, landscape, false);
 
-                if (mNumberOfButtons == 4 && j != (mNumberOfButtons - 1)) {
+                if (mNumberOfButtons == 3 && j != (mNumberOfButtons - 1)) {
                     // add separator view here
                     View separator = new View(mContext);
                     separator.setLayoutParams(getSeparatorLayoutParams(landscape));
@@ -818,6 +819,9 @@ public class NavigationBarView extends LinearLayout {
             } else if (uri.equals(ACTION_MENU)) {
 
                 return getResources().getDrawable(R.drawable.ic_sysbar_menu_big);
+            } else if (uri.equals(ACTION_WIDGETS)) {
+
+                return getResources().getDrawable(R.drawable.ic_sysbar_widget);
             } else if (uri.equals(ACTION_KILL)) {
 
                 return getResources().getDrawable(R.drawable.ic_sysbar_killtask);

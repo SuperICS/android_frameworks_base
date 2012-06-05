@@ -90,16 +90,6 @@ public class Smdk4210RIL extends RIL implements CommandsInterface {
          */
     }
 	
-    private boolean NeedReconnect()	
-    {
-        ConnectivityManager cm =
-            (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo ni_active = cm.getActiveNetworkInfo();
-	
-        return ni_active != null && ni_active.getTypeName().equalsIgnoreCase( "mobile" ) &&
-                ni_active.isConnected() && cm.getMobileDataEnabled();
-    }
-
     private boolean NeedReconnect()
     {
         ConnectivityManager cm =

@@ -51,11 +51,8 @@ public class NetworkToggle extends Toggle {
 
     @Override
     protected void onCheckChanged(boolean isChecked) {
-        final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        if (adapter != null) {
-            setMobileDataEnabled(isChecked);
-        }
-        	setIcon(R.drawable.toggle_data);
+        setMobileDataEnabled(isChecked);
+        updateState();
     }
 
     protected BroadcastReceiver getBroadcastReceiver() {
