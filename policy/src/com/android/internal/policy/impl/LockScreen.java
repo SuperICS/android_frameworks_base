@@ -16,40 +16,20 @@
 
 package com.android.internal.policy.impl;
 
-import com.android.internal.R;
-import com.android.internal.widget.LockPatternUtils;
-import com.android.internal.widget.SlidingTab;
-import com.android.internal.widget.WaveView;
-import com.android.internal.widget.multiwaveview.MultiWaveView;
-import com.android.internal.widget.multiwaveview.TargetDrawable;
-
-import android.app.ActivityManager;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ActivityNotFoundException;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.content.res.Resources.NotFoundException;
 import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.InsetDrawable;
-import android.graphics.drawable.LayerDrawable;
-import android.graphics.drawable.StateListDrawable;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.*;
-import android.util.Log;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Handler;
@@ -57,6 +37,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -121,7 +102,6 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
 
     private KeyguardStatusViewManager mStatusViewManager;
     private UnlockWidgetCommonMethods mUnlockWidgetMethods;
-    private UnlockWidgetCommonMethods mUnlockWidgetMethods2;
     private View mUnlockWidget;
     private View mUnlockWidget2;
     
@@ -740,8 +720,6 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
         mDigitalClock = (DigitalClock) findViewById(R.id.time);
 
         mUnlockWidget = findViewById(R.id.unlock_widget);
-        mUnlockWidget2 = findViewById(R.id.unlock_widget2);
-        if(mUnlockWidget2 == null) Log.e("HELP", "ERROR UNLOCKWIDGET2 IS NULL");
         if (mUnlockWidget instanceof SlidingTab) {
             SlidingTab slidingTabView = (SlidingTab) mUnlockWidget;
             slidingTabView.setHoldAfterTrigger(true, false);
@@ -754,6 +732,8 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
             SlidingTabMethods slidingTabMethods = new SlidingTabMethods(slidingTabView);
             slidingTabView.setOnTriggerListener(slidingTabMethods);
             mUnlockWidgetMethods = slidingTabMethods;
+            mUnlockWidget2 = findViewById(R.id.unlock_widget2);
+            if(mUnlockWidget2 == null) Log.e("HELP", "ERROR UNLOCKWIDGET2 IS NULL");
             SlidingTab slidingTabView2 = (SlidingTab) mUnlockWidget2;
             slidingTabView2.setHoldAfterTrigger(true, false);
             slidingTabView2.setLeftHintText(R.string.lockscreen_phone_label);
@@ -770,7 +750,6 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
                     R.drawable.jog_tab_right_generic);
             SlidingTabMethods2 slidingTabMethods2 = new SlidingTabMethods2(slidingTabView2);
             slidingTabView2.setOnTriggerListener(slidingTabMethods2);
-            mUnlockWidgetMethods2 = slidingTabMethods2;
             if (mLockscreen4Tab)
                 slidingTabView2.setVisibility(View.VISIBLE);
             else	
@@ -797,7 +776,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
         if (DBG)
             Log.v(TAG, "*** LockScreen accel is "
                     + (mUnlockWidget.isHardwareAccelerated() ? "on" : "off"));
-		}
+	}
 
     private boolean isSilentMode() {
         return mAudioManager.getRingerMode() != AudioManager.RINGER_MODE_NORMAL;
