@@ -383,14 +383,16 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
      * @return true if the menu key should be enabled
      */
     private boolean shouldEnableMenuKey() {
-        final Resources res = getResources();
-        final boolean configDisabled = res.getBoolean(R.bool.config_disableMenuKeyInLockScreen);
-        final boolean isTestHarness = ActivityManager.isRunningInTestHarness();
-        final boolean fileOverride = (new File(ENABLE_MENU_KEY_FILE)).exists();
-        boolean defaultValue = !configDisabled || isTestHarness || fileOverride;
-
         return (Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.LOCKSCREEN_ENABLE_MENU_KEY, defaultValue ? 1 : 0) == 1);
+                Settings.System.LOCKSCREEN_ENABLE_MENU_KEY, 0) == 1);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_MENU && mEnableMenuKeyInLockScreen) {
+            mCallback.goToUnlockScreen();
+        }
+        return false;
     }
 
     class Target {
