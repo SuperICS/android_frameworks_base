@@ -233,6 +233,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     // Useful scan codes.
     private static final int SW_LID = 0x00;
     private static final int BTN_MOUSE = 0x110;
+    
+    private static final int TRACKBALL_EVENT = 33554432;
 
     /* Table of Application Launch keys.  Maps from key codes to intent categories.
      *
@@ -2940,7 +2942,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             return 0;
         }
 
-        if (true) {
+        if (false) {
             Log.d(TAG, "interceptKeyTq keycode=" + keyCode
                   + " screenIsOn=" + isScreenOn + " keyguardActive=" + keyguardActive);
         }
@@ -3284,8 +3286,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     public int interceptMotionBeforeQueueingWhenScreenOff(int policyFlags) {
         int result = 0;
 
-        final boolean isWakeMotion = (policyFlags
+        boolean isWakeMotion = (policyFlags
                 & (WindowManagerPolicy.FLAG_WAKE | WindowManagerPolicy.FLAG_WAKE_DROPPED)) != 0;
+        isWakeMotion = (isWakeMotion || (isTrackballEnableWake () && policyFlags == TRACKBALL_EVENT));
         if (isWakeMotion) {
             if (mKeyguardMediator.isShowing()) {
                 // If the keyguard is showing, let it decide what to do with the wake motion.
@@ -3298,6 +3301,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         return result;
     }
 
+    private boolean isTrackballEnableWake(){
+        return (Settings.System.getInt(
+                mContext.getContentResolver(), Settings.System.LOCKSCREEN_ENABLE_TRACKBALL_KEY, 0) != 0);
+    }
+    
     void handleVolumeLongPress(int keycode) {
         Runnable btnHandler;
 
