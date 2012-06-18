@@ -2754,6 +2754,13 @@ public final class Settings {
         public static final String LOCKSCREEN_ENABLE_MENU_KEY = "lockscreen_enable_menu_key";        
 
         /**
+         * Whether to enable unlocking from lockscreen via trackball
+         * 
+         * @hide
+         */
+        public static final String LOCKSCREEN_ENABLE_TRACKBALL_KEY = "lockscreen_enable_trackball_key";        
+
+        /**
          * whether to show the IME switcher when typing in the statusbar. Boolean value.
          * 
          * @hide
