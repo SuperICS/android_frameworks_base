@@ -565,7 +565,7 @@ class KeyguardStatusViewManager implements OnClickListener {
     private CharSequence getPriorityTextMessage(MutableInt icon) {
         CharSequence string = null;
         mLockAlwaysBattery = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.LOCKSCREEN_BATTERY, 0) == 1;
+                Settings.System.LOCKSCREEN_BATTERY, 1) == 1;
         if (!TextUtils.isEmpty(mInstructionText)) {
             // Instructions only
             string = mInstructionText;
