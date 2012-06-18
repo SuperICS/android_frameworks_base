@@ -987,6 +987,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             screenTurnedOff(WindowManagerPolicy.OFF_BECAUSE_OF_USER);
         }
 
+        // if we have code for the key handler then load it in
         String deviceKeyHandlerLib = mContext.getResources().getString(
                 com.android.internal.R.string.config_deviceKeyHandlerLib);
 
@@ -1003,12 +1004,14 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 Constructor<?> constructor = klass.getConstructor(Context.class);
                 mDeviceKeyHandler = (DeviceKeyHandler) constructor.newInstance(
                         mContext);
-                Slog.d(TAG, "Loaded device key handler");
+                Slog.d(TAG, "KeyHandler: Loaded device key handler");
             } catch (Exception e) {
-                Slog.d(TAG, "Could not instantiate device key handler "
+                Slog.d(TAG, "KeyHandler: Could not instantiate device key handler "
                         + deviceKeyHandlerClass + " from class "
                         + deviceKeyHandlerLib, e);
             }
+        } else {
+            Slog.d(TAG, "KeyHandler: Did not find a device key handler");
         }
     }
 
@@ -1709,6 +1712,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         final boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
         final boolean canceled = event.isCanceled();
 
+        Log.d(TAG, "KeyHandler: Got key event " + keyCode);
+
         if (false) {
             Log.d(TAG, "interceptKeyTi keyCode=" + keyCode + " down=" + down + " repeatCount="
                     + repeatCount + " keyguardOn=" + keyguardOn + " mHomePressed=" + mHomePressed);
@@ -1945,7 +1950,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             showOrHideRecentAppsDialog(RECENT_APPS_BEHAVIOR_DISMISS_AND_SWITCH);
         }
 
+        Slog.d(TAG, "KeyHandler: Trying to dispatch event to device key handler");
         if (mDeviceKeyHandler != null) {
+            Slog.d(TAG, "KeyHandler: Have key hander, now dispatching");
+
             try {
                 return mDeviceKeyHandler.handleKeyEvent(event);
             } catch (Exception e) {
@@ -1971,7 +1979,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     + ", policyFlags=" + policyFlags);
         }
 
+        Slog.d(TAG, "KeyHandler: dispatchUnhandledKey fired");
+
         if ((event.getFlags() & KeyEvent.FLAG_FALLBACK) == 0) {
+            Slog.d(TAG, "KeyHandler: Fallback init");
             final KeyCharacterMap kcm = event.getKeyCharacterMap();
             final int keyCode = event.getKeyCode();
             final int metaState = event.getMetaState();
@@ -1990,8 +2001,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         event.getRepeatCount(), mFallbackAction.metaState,
                         event.getDeviceId(), event.getScanCode(),
                         flags, event.getSource(), null);
+                Slog.d(TAG, "KeyHandler: Calling interceptKeyBeforeQueueing");
                 int actions = interceptKeyBeforeQueueing(fallbackEvent, policyFlags, true);
                 if ((actions & ACTION_PASS_TO_USER) != 0) {
+                    Slog.d(TAG, "KeyHandler: Calling interceptKeyBeforeDispatching");
                     long delayMillis = interceptKeyBeforeDispatching(
                             win, fallbackEvent, policyFlags);
                     if (delayMillis == 0) {
@@ -3025,10 +3038,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             return 0;
         }
 
-        if (false) {
-            Log.d(TAG, "interceptKeyTq keycode=" + keyCode
+        //if (false) {
+            Log.d(TAG, "KeyHandler: interceptKeyTq keycode=" + keyCode
                   + " screenIsOn=" + isScreenOn + " keyguardActive=" + keyguardActive);
-        }
+        //}
 
         if (down && (policyFlags & WindowManagerPolicy.FLAG_VIRTUAL) != 0
                 && event.getRepeatCount() == 0) {
@@ -3046,6 +3059,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         int result;
         if (isScreenOn || isInjected) {
             // When the screen is on or if the key is injected pass the key to the application.
+            Log.d(TAG, "KeyHandler: Passing event to user");
             result = ACTION_PASS_TO_USER;
         } else {
             // When the screen is off and the key is not injected, determine whether
@@ -3129,12 +3143,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         mVolumeUpKeyTriggered = false;
                         cancelPendingScreenshotChordAction();
                     }
-                } else if (keyCode == KeyEvent.KEYCODE_VOLUME_MUTE) {
-                    if (!down || keyguardActive)
-                        return 0;
-                    handleFunctionKey(event);
-                    result &= ~ACTION_PASS_TO_USER;
-                    break;
                 }
                 if (down) {
                     ITelephony telephonyService = getTelephonyService();
@@ -3325,39 +3333,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         }
                     }
                 }
-                break;
-            }
-            case KeyEvent.KEYCODE_EXPLORER:
-            case KeyEvent.KEYCODE_SETTINGS:
-            case KeyEvent.KEYCODE_WIRELESS:
-            case KeyEvent.KEYCODE_BLUETOOTH:
-            case KeyEvent.KEYCODE_TOUCHPAD: {
-                if (!isDeviceProvisioned())
-                    return 0;
-                handleFunctionKey(event);
-                result &= ~ACTION_PASS_TO_USER;
-                break;
-            }
-            case KeyEvent.KEYCODE_BRIGHTNESS_UP:
-            case KeyEvent.KEYCODE_BRIGHTNESS_DOWN:
-            case KeyEvent.KEYCODE_BRIGHTNESS_AUTO: {
-                if (!down || keyguardActive)
-                    return 0;
-                handleFunctionKey(event);
-                result &= ~ACTION_PASS_TO_USER;
-                break;
-            }
-            case KeyEvent.KEYCODE_CAPTURE: {
-                if (!down)
-                    return 0;
-                mHandler.post(mScreenshotChordLongPress);
-                result &= ~ACTION_PASS_TO_USER;
-                break;
-            }
-            case KeyEvent.KEYCODE_SLEEP: {
-                if (isScreenOn && down && (!keyguardActive || isKeyguardSecure()))
-                    result = (result & ~ACTION_POKE_USER_ACTIVITY) | ACTION_GO_TO_SLEEP;
-                result &= ~ACTION_PASS_TO_USER;
                 break;
             }
         }

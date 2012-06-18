@@ -802,8 +802,6 @@
     <integer-array translatable="false" name="config_oemUsbModeOverride">
     </integer-array>
 
-    <!-- CM CHANGES START HERE -->
-
     <!-- LUN file to be used by legacy USB manager.
          The existence of this file will be used to determine in the
          legacy USB manager should be started. -->

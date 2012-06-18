@@ -89,7 +89,7 @@ public class Smdk4210RIL extends RIL implements CommandsInterface {
          * then change then re-enable).
          */
     }
-	
+
     private boolean NeedReconnect()
     {
         ConnectivityManager cm =
