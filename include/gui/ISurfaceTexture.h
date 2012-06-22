@@ -141,6 +141,9 @@ protected:
                                           int arg3) = 0;
 #endif
 
+    virtual uint32_t getParameter(uint32_t cmd) = 0;
+    virtual int      setParameter(uint32_t cmd,uint32_t value) = 0;
+
 };
 
 // ----------------------------------------------------------------------------

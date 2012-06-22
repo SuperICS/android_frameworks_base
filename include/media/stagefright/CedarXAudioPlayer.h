@@ -14,68 +14,74 @@
  * limitations under the License.
  */
 
-#ifndef AUDIO_PLAYER_H_
+#ifndef CEDARX_AUDIO_PLAYER_H_
 
-#define AUDIO_PLAYER_H_
+#define CEDARX_AUDIO_PLAYER_H_
 
 #include <media/MediaPlayerInterface.h>
 #include <media/stagefright/MediaBuffer.h>
 #include <media/stagefright/TimeSource.h>
 #include <utils/threads.h>
+//#include <media/stagefright/MediaClock.h>
 
 namespace android {
 
 class MediaSource;
 class AudioTrack;
-class AwesomePlayer;
+class CedarXPlayer;
 
-class AudioPlayer : public TimeSource {
+class CedarXAudioPlayer {
 public:
     enum {
         REACHED_EOS,
         SEEK_COMPLETE
     };
 
-    AudioPlayer(const sp<MediaPlayerBase::AudioSink> &audioSink,
-                AwesomePlayer *audioObserver = NULL);
+    enum {
+    	FlagsFillBuffer = 1,
+    };
 
-    virtual ~AudioPlayer();
+    CedarXAudioPlayer(const sp<MediaPlayerBase::AudioSink> &audioSink,
+                CedarXPlayer *audioObserver = NULL);
+
+    virtual ~CedarXAudioPlayer();
 
     // Caller retains ownership of "source".
     void setSource(const sp<MediaSource> &source);
 
-    // Return time in us.
-    virtual int64_t getRealTimeUs();
+    void setFormat(int samplerate, int channel);
+
 
     status_t start(bool sourceAlreadyStarted = false);
 
     void pause(bool playPendingSamples = false);
     void resume();
 
-    // Returns the timestamp of the last buffer played (in us).
-    int64_t getMediaTimeUs();
-
-    // Returns true iff a mapping is established, i.e. the AudioPlayer
-    // has played at least one frame of audio.
-    bool getMediaTimeMapping(int64_t *realtime_us, int64_t *mediatime_us);
+    int getLatency();
+    int getSpace();
+    int render(void* data, int len);
 
     status_t seekTo(int64_t time_us);
 
     bool isSeeking();
     bool reachedEOS(status_t *finalStatus);
+    //void setEventMark(uint32_t event);
 
 private:
-    friend class VideoEditorAudioPlayer;
     sp<MediaSource> mSource;
     AudioTrack *mAudioTrack;
+
+    //bool mInitMediaClock;
+    //MediaClock *mMediaClock;
 
     MediaBuffer *mInputBuffer;
 
     int mSampleRate;
+    int numChannels;
     int64_t mLatencyUs;
     size_t mFrameSize;
 
-    Mutex mLock;
+    Mutex mLock, mLock2;
     int64_t mNumFramesPlayed;
 
     int64_t mPositionTimeMediaUs;
@@ -87,15 +93,18 @@ private:
     int64_t mSeekTimeUs;
 
     bool mStarted;
-#ifdef QCOM_HARDWARE
-    bool mSourcePaused;
-#endif
+
     bool mIsFirstBuffer;
     status_t mFirstBufferResult;
     MediaBuffer *mFirstBuffer;
 
     sp<MediaPlayerBase::AudioSink> mAudioSink;
-    AwesomePlayer *mObserver;
+    CedarXPlayer *mObserver;
+    char *mAudioBufferPtr;
+    int mAudioBufferSize;
+    char *mAudioBufferPtrBak;
+    int mAudioBufferSizeBak;
+    int mFlags;
 
     static void AudioCallback(int event, void *user, void *info);
     void AudioCallback(int event, void *info);
@@ -105,15 +114,12 @@ private:
             void *data, size_t size, void *me);
 
     size_t fillBuffer(void *data, size_t size);
-
-    int64_t getRealTimeUsLocked() const;
+    Condition mFillBufferCondition;
 
     void reset();
 
-    uint32_t getNumFramesPendingPlayout() const;
-
-    AudioPlayer(const AudioPlayer &);
-    AudioPlayer &operator=(const AudioPlayer &);
+    CedarXAudioPlayer(const CedarXAudioPlayer &);
+    CedarXAudioPlayer &operator=(const CedarXAudioPlayer &);
 };
 
 }  // namespace android

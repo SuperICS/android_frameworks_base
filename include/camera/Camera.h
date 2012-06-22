@@ -148,6 +148,9 @@ public:
 
     sp<ICamera>         remote();
 
+    // add for set overlay screen
+    static int    setCameraScreen(int screen);
+
     class RecordingProxy : public BnCameraRecordingProxy
     {
     public:
