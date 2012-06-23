@@ -56,7 +56,6 @@ LiveSession::LiveSession(uint32_t flags, bool uidValid, uid_t uid)
       mSeekTimeUs(-1),
       mNumRetries(0),
       mDurationUs(-1),
-      mSeekDone(false),
       mDisconnectPending(false),
       mMonitorQueueGeneration(0),
       mRefreshState(INITIAL_MINIMUM_RELOAD_DELAY),
@@ -106,10 +105,6 @@ int64_t LiveSession::seekTo(int64_t timeUs) {
 
     while (!mSeekDone) {
         mCondition.wait(mLock);
-        if( newSeekTime != NULL ) {
-           *newSeekTime = mSeekTimeUs;
-           LOGV("new Seek Time %lld", mSeekTimeUs);
-        }
     }
     return mSeekTargetStartUs;
 }
