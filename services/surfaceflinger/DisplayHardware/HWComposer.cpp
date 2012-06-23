@@ -188,6 +188,27 @@ uint32_t HWComposer::getFlags() const {
 }
 #endif
 
+int  HWComposer::setParameter(uint32_t cmd,uint32_t value)
+{
+    if (mHwc) 
+    {
+        int err = mHwc->setparameter(mHwc, cmd,value);
+        
+        return (status_t)err;
+    }
+    return NO_ERROR;
+}
+
+uint32_t HWComposer::getParameter(uint32_t cmd)
+{
+    if (mHwc) 
+    {
+        return mHwc->getparameter(mHwc, cmd);
+    }
+    
+    return NO_ERROR;
+}
+
 void HWComposer::dump(String8& result, char* buffer, size_t SIZE,
         const Vector< sp<LayerBase> >& visibleLayersSortedByZ) const {
     if (mHwc && mList) {
