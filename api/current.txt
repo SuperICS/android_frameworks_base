@@ -5531,6 +5531,7 @@ package android.content {
     field public static final java.lang.String CATEGORY_HE_DESK_DOCK = "android.intent.category.HE_DESK_DOCK";
     field public static final java.lang.String CATEGORY_HOME = "android.intent.category.HOME";
     field public static final java.lang.String CATEGORY_INFO = "android.intent.category.INFO";
+    field public static final java.lang.String CATEGORY_KB_DOCK = "android.intent.category.KB_DOCK";
     field public static final java.lang.String CATEGORY_LAUNCHER = "android.intent.category.LAUNCHER";
     field public static final java.lang.String CATEGORY_LE_DESK_DOCK = "android.intent.category.LE_DESK_DOCK";
     field public static final java.lang.String CATEGORY_MONKEY = "android.intent.category.MONKEY";
@@ -6654,6 +6655,7 @@ package android.content.res {
     method public void parseBundleExtra(java.lang.String, android.util.AttributeSet, android.os.Bundle) throws org.xmlpull.v1.XmlPullParserException;
     method public void parseBundleExtras(android.content.res.XmlResourceParser, android.os.Bundle) throws java.io.IOException, org.xmlpull.v1.XmlPullParserException;
     method public void updateConfiguration(android.content.res.Configuration, android.util.DisplayMetrics);
+    method public final void updateStringCache();
   }
 
   public static class Resources.NotFoundException extends java.lang.RuntimeException {
@@ -10950,7 +10952,7 @@ package android.media {
   public static abstract interface MediaPlayer.OnInfoListener {
     method public abstract boolean onInfo(android.media.MediaPlayer, int, int);
   }
-  
+
   public static abstract interface MediaPlayer.OnParse3dFileListener {
     method public abstract int onParse3dFile(int);
   }
@@ -17735,6 +17737,7 @@ package android.provider {
     field public static final java.lang.String MODE_RINGER = "mode_ringer";
     field public static final java.lang.String MODE_RINGER_STREAMS_AFFECTED = "mode_ringer_streams_affected";
     field public static final java.lang.String MUTE_STREAMS_AFFECTED = "mute_streams_affected";
+    field public static final java.lang.String NAVIGATION_BAR_WIDGETS = "navigation_bar_widgets";
     field public static final deprecated java.lang.String NETWORK_PREFERENCE = "network_preference";
     field public static final java.lang.String NEXT_ALARM_FORMATTED = "next_alarm_formatted";
     field public static final java.lang.String NOTIFICATION_SOUND = "notification_sound";
@@ -22049,7 +22052,7 @@ package android.view {
     method public deprecated int getWidth();
     field public static final int DEFAULT_DISPLAY = 0; // 0x0
   }
-  
+
   public class DisplayManager {
     ctor public DisplayManager();
     method public int closeDisplay(int);
@@ -22921,6 +22924,7 @@ package android.view {
     method public static android.view.MotionEvent obtainNoHistory(android.view.MotionEvent);
     method public final void offsetLocation(float, float);
     method public final void recycle();
+    method public final void scale(float, float);
     method public final void setAction(int);
     method public final void setEdgeFlags(int);
     method public final void setLocation(float, float);
