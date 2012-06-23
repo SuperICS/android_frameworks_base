@@ -878,8 +878,6 @@ status_t StagefrightRecorder::start() {
         return UNKNOWN_ERROR;
     }
 
-    status_t status = OK;
-
     switch (mOutputFormat) {
         case OUTPUT_FORMAT_DEFAULT:
         case OUTPUT_FORMAT_THREE_GPP:
