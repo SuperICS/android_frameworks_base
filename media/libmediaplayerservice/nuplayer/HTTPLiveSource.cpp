@@ -169,7 +169,7 @@ status_t NuPlayer::HTTPLiveSource::getDuration(int64_t *durationUs) {
     return mLiveSession->getDuration(durationUs);
 }
 
-status_t NuPlayer::HTTPLiveSource::seekTo(int64_t seekTimeUs, int64_t* newSeekTime) {
+status_t NuPlayer::HTTPLiveSource::seekTo(int64_t seekTimeUs) {
     // We need to make sure we're not seeking until we have seen the very first
     // PTS timestamp in the whole stream (from the beginning of the stream).
     while (!mTSParser->PTSTimeDeltaEstablished() && feedMoreTSData() == OK) {
@@ -180,10 +180,7 @@ status_t NuPlayer::HTTPLiveSource::seekTo(int64_t seekTimeUs, int64_t* newSeekTi
        return mFinalResult;
     }
 
-    mLiveSession->seekTo(seekTimeUs, newSeekTime);
-    if( *newSeekTime >= 0 ) {
-       mTSParser->signalDiscontinuity( ATSParser::DISCONTINUITY_SEEK, NULL);
-    }
+    mLiveSession->seekTo(seekTimeUs);
 
     return OK;
 }

@@ -670,7 +670,8 @@ sp<MediaSource> OMXCodec::Create(
 
         sp<MediaSource> softwareCodec;
         if (createEncoder) {
-            softwareCodec = InstantiateSoftwareEncoder(componentName, source, meta);
+            sp<MediaSource> softwareCodec =
+                InstantiateSoftwareEncoder(componentName, source, meta);
 #ifdef WITH_QCOM_LPA
         } else {
             softwareCodec = InstantiateSoftwareDecoder(componentName, source);
@@ -1659,6 +1660,7 @@ status_t OMXCodec::setupH263EncoderParameters(const sp<MetaData>& meta) {
     h263type.nAllowedPictureTypes =
         OMX_VIDEO_PictureTypeI | OMX_VIDEO_PictureTypeP;
 
+    h263type.nPFrames = setPFramesSpacing(iFramesInterval, frameRate);
     if (h263type.nPFrames == 0) {
         h263type.nAllowedPictureTypes = OMX_VIDEO_PictureTypeI;
     }
@@ -4313,9 +4315,17 @@ status_t OMXCodec::waitForBufferFilled_l() {
     }
     status_t err = mBufferFilled.waitRelative(mLock, kBufferFilledEventTimeOutNs);
     if (err != OK) {
-        CODEC_LOGE("Timed out waiting for output buffers: %d/%d",
-            countBuffersWeOwn(mPortBuffers[kPortIndexInput]),
-            countBuffersWeOwn(mPortBuffers[kPortIndexOutput]));
+    	if(countBuffersWeOwn(mPortBuffers[kPortIndexOutput]) > 0) {
+//    		CODEC_LOGI("Warnning Timed out waiting for output buffers: %d/%d",
+//				countBuffersWeOwn(mPortBuffers[kPortIndexInput]),
+//				countBuffersWeOwn(mPortBuffers[kPortIndexOutput]));
+    		return OK;
+    	}
+    	else {
+			CODEC_LOGE("Timed out waiting for output buffers: %d/%d",
+				countBuffersWeOwn(mPortBuffers[kPortIndexInput]),
+				countBuffersWeOwn(mPortBuffers[kPortIndexOutput]));
+    	}
     }
     return err;
 }

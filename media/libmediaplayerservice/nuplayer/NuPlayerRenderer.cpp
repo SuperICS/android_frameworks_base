@@ -373,7 +373,7 @@ void NuPlayer::Renderer::onDrainVideoQueue() {
     int64_t realTimeUs = mediaTimeUs - mAnchorTimeMediaUs + mAnchorTimeRealUs;
     mVideoLateByUs = ALooper::GetNowUs() - realTimeUs;
 
-    bool tooLate = (mVideoLateByUs > 40000);
+    bool tooLate = (mVideoLateByUs > 40000*3);
 
     if (tooLate) {
         LOGV("video late by %lld us (%.2f secs)", lateByUs, lateByUs / 1E6);
