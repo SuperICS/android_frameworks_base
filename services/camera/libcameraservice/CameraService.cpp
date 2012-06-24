@@ -121,17 +121,6 @@ void CameraService::onFirstRef()
             setCameraFree(i);
         }
     }
-
-    char prop_value[PROPERTY_VALUE_MAX];
-    if (property_get(PROP_CAMERA_KEY, prop_value, PROP_SCREEN_DEFAULT_VALUE) > 0)
-    {
-	    LOGV("camera prop_value = %s", prop_value);
-	    String8 value_screen( prop_value );
-	    if(value_screen == PROP_MASTER_SCREEN)
-	        mOverlayScreen = MASTER_SCREEN;
-	    else
-	        mOverlayScreen = SLAVE_SCREEN;
-    }
 }
 
 CameraService::~CameraService() {
@@ -142,34 +131,6 @@ CameraService::~CameraService() {
     }
 
     gCameraService = NULL;
-}
-
-// add for switch camera overlay surface
-int CameraService::setCameraScreen(int32_t screen)
-{
-	LOGD("CameraService::setCameraScreen: %d", screen);
-	sp<Client> client;
-	
-	mOverlayScreen = screen;
-	
-	if(mOverlayScreen == MASTER_SCREEN)
-        property_set(PROP_CAMERA_KEY, PROP_MASTER_SCREEN);
-    else
-        property_set(PROP_CAMERA_KEY, PROP_SLAVE_SCREEN);
-	
-	for(int i = 0; i < MAX_CAMERAS; i++)
-	{
-		if(mClient[i] != 0)
-		{
-			client = mClient[i].promote();
-	        if (client != 0) 
-	        {
-	            client->sendCommand(CAMERA_CMD_SET_SCREEN_ID, screen, 0);
-	        }
-		}
-	}
-		
-	return OK;
 }
 
 int32_t CameraService::getNumberOfCameras() {
