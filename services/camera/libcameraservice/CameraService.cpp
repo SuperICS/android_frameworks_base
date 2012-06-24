@@ -91,9 +91,6 @@ static void htcCameraSwitch(int cameraId)
 // should be ok for now.
 static CameraService *gCameraService;
 
-// define and initialize static class member
-int CameraService::mOverlayScreen = MASTER_SCREEN;
-
 CameraService::CameraService()
 :mSoundRef(0), mModule(0)
 {
@@ -570,9 +567,6 @@ status_t CameraService::Client::setPreviewWindow(const sp<IBinder>& binder,
         }
     }
 
-	// 
-	mHardware->sendCommand(CAMERA_CMD_SET_SCREEN_ID, mOverlayScreen, 0);
-
     // If preview has been already started, register preview buffers now.
     if (mHardware->previewEnabled()) {
         if (window != 0) {
@@ -889,12 +883,6 @@ status_t CameraService::Client::sendCommand(int32_t cmd, int32_t arg1, int32_t a
     LOG1("sendCommand (pid %d)", getCallingPid());
     int orientation;
     Mutex::Autolock lock(mLock);
-
-	if (cmd == CAMERA_CMD_SET_SCREEN_ID)
-	{
-		return mHardware->sendCommand(cmd, arg1, arg2);
-	}
-	
     status_t result = checkPidAndHardware();
     if (result != NO_ERROR) return result;
 

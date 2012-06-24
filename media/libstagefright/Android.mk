@@ -154,8 +154,8 @@ ifeq ($(BOARD_USES_PROPRIETARY_OMX),SAMSUNG)
 LOCAL_CFLAGS     += -DSAMSUNG_OMX
 endif
 
-LOCAL_LDFLAGS += \
-	$(TOP)/external/cedarx/CedarAndroidLib/LIB_ICS_F23/libstagefright_httplive_opt.a
+#LOCAL_LDFLAGS += \
+#	$(TOP)/external/cedarx/CedarAndroidLib/LIB_ICS_F23/libstagefright_httplive_opt.a
 
 ################################################################################
 
