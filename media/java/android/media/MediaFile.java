@@ -278,7 +278,7 @@ public class MediaFile {
                 fileType <= LAST_AUDIO_FILE_TYPE) ||
                 (fileType >= FIRST_MIDI_FILE_TYPE &&
                 fileType <= LAST_MIDI_FILE_TYPE ||
-    fileType == FILE_TYPE_CEDARA);
+    fileType == FILE_TYPE_CEDARA));
     }
 
     public static boolean isVideoFileType(int fileType) {

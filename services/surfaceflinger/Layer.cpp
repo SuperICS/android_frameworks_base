@@ -784,6 +784,16 @@ uint32_t Layer::getEffectiveUsage(uint32_t usage) const
     return usage;
 }
 
+int Layer::setDisplayParameter(uint32_t cmd,uint32_t  value)
+{
+    return mFlinger->setDisplayParameter(cmd,value);
+}
+
+uint32_t Layer::getDisplayParameter(uint32_t cmd)
+{
+    return mFlinger->getDisplayParameter(cmd);
+}
+
 uint32_t Layer::getTransformHint() const {
     uint32_t orientation = 0;
     if (!mFlinger->mDebugDisableTransformHint) {
