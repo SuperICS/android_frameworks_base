@@ -1679,8 +1679,8 @@ public final class MotionEvent extends InputEvent implements Parcelable {
     public final void scale(float scale) {
         nativeScale(mNativePtr, scale);
     }
-
-public final void scale(float scaleX,float scaleY) {
+    
+    public final void scale(float scaleX,float scaleY) {
         nativeScaleXY(mNativePtr, scaleX, scaleY);
     }
 

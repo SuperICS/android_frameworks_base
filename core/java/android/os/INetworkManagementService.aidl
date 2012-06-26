@@ -53,6 +53,13 @@ interface INetworkManagementService
      */
     InterfaceConfiguration getInterfaceConfig(String iface);
 
+	/*  Begin (add by shuge@allwinnertech.com)  */
+    /**
+     * Sets the configuration of the specified interface
+     */
+    void renameInterface(String iface, String newname);
+	/*  End (add by shuge@allwinnertech.com)  */
+
     /**
      * Sets the configuration of the specified interface
      */

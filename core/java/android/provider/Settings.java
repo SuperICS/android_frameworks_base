@@ -2172,12 +2172,32 @@ public final class Settings {
          */
         public static final String POINTER_SPEED = "pointer_speed";
 
-        /**
-         * Use the Notification Power Widget? (Who wouldn't!)
-         *
-         * @hide
-         */
-        public static final String EXPANDED_VIEW_WIDGET = "expanded_view_widget";
+	/**
+	 * Select your preferred hdmi display resolution
+	 * @hide
+	 */
+
+	public static final String HDMI_RESOLUTION = "hdmi_resolution";
+	
+	/**
+	 * To use default or special accelerometer coordinate system
+	 * @hide
+	 */
+	 public static final String ACCELEROMETER_COORDINATE = "accelerometer_coordinate";
+
+	/**
+	 * HDMI should use or ignore gsensor
+	 * @hide
+	 */
+
+	public static final String HDMI_IGNORE_GSENSOR = "hdmi_ignore_gsensor";
+
+	/**
+	 * Show or hide volume control on tablet statusbar
+	 * @hide
+	 */
+
+	public static final String VOLUME_SYSBAR = "volume_sysbar";
 
         /**
          * Whether to hide the notification screen after clicking on a widget
@@ -2721,6 +2741,7 @@ public final class Settings {
         @Deprecated
         public static final String WIFI_WATCHDOG_PING_TIMEOUT_MS =
             Secure.WIFI_WATCHDOG_PING_TIMEOUT_MS;
+
         /**
          * where to show the legacy menu key
          * 0 = right (default)
@@ -2730,6 +2751,13 @@ public final class Settings {
          * @hide
          */
         public static final String MENU_LOCATION = "menu_location";
+
+        /**
+         * NFC polling mode configuration key
+         *
+         * @hide
+         */
+        public static final String NFC_POLLING_MODE = "nfc_polling_mode";
 
         /**
          * Whether to show CRT off animation
@@ -2744,8 +2772,8 @@ public final class Settings {
          * 
          * @hide
          */
-        public static final String CRT_ON_ANIMATION = "crt_on_animation";
-
+        public static final String CRT_ON_ANIMATION = "crt_on_animation";    
+        
         /**
          * Whether to enable unlocking from lockscreen via menu key
          * 
@@ -3198,6 +3226,12 @@ public final class Settings {
         public static final String STATUSBAR_BATTERY_BAR_COLOR = "statusbar_battery_bar_color";
 
         /**
+         * Show the pending notification counts as overlays on the status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_NOTIF_COUNT = "status_bar_notif_count";
+
+        /**
          * Last state of the quick toggles, to restore on boot
          * @hide
          */
@@ -3292,11 +3326,28 @@ public final class Settings {
          * @hide
          */
         public static final String NAVIGATION_BAR_BUTTON_ALPHA = "navigation_bar_button_alpha";
+
+        /**
+         * Boolean value whether to link ringtone and notification volumes
+         * 
+         * @hide
+         */
+        public static final String VOLUME_LINK_NOTIFICATION = "volume_link_notification";
+
+        /**
+         * @hide
+         */
+        public static final String LOCKSCREEN_QUICK_UNLOCK_CONTROL = "lockscreen_quick_unlock_control";
         
         /**
          * @hide
          */
         public static final String LOCKSCREEN_WEATHER = "lockscreen_weather";
+
+        /**
+         * @hide
+         */
+        public static final String LOCKSCREEN_WEATHER_TYPE = "lockscreen_weather_type";
 
         /**
          * @hide
@@ -3363,6 +3414,24 @@ public final class Settings {
          * @hide
          */
         public static final String NAVIGATION_BAR_WIDTH = "navigation_bar_width";
+        
+        /**
+         * Whether to enable quiet hours.
+         * @hide
+         */
+        public static final String QUIET_HOURS_ENABLED = "quiet_hours_enabled";
+
+        /**
+         * Sets when quiet hours starts. This is stored in minutes from the start of the day.
+         * @hide
+         */
+        public static final String QUIET_HOURS_START = "quiet_hours_start";
+
+        /**
+         * Sets when quiet hours end. This is stored in minutes from the start of the day.
+         * @hide
+         */
+        public static final String QUIET_HOURS_END = "quiet_hours_end";
 
         /**
          * Whether to remove the sound from outgoing notifications during quiet hours.
@@ -3377,6 +3446,18 @@ public final class Settings {
         public static final String QUIET_HOURS_RINGER = "quiet_hours_ringer";
 
         /**
+         * Whether to disable vibrations during quiet hours.
+         * @hide
+         */
+        public static final String QUIET_HOURS_STILL = "quiet_hours_still";
+
+        /**
+         * Whether to attempt to dim the LED color during quiet hours.
+         * @hide
+         */
+        public static final String QUIET_HOURS_DIM = "quiet_hours_dim";
+
+        /**
          * Color to tint the nav bar glow
          * @hide
          */
@@ -3384,6 +3465,7 @@ public final class Settings {
 
         /**
          * Widgets to show, should be separated by |
+         * @hide
          */
         public static final String NAVIGATION_BAR_WIDGETS = "navigation_bar_widgets";
 
@@ -4188,6 +4270,17 @@ public final class Settings {
          * least-recently-used excess networks will be removed.
          */
         public static final String WIFI_NUM_OPEN_NETWORKS_KEPT = "wifi_num_open_networks_kept";
+        /**
+         * Ethernet related configurations
+         */
+        public static final String ETHERNET_ON      = "eth_on";
+        public static final String ETHERNET_MODE    = "eth_mode";
+        public static final String ETHERNET_IP      = "eth_ip";
+        public static final String ETHERNET_MASK    = "eth_netmask";
+        public static final String ETHERNET_DNS     = "eth_dns";
+        public static final String ETHERNET_ROUTE   = "eth_route";
+        public static final String ETHERNET_CONF    = "eth_conf";
+        public static final String ETHERNET_IFNAME  = "eth_ifname";
 
         /**
          * Whether the Wi-Fi should be on.  Only the Wi-Fi service should touch this.

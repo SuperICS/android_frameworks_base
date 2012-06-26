@@ -427,7 +427,8 @@ public class Environment {
         try {
             IMountService mountService = IMountService.Stub.asInterface(ServiceManager
                     .getService("mount"));
-            return mountService.getVolumeState(path);
+            return mountService.getVolumeState(getExternalStorageDirectory()
+                    .toString());
         } catch (Exception rex) {
             return Environment.MEDIA_REMOVED;
         }
