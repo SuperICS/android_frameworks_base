@@ -310,6 +310,7 @@ public class DisplayManager
             return -1;
         }
 	}
+    
 	
 	public int setDisplayMaster(int mDisplay)
 	{

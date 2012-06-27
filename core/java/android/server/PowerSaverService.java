@@ -372,7 +372,7 @@ public class PowerSaverService extends BroadcastReceiver {
                     Slog.i(TAG, "screenOffTask: storing current data states");
                     requestPreferredDataType();
                     originalDataOn = Settings.Secure.getInt(
-                            mContext.getContentResolver(), Settings.Secure.MOBILE_DATA, 1) == 1;
+                            mContext.getContentResolver(), Settings.Secure.MOBILE_DATA, 0) == 1;
                     Settings.Secure
                             .putInt(mContext.getContentResolver(),
                                     Settings.Secure.POWER_SAVER_ORIGINAL_NETWORK_ON,
@@ -643,7 +643,7 @@ public class PowerSaverService extends BroadcastReceiver {
     private boolean isValidNetwork(int networkType) {
         isCdma = (telephony.getCurrentPhoneType() == Phone.PHONE_TYPE_CDMA);
 
-        switch (networkType) {
+ /*       switch (networkType) {
             case Phone.NT_MODE_CDMA:
             case Phone.NT_MODE_CDMA_NO_EVDO:
             case Phone.NT_MODE_EVDO_NO_CDMA:

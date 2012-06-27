@@ -2057,6 +2057,13 @@ public final class Settings {
                 "window_orientation_listener_log";
 
         /**
+        * To use default or special accelerometer coordinate system
+        * @hide
+        */
+   public static final String ACCELEROMETER_COORDINATE = "accelerometer_coordinate";
+
+
+         /**
          * Whether to play a sound for low-battery alerts.
          * @hide
          */
@@ -2172,32 +2179,12 @@ public final class Settings {
          */
         public static final String POINTER_SPEED = "pointer_speed";
 
-	/**
-	 * Select your preferred hdmi display resolution
-	 * @hide
-	 */
-
-	public static final String HDMI_RESOLUTION = "hdmi_resolution";
-	
-	/**
-	 * To use default or special accelerometer coordinate system
-	 * @hide
-	 */
-	 public static final String ACCELEROMETER_COORDINATE = "accelerometer_coordinate";
-
-	/**
-	 * HDMI should use or ignore gsensor
-	 * @hide
-	 */
-
-	public static final String HDMI_IGNORE_GSENSOR = "hdmi_ignore_gsensor";
-
-	/**
-	 * Show or hide volume control on tablet statusbar
-	 * @hide
-	 */
-
-	public static final String VOLUME_SYSBAR = "volume_sysbar";
+        /**
+         * Use the Notification Power Widget? (Who wouldn't!)
+         *
+         * @hide
+         */
+        public static final String EXPANDED_VIEW_WIDGET = "expanded_view_widget";
 
         /**
          * Whether to hide the notification screen after clicking on a widget
@@ -2431,6 +2418,26 @@ public final class Settings {
          */
         public static final String STATUS_BAR_NOTIF_COUNT = "status_bar_notif_count";
 
+	/**
+	 * Select your preferred hdmi display resolution
+	 * @hide
+	 */
+
+	public static final String HDMI_RESOLUTION = "hdmi_resolution";
+	
+	/**
+	 * HDMI should use or ignore gsensor
+	 * @hide
+	 */
+
+	public static final String HDMI_IGNORE_GSENSOR = "hdmi_ignore_gsensor";
+
+	/**
+	 * Show or hide volume control on tablet statusbar
+	 * @hide
+	 */
+
+	public static final String VOLUME_SYSBAR = "volume_sysbar";
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
@@ -2741,7 +2748,6 @@ public final class Settings {
         @Deprecated
         public static final String WIFI_WATCHDOG_PING_TIMEOUT_MS =
             Secure.WIFI_WATCHDOG_PING_TIMEOUT_MS;
-
         /**
          * where to show the legacy menu key
          * 0 = right (default)
@@ -2751,13 +2757,6 @@ public final class Settings {
          * @hide
          */
         public static final String MENU_LOCATION = "menu_location";
-
-        /**
-         * NFC polling mode configuration key
-         *
-         * @hide
-         */
-        public static final String NFC_POLLING_MODE = "nfc_polling_mode";
 
         /**
          * Whether to show CRT off animation
@@ -2772,8 +2771,8 @@ public final class Settings {
          * 
          * @hide
          */
-        public static final String CRT_ON_ANIMATION = "crt_on_animation";    
-        
+        public static final String CRT_ON_ANIMATION = "crt_on_animation";
+
         /**
          * Whether to enable unlocking from lockscreen via menu key
          * 
@@ -3226,12 +3225,6 @@ public final class Settings {
         public static final String STATUSBAR_BATTERY_BAR_COLOR = "statusbar_battery_bar_color";
 
         /**
-         * Show the pending notification counts as overlays on the status bar
-         * @hide
-         */
-        public static final String STATUS_BAR_NOTIF_COUNT = "status_bar_notif_count";
-
-        /**
          * Last state of the quick toggles, to restore on boot
          * @hide
          */
@@ -3326,28 +3319,11 @@ public final class Settings {
          * @hide
          */
         public static final String NAVIGATION_BAR_BUTTON_ALPHA = "navigation_bar_button_alpha";
-
-        /**
-         * Boolean value whether to link ringtone and notification volumes
-         * 
-         * @hide
-         */
-        public static final String VOLUME_LINK_NOTIFICATION = "volume_link_notification";
-
-        /**
-         * @hide
-         */
-        public static final String LOCKSCREEN_QUICK_UNLOCK_CONTROL = "lockscreen_quick_unlock_control";
         
         /**
          * @hide
          */
         public static final String LOCKSCREEN_WEATHER = "lockscreen_weather";
-
-        /**
-         * @hide
-         */
-        public static final String LOCKSCREEN_WEATHER_TYPE = "lockscreen_weather_type";
 
         /**
          * @hide
@@ -3414,24 +3390,6 @@ public final class Settings {
          * @hide
          */
         public static final String NAVIGATION_BAR_WIDTH = "navigation_bar_width";
-        
-        /**
-         * Whether to enable quiet hours.
-         * @hide
-         */
-        public static final String QUIET_HOURS_ENABLED = "quiet_hours_enabled";
-
-        /**
-         * Sets when quiet hours starts. This is stored in minutes from the start of the day.
-         * @hide
-         */
-        public static final String QUIET_HOURS_START = "quiet_hours_start";
-
-        /**
-         * Sets when quiet hours end. This is stored in minutes from the start of the day.
-         * @hide
-         */
-        public static final String QUIET_HOURS_END = "quiet_hours_end";
 
         /**
          * Whether to remove the sound from outgoing notifications during quiet hours.
@@ -3446,18 +3404,6 @@ public final class Settings {
         public static final String QUIET_HOURS_RINGER = "quiet_hours_ringer";
 
         /**
-         * Whether to disable vibrations during quiet hours.
-         * @hide
-         */
-        public static final String QUIET_HOURS_STILL = "quiet_hours_still";
-
-        /**
-         * Whether to attempt to dim the LED color during quiet hours.
-         * @hide
-         */
-        public static final String QUIET_HOURS_DIM = "quiet_hours_dim";
-
-        /**
          * Color to tint the nav bar glow
          * @hide
          */
@@ -3465,7 +3411,6 @@ public final class Settings {
 
         /**
          * Widgets to show, should be separated by |
-         * @hide
          */
         public static final String NAVIGATION_BAR_WIDGETS = "navigation_bar_widgets";
 

@@ -455,6 +455,6 @@ public class SensorEvent {
 
     SensorEvent(int size) {
         values = new float[size];
-        originalValue = new float[size];
+	originalValue = new float[size];
     }
 }

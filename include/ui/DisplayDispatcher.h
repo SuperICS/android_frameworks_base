@@ -50,7 +50,6 @@
 #define   DISPLAY_CMD_GETDISPLAYMODE    11
 #define   DISPLAY_CMD_GETDISPCOUNT      12
 #define   DISPLAY_CMD_SETDISPMODE       13
-#define   DISPLAY_CMD_SETBACKLIGHTMODE  14
 namespace android 
 {
     /* ......... */
@@ -101,7 +100,6 @@ namespace android
 			int 	getDisplayCount();
 			int		getMaxWidthDisplay();
 			int     getMaxHdmiMode();
-			int     setDisplayBacklightMode(int mode);
 			
 			bool 	mDisplayOpen0;
 	        bool 	mDisplayOpen1;

@@ -139,7 +139,7 @@ class ServerThread extends Thread {
         ConnectivityService connectivity = null;
         WifiP2pService wifiP2p = null;
         WifiService wifi = null;
-		EthernetService ethernet = null;	/*  EthernetService (add by shuge@allwinnertech.com)  */
+	EthernetService ethernet = null;	/*  EthernetService (add by shuge@allwinnertech.com)  */
         IPackageManager pm = null;
         Context context = null;
         WindowManagerService wm = null;

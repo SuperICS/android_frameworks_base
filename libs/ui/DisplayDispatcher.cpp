@@ -418,15 +418,6 @@ namespace android
 		
 		return  -1;
     }
-	int DisplayDispatcher::setDisplayBacklightMode(int mode)
-	{
-		  if(mDevice)
-		  {
-		  		return mDevice->setdisplaybacklightmode(mDevice,mode);
-		  }
-		  
-		  return -1;
-	}
     int DisplayDispatcher::setDispProp(int cmd,int param0,int param1,int param2)		
     {
         switch(cmd)
@@ -473,9 +464,6 @@ namespace android
             case DISPLAY_CMD_SETDISPMODE:
                 return  setDisplayMode(param0);
                 
-			case DISPLAY_CMD_SETBACKLIGHTMODE:
-				return  setDisplayBacklightMode(param0);
-				
             default:
                 LOGE("Display Cmd not Support!\n");
                 return  -1;
