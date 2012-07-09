@@ -121,6 +121,17 @@ void CameraService::onFirstRef()
             setCameraFree(i);
         }
     }
+
+char prop_value[PROPERTY_VALUE_MAX];
+    if (property_get(PROP_CAMERA_KEY, prop_value, PROP_SCREEN_DEFAULT_VALUE) > 0)
+    {
+      LOGV("camera prop_value = %s", prop_value);
+      String8 value_screen( prop_value );
+      if(value_screen == PROP_MASTER_SCREEN)
+          mOverlayScreen = MASTER_SCREEN;
+      else
+          mOverlayScreen = SLAVE_SCREEN;
+    }
 }
 
 CameraService::~CameraService() {

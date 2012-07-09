@@ -1863,6 +1863,11 @@ status_t MPEG4Extractor::updateAudioTrackInfoFromESDS_MPEG4Audio(
         numChannels = (csd[1] >> 3) & 15;
     }
 
+
+    if (numChannels == 0) {
+        return ERROR_UNSUPPORTED;
+    }
+
     int32_t prevSampleRate;
     CHECK(mLastTrack->meta->findInt32(kKeySampleRate, &prevSampleRate));
 
@@ -2060,6 +2065,7 @@ status_t MPEG4Source::read(
         isSeekMode = true;
 
         uint32_t sampleIndex;
+	LOGV("seekTimeUs:%lld mTimescale:%d to:%lld",seekTimeUs,mTimescale,seekTimeUs * mTimescale / 1000000);
         status_t err = mSampleTable->findSampleAtTime(
                 seekTimeUs * mTimescale / 1000000,
                 &sampleIndex, findFlags);
@@ -2120,6 +2126,46 @@ status_t MPEG4Source::read(
         if (err == OK) {
             err = mSampleTable->getMetaDataForSample(
                     sampleIndex, NULL, NULL, &sampleTime);
+        }
+
+ LOGV("syncSampleIndex:%d",syncSampleIndex);
+        if (mode == ReadOptions::SEEK_VENDOR_OPT) {
+            off64_t offset;
+            size_t size;
+            uint64_t cts;
+      status_t err;
+      uint32_t currSampleIndex = syncSampleIndex;
+      int64_t offsetBefind;
+      uint32_t left;
+      uint32_t right;
+
+      offsetBefind = options->getLateBy();
+      mSampleTable->getMetaDataForSample(currSampleIndex, &offset, &size, &cts);
+
+      if(offset < offsetBefind) {
+        left = currSampleIndex;
+        right = mSampleTable->countSamples() - 1;
+
+        while (left < right) {
+          uint32_t center = (left + right) / 2;
+          mSampleTable->getMetaDataForSample(center, &offset, &size, &cts);
+          LOGV("offsetBefind:0x%llx offset:0x%llx center:%d left:%d right:%d",offsetBefind, offset, center, left, right);
+          if (offsetBefind < offset) {
+            right = center;
+          } else if (offsetBefind > offset) {
+            left = center + 1;
+          } else {
+            left = center;
+            break;
+          }
+        }
+
+        currSampleIndex = left;
+
+        mSampleTable->getMetaDataForSample(currSampleIndex, &offset, &size, &cts);
+      }
+
+      syncSampleIndex = sampleIndex = currSampleIndex;
         }
 
         if (err != OK) {

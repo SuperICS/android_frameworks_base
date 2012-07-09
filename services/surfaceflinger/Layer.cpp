@@ -76,6 +76,9 @@ Layer::Layer(SurfaceFlinger* flinger,
 #ifdef QCOM_HARDWARE
     updateLayerQcomFlags(LAYER_UPDATE_STATUS, true, mLayerQcomFlags);
 #endif
+    texture_srcw       = 0;
+    texture_srch       = 0;
+    texture_format     = 0;
 }
 
 void Layer::onFirstRef()
@@ -299,6 +302,8 @@ void Layer::setPerFrameData(hwc_layer_t* hwcl) {
     updateLayerQcomFlags(LAYER_ASYNCHRONOUS_STATUS, !mSurfaceTexture->isSynchronousMode(), mLayerQcomFlags);
     hwcl->flags = getPerFrameFlags(hwcl->flags, mLayerQcomFlags);
 #endif
+    hwcl->format = texture_format;
+    LOGV("hwcl->format = %d\n",texture_format);
 }
 
 void Layer::onDraw(const Region& clip) const

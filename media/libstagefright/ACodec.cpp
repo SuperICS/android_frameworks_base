@@ -38,6 +38,9 @@ Copyright (c) 2010-2012, Code Aurora Forum. All rights reserved.
 #include <gui/SurfaceTextureClient.h>
 
 #include <OMX_Component.h>
+#include <ui/android_native_buffer.h>
+#include <ui/GraphicBufferMapper.h>
+#include <gui/ISurfaceTexture.h>
 #ifdef QCOM_HARDWARE
 #include <OMX_QCOMExtns.h>
 #include <gralloc_priv.h>

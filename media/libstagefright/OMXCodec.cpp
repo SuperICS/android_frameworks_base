@@ -682,7 +682,7 @@ sp<MediaSource> OMXCodec::Create(
             return softwareCodec;
         }
 
-        LOGE("Attempting to allocate OMX node '%s'", componentName);
+        LOGV("Attempting to allocate OMX node '%s'", componentName);
 
         uint32_t quirks = getComponentQuirks(componentNameBase, createEncoder);
 #ifdef QCOM_HARDWARE
@@ -722,7 +722,7 @@ sp<MediaSource> OMXCodec::Create(
 
         status_t err = omx->allocateNode(componentName, observer, &node);
         if (err == OK) {
-            LOGE("Successfully allocated OMX node '%s'", componentName);
+            LOGV("Successfully allocated OMX node '%s'", componentName);
 
             sp<OMXCodec> codec = new OMXCodec(
                     omx, node, quirks, flags,
@@ -900,12 +900,6 @@ status_t OMXCodec::configureCodec(const sp<MetaData> &meta) {
                 // and wreak havoc instead...
 
                 LOGE("Profile and/or level exceed the decoder's capabilities.");
-                return ERROR_UNSUPPORTED;
-            }
-            if(!strcmp(mComponentName, "OMX.google.h264.decoder")
-                && (profile != kAVCProfileBaseline)) {
-                LOGE("%s does not support profiles > kAVCProfileBaseline", mComponentName);
-                // The profile is unsupported by the decoder
                 return ERROR_UNSUPPORTED;
             }
 
@@ -2904,7 +2898,7 @@ int64_t OMXCodec::retrieveDecodingTimeUs(bool isCodecSpecific) {
 }
 
 void OMXCodec::on_message(const omx_message &msg) {
-    if (mState == ERROR && !strncmp(mComponentName, "OMX.google.", 11)) {
+    if (mState == ERROR) {
         LOGW("Dropping OMX message - we're in ERROR state.");
         return;
     }
@@ -4723,7 +4717,7 @@ void OMXCodec::setG711Format(int32_t numChannels) {
 
 void OMXCodec::setImageOutputFormat(
         OMX_COLOR_FORMATTYPE format, OMX_U32 width, OMX_U32 height) {
-    CODEC_LOGE("setImageOutputFormat(%ld, %ld)", width, height);
+    CODEC_LOGV("setImageOutputFormat(%ld, %ld)", width, height);
 
 #if 0
     OMX_INDEXTYPE index;

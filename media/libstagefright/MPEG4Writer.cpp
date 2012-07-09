@@ -2787,7 +2787,6 @@ void MPEG4Writer::Track::writeCttsBox() {
         mOwner->writeInt32(it->sampleDuration);
         totalCount += it->sampleCount;
     }
-    LOGV("totalCount = %lld, mNumSamples = %d", totalCount, mNumSamples);
     CHECK(totalCount == mNumSamples);
     mOwner->endBox();  // ctts
 }

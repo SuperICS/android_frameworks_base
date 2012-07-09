@@ -162,6 +162,7 @@ public class DisplayManagerService extends IDisplayManager.Stub
 	private int 			mDisplayFormat1;
 	private static 			DisplayThread sThread;
     private static 			boolean sThreadStarted = false;
+	private int             mBacklightMode;
     
     private native void nativeInit();
     private native int 	nativeGetDisplayCount();
@@ -184,6 +185,7 @@ public class DisplayManagerService extends IDisplayManager.Stub
 	private native int  nativeGetMaxWidthDisplay();
 	private native int  nativeGetMaxHdmiMode();
 	private native int  nativeSetDisplayParameter(int mDisplay,int para0,int para1);
+	private native int nativeSetDisplayBacklihgtMode(int mode);
 
 	private final void sendHdmiIntent() 
 	{
@@ -490,6 +492,17 @@ public class DisplayManagerService extends IDisplayManager.Stub
 	public int getDisplayHotPlugStatus(int mDisplay)
 	{
 		return nativeGetDisplayHotPlug(mDisplay);
+	}
+
+	public int setDisplayBacklightMode(int mode)
+	{
+		mBacklightMode = mode;
+		return nativeSetDisplayBacklihgtMode(mode);
+	}
+
+	public int getDisplayBacklightMode()
+	{
+		return mBacklightMode;
 	}
 	
 	public int openDisplay(int mDisplay)

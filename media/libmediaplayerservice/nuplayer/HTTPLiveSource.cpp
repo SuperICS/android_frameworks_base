@@ -175,10 +175,6 @@ status_t NuPlayer::HTTPLiveSource::seekTo(int64_t seekTimeUs) {
     while (!mTSParser->PTSTimeDeltaEstablished() && feedMoreTSData() == OK) {
         usleep(100000);
     }
-    if( mFinalResult != OK  ) {
-       LOGW("Error state %d, Ignore this seek", mFinalResult);
-       return mFinalResult;
-    }
 
     mLiveSession->seekTo(seekTimeUs);
 

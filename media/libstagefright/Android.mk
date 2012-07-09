@@ -29,6 +29,7 @@ ifeq ($(BOARD_CAMERA_USE_MM_HEAP),true)
 endif
 endif
 include frameworks/base/media/libstagefright/codecs/common/Config.mk
+include external/cedarx/Config.mk
 
 LOCAL_SRC_FILES:=                         \
         ACodec.cpp                        \
@@ -154,8 +155,12 @@ ifeq ($(BOARD_USES_PROPRIETARY_OMX),SAMSUNG)
 LOCAL_CFLAGS     += -DSAMSUNG_OMX
 endif
 
+#ifeq ($(CEDARX_DEBUG_FRAMEWORK),Y)
+#LOCAL_STATIC_LIBRARIES += libstagefright_httplive_opt
+#else
 #LOCAL_LDFLAGS += \
-#	$(TOP)/external/cedarx/CedarAndroidLib/LIB_ICS_F23/libstagefright_httplive_opt.a
+#  $(CEDARX_TOP)/../CedarAndroidLib/LIB_ICS_$(CEDARX_CHIP_VERSION)/libstagefright_httplive_opt.a
+#endif
 
 ################################################################################
 
