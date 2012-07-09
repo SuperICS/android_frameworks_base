@@ -28,7 +28,6 @@
 #include <gui/SurfaceTexture.h>
 
 #include <hardware/hardware.h>
-#include <hardware/hwcomposer.h>
 
 #include <surfaceflinger/ISurfaceComposer.h>
 #include <surfaceflinger/SurfaceComposerClient.h>
@@ -747,9 +746,7 @@ status_t SurfaceTexture::connect(int api,
         case NATIVE_WINDOW_API_CPU:
         case NATIVE_WINDOW_API_MEDIA:
         case NATIVE_WINDOW_API_CAMERA:
-    case NATIVE_WINDOW_API_MEDIA_HW:
-    case NATIVE_WINDOW_API_CAMERA_HW:
-            if (mConnectedApi != NO_CONNECTED_API && (mConnectedApi != api)) {
+            if (mConnectedApi != NO_CONNECTED_API) {
                 ST_LOGE("connect: already connected (cur=%d, req=%d)",
                         mConnectedApi, api);
                 err = -EINVAL;
@@ -783,8 +780,6 @@ status_t SurfaceTexture::disconnect(int api) {
         case NATIVE_WINDOW_API_CPU:
         case NATIVE_WINDOW_API_MEDIA:
         case NATIVE_WINDOW_API_CAMERA:
-    case NATIVE_WINDOW_API_MEDIA_HW:
-        case NATIVE_WINDOW_API_CAMERA_HW:
             if (mConnectedApi == api) {
                 drainQueueAndFreeBuffersLocked();
                 mConnectedApi = NO_CONNECTED_API;
@@ -1260,41 +1255,6 @@ void SurfaceTexture::abandon() {
 
 void SurfaceTexture::setName(const String8& name) {
     mName = name;
-}
-
-bool SurfaceTexture::IsHardwareRenderSupport()
-{
-    if(mPixelFormat >= HWC_FORMAT_MINVALUE && mPixelFormat <= HWC_FORMAT_MAXVALUE)
-    {
-        return true;
-    }
-    return false;
-}
-
-int SurfaceTexture::setParameter(uint32_t cmd,uint32_t value)
-{
-    mCurrentTransform   = mNextTransform;
-    mCurrentCrop        = mNextCrop;
-    mCurrentScalingMode = mNextScalingMode;
-    if(cmd == HWC_LAYER_SETINITPARA)
-  {
-    layerinitpara_t  *layer_info;
-    layer_info = (layerinitpara_t  *)value;
-        mPixelFormat = layer_info->format;
-  }
-    if(IsHardwareRenderSupport())
-    {
-        return 100;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
-uint32_t SurfaceTexture::getParameter(uint32_t cmd)
-{
-    return 0;
 }
 
 void SurfaceTexture::dump(String8& result) const

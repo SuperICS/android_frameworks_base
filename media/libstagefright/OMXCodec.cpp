@@ -670,8 +670,7 @@ sp<MediaSource> OMXCodec::Create(
 
         sp<MediaSource> softwareCodec;
         if (createEncoder) {
-            sp<MediaSource> softwareCodec =
-                InstantiateSoftwareEncoder(componentName, source, meta);
+            softwareCodec = InstantiateSoftwareEncoder(componentName, source, meta);
 #ifdef WITH_QCOM_LPA
         } else {
             softwareCodec = InstantiateSoftwareDecoder(componentName, source);
@@ -682,7 +681,7 @@ sp<MediaSource> OMXCodec::Create(
             return softwareCodec;
         }
 
-        LOGV("Attempting to allocate OMX node '%s'", componentName);
+        LOGE("Attempting to allocate OMX node '%s'", componentName);
 
         uint32_t quirks = getComponentQuirks(componentNameBase, createEncoder);
 #ifdef QCOM_HARDWARE
@@ -722,7 +721,7 @@ sp<MediaSource> OMXCodec::Create(
 
         status_t err = omx->allocateNode(componentName, observer, &node);
         if (err == OK) {
-            LOGV("Successfully allocated OMX node '%s'", componentName);
+            LOGE("Successfully allocated OMX node '%s'", componentName);
 
             sp<OMXCodec> codec = new OMXCodec(
                     omx, node, quirks, flags,
@@ -900,6 +899,12 @@ status_t OMXCodec::configureCodec(const sp<MetaData> &meta) {
                 // and wreak havoc instead...
 
                 LOGE("Profile and/or level exceed the decoder's capabilities.");
+                return ERROR_UNSUPPORTED;
+            }
+            if(!strcmp(mComponentName, "OMX.google.h264.decoder")
+                && (profile != kAVCProfileBaseline)) {
+                LOGE("%s does not support profiles > kAVCProfileBaseline", mComponentName);
+                // The profile is unsupported by the decoder
                 return ERROR_UNSUPPORTED;
             }
 
@@ -1654,7 +1659,6 @@ status_t OMXCodec::setupH263EncoderParameters(const sp<MetaData>& meta) {
     h263type.nAllowedPictureTypes =
         OMX_VIDEO_PictureTypeI | OMX_VIDEO_PictureTypeP;
 
-    h263type.nPFrames = setPFramesSpacing(iFramesInterval, frameRate);
     if (h263type.nPFrames == 0) {
         h263type.nAllowedPictureTypes = OMX_VIDEO_PictureTypeI;
     }
@@ -2898,7 +2902,7 @@ int64_t OMXCodec::retrieveDecodingTimeUs(bool isCodecSpecific) {
 }
 
 void OMXCodec::on_message(const omx_message &msg) {
-    if (mState == ERROR) {
+    if (mState == ERROR && !strncmp(mComponentName, "OMX.google.", 11)) {
         LOGW("Dropping OMX message - we're in ERROR state.");
         return;
     }
@@ -4309,17 +4313,9 @@ status_t OMXCodec::waitForBufferFilled_l() {
     }
     status_t err = mBufferFilled.waitRelative(mLock, kBufferFilledEventTimeOutNs);
     if (err != OK) {
-    	if(countBuffersWeOwn(mPortBuffers[kPortIndexOutput]) > 0) {
-//    		CODEC_LOGI("Warnning Timed out waiting for output buffers: %d/%d",
-//				countBuffersWeOwn(mPortBuffers[kPortIndexInput]),
-//				countBuffersWeOwn(mPortBuffers[kPortIndexOutput]));
-    		return OK;
-    	}
-    	else {
-			CODEC_LOGE("Timed out waiting for output buffers: %d/%d",
-				countBuffersWeOwn(mPortBuffers[kPortIndexInput]),
-				countBuffersWeOwn(mPortBuffers[kPortIndexOutput]));
-    	}
+        CODEC_LOGE("Timed out waiting for output buffers: %d/%d",
+            countBuffersWeOwn(mPortBuffers[kPortIndexInput]),
+            countBuffersWeOwn(mPortBuffers[kPortIndexOutput]));
     }
     return err;
 }
@@ -4717,7 +4713,7 @@ void OMXCodec::setG711Format(int32_t numChannels) {
 
 void OMXCodec::setImageOutputFormat(
         OMX_COLOR_FORMATTYPE format, OMX_U32 width, OMX_U32 height) {
-    CODEC_LOGV("setImageOutputFormat(%ld, %ld)", width, height);
+    CODEC_LOGE("setImageOutputFormat(%ld, %ld)", width, height);
 
 #if 0
     OMX_INDEXTYPE index;

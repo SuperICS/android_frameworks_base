@@ -99,7 +99,6 @@ import com.android.systemui.statusbar.policy.NetworkController;
 import com.android.systemui.statusbar.policy.Prefs;
 import com.android.systemui.statusbar.policy.buttons.ExtensibleKeyButtonView;
 import com.android.systemui.statusbar.policy.toggles.TogglesView;
-import com.android.systemui.statusbar.policy.DisplayController;
 
 public class TabletStatusBar extends StatusBar implements
         HeightReceiver.OnBarHeightChangedListener,
@@ -211,7 +210,6 @@ public class TabletStatusBar extends StatusBar implements
     BluetoothController mBluetoothController;
     LocationController mLocationController;
     NetworkController mNetworkController;
-    DisplayController mDisplayController;
 
     ViewGroup mBarContents;
 
@@ -616,7 +614,6 @@ public class TabletStatusBar extends StatusBar implements
 
 //        mBatteryController = new BatteryController(mContext);
 //        mBatteryController.addIconView((ImageView)sb.findViewById(R.id.battery));
-	mDisplayController = new DisplayController(mContext);
         mBluetoothController = new BluetoothController(mContext);
         mBluetoothController.addIconView((ImageView)sb.findViewById(R.id.bluetooth));
 

@@ -91,9 +91,6 @@ static void htcCameraSwitch(int cameraId)
 // should be ok for now.
 static CameraService *gCameraService;
 
-// define and initialize static class member
-int CameraService::mOverlayScreen = MASTER_SCREEN;
-
 CameraService::CameraService()
 :mSoundRef(0), mModule(0)
 {
@@ -121,17 +118,6 @@ void CameraService::onFirstRef()
             setCameraFree(i);
         }
     }
-
-char prop_value[PROPERTY_VALUE_MAX];
-    if (property_get(PROP_CAMERA_KEY, prop_value, PROP_SCREEN_DEFAULT_VALUE) > 0)
-    {
-      LOGV("camera prop_value = %s", prop_value);
-      String8 value_screen( prop_value );
-      if(value_screen == PROP_MASTER_SCREEN)
-          mOverlayScreen = MASTER_SCREEN;
-      else
-          mOverlayScreen = SLAVE_SCREEN;
-    }
 }
 
 CameraService::~CameraService() {
@@ -142,29 +128,6 @@ CameraService::~CameraService() {
     }
 
     gCameraService = NULL;
-}
-
-// add for switch camera overlay surface
-int CameraService::setCameraScreen(int32_t screen)
-{
-	LOGD("CameraService::setCameraScreen: %d", screen);
-	sp<Client> client;
-	
-	mOverlayScreen = screen;
-	
-	for(int i = 0; i < MAX_CAMERAS; i++)
-	{
-		if(mClient[i] != 0)
-		{
-			client = mClient[i].promote();
-	        if (client != 0) 
-	        {
-	            client->sendCommand(CAMERA_CMD_SET_SCREEN_ID, screen, 0);
-	        }
-		}
-	}
-		
-	return OK;
 }
 
 int32_t CameraService::getNumberOfCameras() {
@@ -531,10 +494,10 @@ status_t CameraService::Client::connect(const sp<ICameraClient>& client) {
 static void disconnectWindow(const sp<ANativeWindow>& window) {
     if (window != 0) {
         status_t result = native_window_api_disconnect(window.get(),
-                NATIVE_WINDOW_API_CAMERA_HW);	// [star] NATIVE_WINDOW_API_CAMERA_HW
+                NATIVE_WINDOW_API_CAMERA);
         if (result != NO_ERROR) {
-            LOGW("native_window_api_disconnect failed: %s (%d), api: %d", strerror(-result),
-                    result, NATIVE_WINDOW_API_CAMERA_HW);
+            LOGW("native_window_api_disconnect failed: %s (%d)", strerror(-result),
+                    result);
         }
     }
 }
@@ -596,16 +559,13 @@ status_t CameraService::Client::setPreviewWindow(const sp<IBinder>& binder,
     }
 
     if (window != 0) {
-        result = native_window_api_connect(window.get(), NATIVE_WINDOW_API_CAMERA_HW);		// [star] NATIVE_WINDOW_API_CAMERA_HW
+        result = native_window_api_connect(window.get(), NATIVE_WINDOW_API_CAMERA);
         if (result != NO_ERROR) {
-            LOGE("native_window_api_connect failed: %s (%d), api: %d", strerror(-result),
-                    result, NATIVE_WINDOW_API_CAMERA_HW);
+            LOGE("native_window_api_connect failed: %s (%d)", strerror(-result),
+                    result);
             return result;
         }
     }
-
-	// 
-	mHardware->sendCommand(CAMERA_CMD_SET_SCREEN_ID, mOverlayScreen, 0);
 
     // If preview has been already started, register preview buffers now.
     if (mHardware->previewEnabled()) {
@@ -923,12 +883,6 @@ status_t CameraService::Client::sendCommand(int32_t cmd, int32_t arg1, int32_t a
     LOG1("sendCommand (pid %d)", getCallingPid());
     int orientation;
     Mutex::Autolock lock(mLock);
-
-	if (cmd == CAMERA_CMD_SET_SCREEN_ID)
-	{
-		return mHardware->sendCommand(cmd, arg1, arg2);
-	}
-	
     status_t result = checkPidAndHardware();
     if (result != NO_ERROR) return result;
 
@@ -986,7 +940,6 @@ void CameraService::Client::disableMsgType(int32_t msgType) {
 #define CHECK_MESSAGE_INTERVAL 10 // 10ms
 bool CameraService::Client::lockIfMessageWanted(int32_t msgType) {
     int sleepCount = 0;
-#if 0	// star comment for taking picture deadlock
     while (mMsgEnabled & msgType) {
         if (mLock.tryLock() == NO_ERROR) {
             if (sleepCount > 0) {
@@ -1002,9 +955,6 @@ bool CameraService::Client::lockIfMessageWanted(int32_t msgType) {
     }
     LOGW("lockIfMessageWanted(%d): dropped unwanted message", msgType);
     return false;
-#else
-	return true;
-#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -1297,26 +1247,39 @@ void CameraService::Client::copyFrameAndPostCopiedFrame(
 }
 
 int CameraService::Client::getOrientation(int degrees, bool mirror) {
-    if (!mirror) {
-        if (degrees == 0) return 0;
-        else if (degrees == 90) return HAL_TRANSFORM_ROT_90;
-        else if (degrees == 180) return HAL_TRANSFORM_ROT_180;
-        else if (degrees == 270) return HAL_TRANSFORM_ROT_270;
-    } else {  // Do mirror (horizontal flip)
-        if (degrees == 0) {           // FLIP_H and ROT_0
-            return HAL_TRANSFORM_FLIP_H;
-        } else if (degrees == 90) {   // FLIP_H and ROT_90
-            return HAL_TRANSFORM_FLIP_H | HAL_TRANSFORM_ROT_90;
-        } else if (degrees == 180) {  // FLIP_H and ROT_180
-            return HAL_TRANSFORM_FLIP_V;
-        } else if (degrees == 270) {  // FLIP_H and ROT_270
-            return HAL_TRANSFORM_FLIP_V | HAL_TRANSFORM_ROT_90;
-        }
-    }
-    LOGE("Invalid setDisplayOrientation degrees=%d", degrees);
-    return -1;
+	#ifndef CUSTOM_PANEL_AMLOGIC
+	    if (!mirror) {
+		if (degrees == 0) return 0;
+		else if (degrees == 90) return HAL_TRANSFORM_ROT_90;
+		else if (degrees == 180) return HAL_TRANSFORM_ROT_180;
+		else if (degrees == 270) return HAL_TRANSFORM_ROT_270;
+	    } else {  // Do mirror (horizontal flip)
+		if (degrees == 0) {           // FLIP_H and ROT_0
+		    return HAL_TRANSFORM_FLIP_H;
+		} else if (degrees == 90) {   // FLIP_H and ROT_90
+		    return HAL_TRANSFORM_FLIP_H | HAL_TRANSFORM_ROT_90;
+		} else if (degrees == 180) {  // FLIP_H and ROT_180
+		    return HAL_TRANSFORM_FLIP_V;
+		} else if (degrees == 270) {  // FLIP_H and ROT_270
+		    return HAL_TRANSFORM_FLIP_V | HAL_TRANSFORM_ROT_90;
+		}
+	    }
+	    LOGE("Invalid setDisplayOrientation degrees=%d", degrees);
+	    return -1;
+	#else
+	    /* Para las apps que utilizan videoconferencia, es necesario girar la cámara 270º 
+	     * En caso de tener activada rotación(ro.sf.hwrotation!=0) se enviará de forma normal.
+	    */
+	    if (degrees == 0 && mirror)
+	    {
+		return HAL_TRANSFORM_FLIP_V | HAL_TRANSFORM_ROT_90;
+	    }
+	    else
+	    {
+	    	return 0;
+	    }
+	#endif
 }
-
 
 // ----------------------------------------------------------------------------
 

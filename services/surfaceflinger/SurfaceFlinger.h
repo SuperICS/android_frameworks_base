@@ -186,9 +186,6 @@ public:
     //HDMI Specific
     virtual void                        enableExternalDisplay(int disp_type, int externaltype);
 #endif
-    
-    virtual int                         setDisplayProp(int cmd,int param0,int param1,int param2);
-    virtual int                         getDisplayProp(int cmd,int param0,int param1);
 
     virtual status_t captureScreen(DisplayID dpy,
             sp<IMemoryHeap>* heap,
@@ -223,9 +220,6 @@ public:
     GLuint getProtectedTexName() const { return mProtectedTexName; }
 
     inline int  getUseDithering() const { return mUseDithering; }
-    
-    int         setDisplayParameter(uint32_t cmd,uint32_t  value);
-    uint32_t    getDisplayParameter(uint32_t cmd);
 
 
     class MessageDestroyGLTexture : public MessageBase {

@@ -950,10 +950,6 @@ public class WifiStateMachine extends StateMachine {
         sendMessage(msg);
     }
 
-    public boolean isDoingWps() {
-        return getCurrentState() == mWaitForWpsCompletionState;
-    }
-
     public void enableRssiPolling(boolean enabled) {
        sendMessage(obtainMessage(CMD_ENABLE_RSSI_POLL, enabled ? 1 : 0, 0));
     }
@@ -1978,22 +1974,6 @@ public class WifiStateMachine extends StateMachine {
                                 sendMessage(CMD_LOAD_DRIVER_FAILURE);
                             }
                             break;
-                    }
-
-                    if(WifiNative.loadDriver()) {
-                        if (DBG) log("Driver load successful");
-                        sendMessage(CMD_LOAD_DRIVER_SUCCESS);
-                    } else {
-                        loge("Failed to load driver!");
-                        switch(message.arg1) {
-                            case WIFI_STATE_ENABLING:
-                                setWifiState(WIFI_STATE_UNKNOWN);
-                                break;
-                            case WIFI_AP_STATE_ENABLING:
-                                setWifiApState(WIFI_AP_STATE_FAILED);
-                                break;
-                        }
-                        sendMessage(CMD_LOAD_DRIVER_FAILURE);
                     }
                     mWakeLock.release();
                 }

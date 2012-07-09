@@ -160,8 +160,7 @@ class SupplicantStateTracker extends StateMachine {
             if (DBG) Log.d(TAG, getName() + message.toString() + "\n");
             switch (message.what) {
                 case WifiMonitor.AUTHENTICATION_FAILURE_EVENT:
-		    if(!mWifiStateMachine.isDoingWps())
-		      mAuthenticationFailuresCount++;
+                    mAuthenticationFailuresCount++;
                     mAuthFailureInSupplicantBroadcast = true;
                     break;
                 case WifiMonitor.SUPPLICANT_STATE_CHANGE_EVENT:

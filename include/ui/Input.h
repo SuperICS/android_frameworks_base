@@ -209,7 +209,6 @@ struct PointerCoords {
     status_t setAxisValue(int32_t axis, float value);
 
     void scale(float scale);
-    void scale(float scalex,float scaley);
 
     inline float getX() const {
         return getAxisValue(AMOTION_EVENT_AXIS_X);
@@ -548,7 +547,6 @@ public:
     void offsetLocation(float xOffset, float yOffset);
 
     void scale(float scaleFactor);
-    void scale(float scalex, float scaley);
 
 #ifdef HAVE_ANDROID_OS
     void transform(const SkMatrix* matrix);

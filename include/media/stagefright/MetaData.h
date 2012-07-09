@@ -155,9 +155,6 @@ enum {
     kKeyUseArbitraryMode  = 'ArbM'  //bool (int32_t)
 #endif
 
-    kKeyScreenID                = 'scrn',
-    kKeyOffset                  = 'offs'
-
 };
 
 enum {

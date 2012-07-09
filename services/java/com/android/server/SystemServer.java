@@ -139,7 +139,6 @@ class ServerThread extends Thread {
         ConnectivityService connectivity = null;
         WifiP2pService wifiP2p = null;
         WifiService wifi = null;
-	EthernetService ethernet = null;	/*  EthernetService (add by shuge@allwinnertech.com)  */
         IPackageManager pm = null;
         Context context = null;
         WindowManagerService wm = null;
@@ -240,13 +239,6 @@ class ServerThread extends Thread {
                     factoryTest != SystemServer.FACTORY_TEST_LOW_LEVEL,
                     !firstBoot);
             ServiceManager.addService(Context.WINDOW_SERVICE, wm);
-
-			if(SystemProperties.get("ro.display.switch").equals("1"))
-			{
-				Slog.i(TAG, "Display Manager");
-				DisplayManagerService display = new DisplayManagerService(context,power);
-	            ServiceManager.addService(Context.DISPLAY_SERVICE, display);
-			}
 
             ActivityManagerService.self().setWindowManager(wm);
 
@@ -416,16 +408,6 @@ class ServerThread extends Thread {
             } catch (Throwable e) {
                 reportWtf("starting Wi-Fi Service", e);
             }
-
-		   /* Begin (add by shuge@allwinnertech.com) */
-           try {
-                Slog.i(TAG, "Ethernet Service");
-                ethernet = new EthernetService(context);
-                ServiceManager.addService(Context.ETHERNET_SERVICE, ethernet);
-            } catch (Throwable e) {
-                reportWtf("starting Ethernet Service", e);
-            }
-		   /* End (add by shuge@allwinnertech.com) */
 
             try {
                 Slog.i(TAG, "Connectivity Service");

@@ -56,8 +56,7 @@ public class SignalClusterView
     private boolean showingWiFiText = false;
     private boolean mHideSignal = false;
     
-    //ViewGroup mWifiGroup, mMobileGroup;
-    ViewGroup mWifiGroup, mMobileGroup, mEthernetGroup;
+    ViewGroup mWifiGroup, mMobileGroup;
     ImageView mWifi, mMobile, mWifiActivity, mMobileActivity, mMobileType;
     TextView mMobileText,mWiFiText;
     

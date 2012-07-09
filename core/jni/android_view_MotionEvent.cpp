@@ -675,12 +675,6 @@ static void android_view_MotionEvent_nativeScale(JNIEnv* env, jclass clazz,
     event->scale(scale);
 }
 
-static void android_view_MotionEvent_nativeScaleXY(JNIEnv* env, jclass clazz,
-        jint nativePtr, jfloat scalex, jfloat scaley) {
-    MotionEvent* event = reinterpret_cast<MotionEvent*>(nativePtr);
-    event->scale(scalex,scaley);
-}
-
 static void android_view_MotionEvent_nativeTransform(JNIEnv* env, jclass clazz,
         jint nativePtr, jobject matrixObj) {
     SkMatrix* matrix = android_graphics_Matrix_getSkMatrix(env, matrixObj);
@@ -826,9 +820,6 @@ static JNINativeMethod gMotionEventMethods[] = {
     { "nativeScale",
             "(IF)V",
             (void*)android_view_MotionEvent_nativeScale },
-    { "nativeScaleXY",
-            "(IFF)V",
-            (void*)android_view_MotionEvent_nativeScaleXY },
     { "nativeTransform",
             "(ILandroid/graphics/Matrix;)V",
             (void*)android_view_MotionEvent_nativeTransform },

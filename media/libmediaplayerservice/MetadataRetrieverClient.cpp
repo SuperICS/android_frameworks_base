@@ -38,12 +38,11 @@
 #include "MidiMetadataRetriever.h"
 #include "MetadataRetrieverClient.h"
 #include "StagefrightMetadataRetriever.h"
-#include "CedarXMetadataRetriever.h"
 
 namespace android {
 
 extern player_type getPlayerType(const char* url);
-extern player_type getPlayerType(int fd, int64_t offset, int64_t length, bool check_cedar);
+extern player_type getPlayerType(int fd, int64_t offset, int64_t length);
 
 MetadataRetrieverClient::MetadataRetrieverClient(pid_t pid)
 {
@@ -87,10 +86,6 @@ static sp<MediaMetadataRetrieverBase> createRetriever(player_type playerType)
 {
     sp<MediaMetadataRetrieverBase> p;
     switch (playerType) {
-    	case CEDARX_PLAYER:
-    	case CEDARA_PLAYER:
-            p = new CedarXMetadataRetriever;
-            break;
         case STAGEFRIGHT_PLAYER:
         {
             p = new StagefrightMetadataRetriever;
@@ -155,7 +150,7 @@ status_t MetadataRetrieverClient::setDataSource(int fd, int64_t offset, int64_t 
         LOGV("calculated length = %lld", length);
     }
 
-    player_type playerType = getPlayerType(fd, offset, length, false);
+    player_type playerType = getPlayerType(fd, offset, length);
     LOGV("player type = %d", playerType);
     sp<MediaMetadataRetrieverBase> p = createRetriever(playerType);
     if (p == NULL) {

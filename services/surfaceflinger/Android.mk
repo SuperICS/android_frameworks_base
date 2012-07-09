@@ -38,9 +38,6 @@ ifeq ($(TARGET_BOARD_PLATFORM), s5pc110)
 	LOCAL_CFLAGS += -DREFRESH_RATE=56
 endif
 
-# required for sun4i target
-LOCAL_CFLAGS += -DSURFACEFLINGER_FORCE_SCREEN_RELEASE
-
 LOCAL_SHARED_LIBRARIES := \
 	libcutils \
 	libhardware \
