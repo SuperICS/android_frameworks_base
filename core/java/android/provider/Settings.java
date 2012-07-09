@@ -2057,6 +2057,13 @@ public final class Settings {
                 "window_orientation_listener_log";
 
         /**
+        * To use default or special accelerometer coordinate system
+        * @hide
+        */
+   public static final String ACCELEROMETER_COORDINATE = "accelerometer_coordinate";
+
+
+         /**
          * Whether to play a sound for low-battery alerts.
          * @hide
          */
@@ -2411,6 +2418,26 @@ public final class Settings {
          */
         public static final String STATUS_BAR_NOTIF_COUNT = "status_bar_notif_count";
 
+	/**
+	 * Select your preferred hdmi display resolution
+	 * @hide
+	 */
+
+	public static final String HDMI_RESOLUTION = "hdmi_resolution";
+	
+	/**
+	 * HDMI should use or ignore gsensor
+	 * @hide
+	 */
+
+	public static final String HDMI_IGNORE_GSENSOR = "hdmi_ignore_gsensor";
+
+	/**
+	 * Show or hide volume control on tablet statusbar
+	 * @hide
+	 */
+
+	public static final String VOLUME_SYSBAR = "volume_sysbar";
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
@@ -4188,6 +4215,17 @@ public final class Settings {
          * least-recently-used excess networks will be removed.
          */
         public static final String WIFI_NUM_OPEN_NETWORKS_KEPT = "wifi_num_open_networks_kept";
+        /**
+         * Ethernet related configurations
+         */
+        public static final String ETHERNET_ON      = "eth_on";
+        public static final String ETHERNET_MODE    = "eth_mode";
+        public static final String ETHERNET_IP      = "eth_ip";
+        public static final String ETHERNET_MASK    = "eth_netmask";
+        public static final String ETHERNET_DNS     = "eth_dns";
+        public static final String ETHERNET_ROUTE   = "eth_route";
+        public static final String ETHERNET_CONF    = "eth_conf";
+        public static final String ETHERNET_IFNAME  = "eth_ifname";
 
         /**
          * Whether the Wi-Fi should be on.  Only the Wi-Fi service should touch this.

@@ -147,6 +147,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
+import android.view.DisplayManager;
 
 /**
  * WindowManagerPolicy implementation for the Android phone UI.  This
@@ -332,6 +333,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     boolean mSystemReady;
     boolean mSystemBooted;
     boolean mHdmiPlugged;
+    boolean mHdmiIgnoreGsensor;
     int mUiMode = Configuration.UI_MODE_TYPE_NORMAL;
     int mDockMode = Intent.EXTRA_DOCK_STATE_UNDOCKED;
     int mLidOpenRotation;
@@ -938,6 +940,21 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             // Retrieve current sticky dock event broadcast.
             mDockMode = intent.getIntExtra(Intent.EXTRA_DOCK_STATE,
                     Intent.EXTRA_DOCK_STATE_UNDOCKED);
+        }
+
+       // register for allwinner HDMI event broadcast
+        IntentFilter filterHDMI = new IntentFilter();
+        filterHDMI.addAction(Intent.ACTION_HDMISTATUS_CHANGED);
+        filterHDMI.addAction(Intent.ACTION_TVDACSTATUS_CHANGED);
+        Intent intentHDMI = context.registerReceiver(mHDMIReceiver, filterHDMI);
+        if (intentHDMI != null) {
+          if (intentHDMI.getIntExtra(DisplayManager.EXTRA_HDMISTATUS, 0) == 1) {
+            setHdmiPlugged(true);
+              mHdmiIgnoreGsensor = (Settings.System.getInt(mContext.getContentResolver(),
+              Settings.System.HDMI_IGNORE_GSENSOR, 1) == 1);
+          } else {
+            setHdmiPlugged(false);
+          }
         }
 
         mVibrator = new Vibrator();
@@ -3365,6 +3382,21 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
     };
 
+        BroadcastReceiver mHDMIReceiver = new BroadcastReceiver() {
+          public void onReceive(Context context, Intent intent) {
+                 if (Intent.ACTION_HDMISTATUS_CHANGED.equals(intent.getAction())) {
+                        if(intent.getIntExtra(DisplayManager.EXTRA_HDMISTATUS, 0) == 1) {
+                               setHdmiPlugged(true);
+                                  mHdmiIgnoreGsensor = (Settings.System.getInt(mContext.getContentResolver(),
+                                  Settings.System.HDMI_IGNORE_GSENSOR, 1) == 1);
+                        } else {
+                               setHdmiPlugged(false);
+                        }
+                 }
+          }
+    };
+
+
     BroadcastReceiver mThemeChangeReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             mUiContext = null;
@@ -3545,7 +3577,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 // enable 180 degree rotation while docked.
                 preferredRotation = mKeyboardDockEnablesAccelerometer
                         ? sensorRotation : mKeyboardDockRotation;
-            } else if (mHdmiPlugged) {
+            } else if (mHdmiPlugged && mHdmiIgnoreGsensor) {
                 // Ignore sensor when plugged into HDMI.
                 // Note that the dock orientation overrides the HDMI orientation.
                 preferredRotation = mHdmiRotation;

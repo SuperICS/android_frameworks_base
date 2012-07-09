@@ -127,6 +127,9 @@ public:
     virtual status_t turnElectronBeamOff(int32_t mode) = 0;
     virtual status_t turnElectronBeamOn(int32_t mode) = 0;
 
+    virtual int      setDisplayProp(int cmd,int param0,int param1,int param2) = 0;
+    virtual int      getDisplayProp(int cmd,int param0,int param1) = 0;
+
     /* verify that an ISurfaceTexture was created by SurfaceFlinger.
      */
     virtual bool authenticateSurfaceTexture(
@@ -160,6 +163,8 @@ public:
 #ifdef QCOM_HDMI_OUT
         EXTERNAL_DISPLAY,
 #endif
+	SET_DISPLAYPROP,
+ 	GET_DISPLAYPROP,
     };
 
     virtual status_t    onTransact( uint32_t code,

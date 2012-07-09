@@ -1367,6 +1367,7 @@ public final class MotionEvent extends InputEvent implements Parcelable {
             int pointerIndex, PointerProperties outPointerProperties);
 
     private static native void nativeScale(int nativePtr, float scale);
+    private static native void nativeScaleXY(int mNativePtr,  float scaleX,float scaleY);
     private static native void nativeTransform(int nativePtr, Matrix matrix);
 
     private static native int nativeReadFromParcel(int nativePtr, Parcel parcel);
@@ -1677,6 +1678,10 @@ public final class MotionEvent extends InputEvent implements Parcelable {
      */
     public final void scale(float scale) {
         nativeScale(mNativePtr, scale);
+    }
+
+public final void scale(float scaleX,float scaleY) {
+        nativeScaleXY(mNativePtr, scaleX, scaleY);
     }
 
     /** {@inheritDoc} */

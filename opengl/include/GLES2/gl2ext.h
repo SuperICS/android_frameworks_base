@@ -1,7 +1,7 @@
 #ifndef __gl2ext_h_
 #define __gl2ext_h_
 
-/* $Revision: 10969 $ on $Date:: 2010-04-09 02:27:15 -0700 #$ */
+/* $Revision: 13239 $ on $Date:: 2010-12-17 15:13:56 -0800 #$ */
 
 #ifdef __cplusplus
 extern "C" {
@@ -196,6 +196,69 @@ typedef void* GLeglImageOES;
 #endif
 
 /*------------------------------------------------------------------------*
+ * ANGLE extension tokens
+ *------------------------------------------------------------------------*/
+
+/* GL_ANGLE_framebuffer_blit */
+#ifndef GL_ANGLE_framebuffer_blit
+#define GL_READ_FRAMEBUFFER_ANGLE                               0x8CA8
+#define GL_DRAW_FRAMEBUFFER_ANGLE                               0x8CA9
+#define GL_DRAW_FRAMEBUFFER_BINDING_ANGLE                       0x8CA6
+#define GL_READ_FRAMEBUFFER_BINDING_ANGLE                       0x8CAA
+#endif
+
+/* GL_ANGLE_framebuffer_multisample */
+#ifndef GL_ANGLE_framebuffer_multisample
+#define GL_RENDERBUFFER_SAMPLES_ANGLE                           0x8CAB
+#define GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_ANGLE             0x8D56
+#define GL_MAX_SAMPLES_ANGLE                                    0x8D57
+#endif
+
+/*------------------------------------------------------------------------*
+ * APPLE extension tokens
+ *------------------------------------------------------------------------*/
+
+/* GL_APPLE_rgb_422 */
+#ifndef GL_APPLE_rgb_422
+#define GL_RGB_422_APPLE                                        0x8A1F
+#define GL_UNSIGNED_SHORT_8_8_APPLE                             0x85BA
+#define GL_UNSIGNED_SHORT_8_8_REV_APPLE                         0x85BB
+#endif
+
+/* GL_APPLE_framebuffer_multisample */
+#ifndef GL_APPLE_framebuffer_multisample
+#define GL_RENDERBUFFER_SAMPLES_APPLE                           0x8CAB
+#define GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_APPLE             0x8D56
+#define GL_MAX_SAMPLES_APPLE                                    0x8D57
+#define GL_READ_FRAMEBUFFER_APPLE                               0x8CA8
+#define GL_DRAW_FRAMEBUFFER_APPLE                               0x8CA9
+#define GL_DRAW_FRAMEBUFFER_BINDING_APPLE                       0x8CA6
+#define GL_READ_FRAMEBUFFER_BINDING_APPLE                       0x8CAA
+#endif
+
+/* GL_APPLE_texture_format_BGRA8888 */
+#ifndef GL_APPLE_texture_format_BGRA8888
+#define GL_BGRA_EXT                                             0x80E1
+#endif
+
+/* GL_APPLE_texture_max_level */
+#ifndef GL_APPLE_texture_max_level
+#define GL_TEXTURE_MAX_LEVEL_APPLE                              0x813D
+#endif
+
+/*------------------------------------------------------------------------*
+ * ARM extension tokens
+ *------------------------------------------------------------------------*/
+
+/* GL_ARM_mali_shader_binary */
+#ifndef GL_ARM_mali_shader_binary
+#define GL_MALI_SHADER_BINARY_ARM                               0x8F60
+#endif
+
+/* GL_ARM_rgba8 */
+/* No new tokens introduced by this extension. */
+
+/*------------------------------------------------------------------------*
  * EXT extension tokens
  *------------------------------------------------------------------------*/
 
@@ -243,6 +306,9 @@ typedef void* GLeglImageOES;
 #define GL_COMPRESSED_RGB_S3TC_DXT1_EXT                         0x83F0
 #define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT                        0x83F1
 #endif
+
+/* GL_EXT_shader_texture_lod */
+/* No new tokens introduced by this extension. */
 
 /*------------------------------------------------------------------------*
  * IMG extension tokens
@@ -378,6 +444,15 @@ typedef void* GLeglImageOES;
 #define GL_MULTISAMPLE_BUFFER_BIT5_QCOM                         0x20000000
 #define GL_MULTISAMPLE_BUFFER_BIT6_QCOM                         0x40000000
 #define GL_MULTISAMPLE_BUFFER_BIT7_QCOM                         0x80000000
+#endif
+
+/*------------------------------------------------------------------------*
+ * VIV extension tokens
+ *------------------------------------------------------------------------*/
+
+/* GL_VIV_shader_binary */
+#ifndef GL_VIV_shader_binary
+#define GL_SHADER_BINARY_VIV                                    0x8FC4
 #endif
 
 /*------------------------------------------------------------------------*
@@ -611,6 +686,72 @@ typedef void (GL_APIENTRYP PFNGLGETPERFMONITORCOUNTERDATAAMDPROC) (GLuint monito
 #endif
 
 /*------------------------------------------------------------------------*
+ * ANGLE extension functions
+ *------------------------------------------------------------------------*/
+
+/* GL_ANGLE_framebuffer_blit */
+#ifndef GL_ANGLE_framebuffer_blit
+#define GL_ANGLE_framebuffer_blit 1
+#ifdef GL_GLEXT_PROTOTYPES
+GL_APICALL void GL_APIENTRY glBlitFramebufferANGLE (GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
+#endif
+typedef void (GL_APIENTRYP PFNGLBLITFRAMEBUFFERANGLEPROC) (GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
+#endif
+
+/* GL_ANGLE_framebuffer_multisample */
+#ifndef GL_ANGLE_framebuffer_multisample
+#define GL_ANGLE_framebuffer_multisample 1
+#ifdef GL_GLEXT_PROTOTYPES
+GL_APICALL void GL_APIENTRY glRenderbufferStorageMultisampleANGLE (GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height);
+#endif
+typedef void (GL_APIENTRYP PFNGLRENDERBUFFERSTORAGEMULTISAMPLEANGLEPROC) (GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height);
+#endif
+
+/*------------------------------------------------------------------------*
+ * APPLE extension functions
+ *------------------------------------------------------------------------*/
+
+/* GL_APPLE_rgb_422 */
+#ifndef GL_APPLE_rgb_422
+#define GL_APPLE_rgb_422 1
+#endif
+
+/* GL_APPLE_framebuffer_multisample */
+#ifndef GL_APPLE_framebuffer_multisample
+#define GL_APPLE_framebuffer_multisample 1
+#ifdef GL_GLEXT_PROTOTYPES
+GL_APICALL void GL_APIENTRY glRenderbufferStorageMultisampleAPPLE (GLenum, GLsizei, GLenum, GLsizei, GLsizei);
+GL_APICALL void GL_APIENTRY glResolveMultisampleFramebufferAPPLE (void);
+#endif /* GL_GLEXT_PROTOTYPES */
+typedef void (GL_APIENTRYP PFNGLRENDERBUFFERSTORAGEMULTISAMPLEAPPLEPROC) (GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height);
+typedef void (GL_APIENTRYP PFNGLRESOLVEMULTISAMPLEFRAMEBUFFERAPPLEPROC) (void);
+#endif
+
+/* GL_APPLE_texture_format_BGRA8888 */
+#ifndef GL_APPLE_texture_format_BGRA8888
+#define GL_APPLE_texture_format_BGRA8888 1
+#endif
+
+/* GL_APPLE_texture_max_level */
+#ifndef GL_APPLE_texture_max_level
+#define GL_APPLE_texture_max_level 1
+#endif
+
+/*------------------------------------------------------------------------*
+ * ARM extension functions
+ *------------------------------------------------------------------------*/
+
+/* GL_ARM_mali_shader_binary */
+#ifndef GL_ARM_mali_shader_binary
+#define GL_ARM_mali_shader_binary 1
+#endif
+
+/* GL_ARM_rgba8 */
+#ifndef GL_ARM_rgba8
+#define GL_ARM_rgba8 1
+#endif
+
+/*------------------------------------------------------------------------*
  * EXT extension functions
  *------------------------------------------------------------------------*/
 
@@ -661,6 +802,11 @@ typedef void (GL_APIENTRYP PFNGLMULTIDRAWELEMENTSEXTPROC) (GLenum mode, const GL
 /* GL_EXT_texture_compression_dxt1 */
 #ifndef GL_EXT_texture_compression_dxt1
 #define GL_EXT_texture_compression_dxt1 1
+#endif
+
+/* GL_EXT_shader_texture_lod */
+#ifndef GL_EXT_shader_texture_lod
+#define GL_EXT_shader_texture_lod 1
 #endif
 
 /*------------------------------------------------------------------------*
@@ -815,6 +961,15 @@ GL_APICALL void GL_APIENTRY glEndTilingQCOM (GLbitfield preserveMask);
 #endif
 typedef void (GL_APIENTRYP PFNGLSTARTTILINGQCOMPROC) (GLuint x, GLuint y, GLuint width, GLuint height, GLbitfield preserveMask);
 typedef void (GL_APIENTRYP PFNGLENDTILINGQCOMPROC) (GLbitfield preserveMask);
+#endif
+
+/*------------------------------------------------------------------------*
+ * VIV extension tokens
+ *------------------------------------------------------------------------*/
+
+/* GL_VIV_shader_binary */
+#ifndef GL_VIV_shader_binary
+#define GL_VIV_shader_binary 1
 #endif
 
 #ifdef __cplusplus

@@ -4628,4 +4628,6 @@ public class Camera {
             return false;
         }
     };
+
+    public static native int setCameraScreen(int screen);
 }

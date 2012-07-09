@@ -826,6 +826,28 @@ void SurfaceFlinger::invalidateHwcGeometry()
     mHwWorkListDirty = true;
 }
 
+int SurfaceFlinger::setDisplayParameter(uint32_t cmd,uint32_t  value)
+{
+    HWComposer& hwc(graphicPlane(0).displayHardware().getHwComposer());
+    if (hwc.initCheck() == NO_ERROR) 
+    {
+        return hwc.setParameter(cmd,value);
+    }
+
+    return NO_ERROR;
+}
+
+uint32_t SurfaceFlinger::getDisplayParameter(uint32_t cmd)
+{
+    HWComposer& hwc(graphicPlane(0).displayHardware().getHwComposer());
+    if (hwc.initCheck() == NO_ERROR) 
+    {
+        return hwc.getParameter(cmd);
+    }
+
+    return NO_ERROR;
+}
+
 bool SurfaceFlinger::lockPageFlip(const LayerVector& currentLayers)
 {
     bool recomputeVisibleRegions = false;
@@ -1102,9 +1124,9 @@ void SurfaceFlinger::composeSurfaces(const Region& dirty)
     const Vector< sp<LayerBase> >& layers(mVisibleLayersSortedByZ);
     size_t count = layers.size();
     for (size_t i=0 ; i<count ; i++) {
-        if (cur && (cur[i].compositionType != HWC_FRAMEBUFFER)) {
-            continue;
-        }
+        //if (cur && (cur[i].compositionType != HWC_FRAMEBUFFER)) {
+        //    continue;
+        //}
         const sp<LayerBase>& layer(layers[i]);
         const Region clip(dirty.intersect(layer->visibleRegionScreen));
         if (!clip.isEmpty()) {
@@ -1423,6 +1445,19 @@ void SurfaceFlinger::enableExternalDisplay(int disp_type, int value)
     }
 }
 #endif
+
+int SurfaceFlinger::setDisplayProp(int cmd,int param0,int param1,int param2)
+{
+    const DisplayHardware& hw(graphicPlane(0).displayHardware());
+    return hw.setDispProp(cmd,param0,param1,param2);
+}
+
+int SurfaceFlinger::getDisplayProp(int cmd,int param0,int param1)
+{
+    const DisplayHardware& hw(graphicPlane(0).displayHardware());
+
+    return hw.getDispProp(cmd,param0,param1);
+}
 
 sp<ISurface> SurfaceFlinger::createSurface(
         ISurfaceComposerClient::surface_data_t* params,
@@ -2167,7 +2202,7 @@ status_t SurfaceFlinger::electronBeamOnAnimationImplLocked()
     const DisplayHardware& hw(graphicPlane(0).displayHardware());
     const uint32_t hw_w = hw.getWidth();
     const uint32_t hw_h = hw.getHeight();
-    const Region screenBounds(hw.getBounds());
+    const Region screenBounds(hw.bounds());
 
     GLfloat u, v;
     GLuint tname;
@@ -2177,9 +2212,9 @@ status_t SurfaceFlinger::electronBeamOnAnimationImplLocked()
     }
 
     GLfloat vtx[8];
-    const GLfloat texCoords[4][2] = { {0,0}, {0,v}, {u,v}, {u,0} };
+    const GLfloat texCoords[4][2] = { {0,v}, {0,0}, {u,0}, {u,v} };
     glBindTexture(GL_TEXTURE_2D, tname);
-    glTexEnvx(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glTexEnvx(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
@@ -2236,7 +2271,7 @@ status_t SurfaceFlinger::electronBeamOnAnimationImplLocked()
     };
 
     // the full animation is 12 frames
-    int nbFrames = 12;
+    int nbFrames = 8;
     s_curve_interpolator itr(nbFrames, 7.5f);
     s_curve_interpolator itg(nbFrames, 8.0f);
     s_curve_interpolator itb(nbFrames, 8.5f);
@@ -2254,6 +2289,7 @@ status_t SurfaceFlinger::electronBeamOnAnimationImplLocked()
         hw.flip(screenBounds);
     }
 
+    nbFrames = 4;
     v_stretch vverts(hw_w, hw_h);
 
     glMatrixMode(GL_TEXTURE);

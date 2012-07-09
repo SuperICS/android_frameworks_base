@@ -142,6 +142,7 @@ LOCAL_SRC_FILES += \
 	core/java/android/view/IWindow.aidl \
 	core/java/android/view/IWindowManager.aidl \
 	core/java/android/view/IWindowSession.aidl \
+	core/java/android/view/IDisplayManager.aidl \
 	core/java/android/speech/IRecognitionListener.aidl \
 	core/java/android/speech/IRecognitionService.aidl \
 	core/java/android/speech/tts/ITextToSpeechCallback.aidl \
@@ -198,6 +199,7 @@ LOCAL_SRC_FILES += \
 	telephony/java/com/android/internal/telephony/ISms.aidl \
 	telephony/java/com/android/internal/telephony/IWapPushManager.aidl \
 	wifi/java/android/net/wifi/IWifiManager.aidl \
+	ethernet/java/android/net/ethernet/IEthernetManager.aidl \
 	wifi/java/android/net/wifi/p2p/IWifiP2pManager.aidl \
 	telephony/java/com/android/internal/telephony/IExtendedNetworkService.aidl \
 	voip/java/android/net/sip/ISipSession.aidl \
