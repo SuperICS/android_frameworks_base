@@ -462,6 +462,9 @@
     <!-- Is the battery LED intrusive? Used to decide if there should be a disable option -->
     <bool name="config_intrusiveBatteryLed">false</bool>
 
+    <!-- Does the battery LED support multiple colors? Used to decide if the user can change the colors -->
+    <bool name="config_multiColorBatteryLed">false</bool>
+
     <!-- Default value for LED off time when the battery is low on charge in miliseconds -->
     <integer name="config_notificationsBatteryLedOff">2875</integer>
 
@@ -667,8 +670,9 @@
     <!-- The VoiceMail default value is displayed to my own number if it is true -->
     <bool name="config_telephony_use_own_number_for_voicemail">false</bool>
 
-    <!-- Set additional audio parameters for incall audio -->
-    <!-- Examples: <item>realcall</item> <item>dualmic_enabled</item> <item>mic_boost</item> -->
+    <!-- Set additional audio parameters for incall audio
+         Usage: parameter=onstring=offstring
+         Examples: <item>realcall=on=off</item> <item>dualmic_enabled=true=false</item> <item>mic_boost=yes=no</item> -->
     <string-array name="config_telephony_set_audioparameters" translatable="false">
     </string-array>
 
@@ -852,5 +856,15 @@
     <integer name="lockscreen_enable_trackball_key">0</integer>
     
     <integer name="statusbar_toggles_style">0</integer>
+    <!-- Timeout in MS for how long you have to long-press the back key to
+         kill the foreground app. -->
+    <integer name="config_backKillTimeout">2000</integer>
+
+
+    <!-- Device has a h/w rotation lock switch -->
+    <bool name="config_hasRotationLockSwitch">false</bool>
+
+    <!--Boolean to enable stk functionality on Samsung phones-->
+    <bool name="config_samsung_stk">false</bool>
 
 </resources>
