@@ -16,6 +16,7 @@
 
 package com.android.internal.policy.impl;
 
+import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -71,8 +72,6 @@ public class KeyguardUpdateMonitor {
 
     private IccCard.State mSimState = IccCard.State.READY;
 
-    private boolean mKeyguardBypassEnabled;
-
     private boolean mDeviceProvisioned;
 
     private BatteryStatus mBatteryStatus;
@@ -83,6 +82,8 @@ public class KeyguardUpdateMonitor {
     private CharSequence mTelephonySpn;
 
     private int mFailedAttempts = 0;
+    private int mFailedBiometricUnlockAttempts = 0;
+    private static final int FAILED_BIOMETRIC_UNLOCK_ATTEMPTS_BEFORE_BACKUP = 3;
 
     private boolean mClockVisible;
 
@@ -105,6 +106,10 @@ public class KeyguardUpdateMonitor {
     private static final int MSG_DEVICE_PROVISIONED = 308;
     private static final int MSG_WEATHER_CHANGED = 309;
     private static final int MSG_CALENDAR_CHANGED = 310;
+    protected static final int MSG_DPM_STATE_CHANGED = 311;
+    protected static final int MSG_USER_CHANGED = 312;
+
+    protected static final boolean DEBUG_SIM_STATES = DEBUG || false;
 
     /**
      * When we receive a
@@ -211,6 +216,12 @@ public class KeyguardUpdateMonitor {
                         break;
                     case MSG_CALENDAR_CHANGED:
                         handleCalendarChanged();
+                    case MSG_DPM_STATE_CHANGED:
+                        handleDevicePolicyManagerStateChanged();
+                        break;
+                    case MSG_USER_CHANGED:
+                        handleUserChanged(msg.arg1);
+                        break;
                 }
             }
         };
@@ -271,6 +282,9 @@ public class KeyguardUpdateMonitor {
         filter.addAction(SPN_STRINGS_UPDATED_ACTION);
         filter.addAction(AudioManager.RINGER_MODE_CHANGED_ACTION);
         filter.addAction("com.aokp.romcontrol.INTENT_WEATHER_UPDATE");
+        filter.addAction(DevicePolicyManager.ACTION_DEVICE_POLICY_MANAGER_STATE_CHANGED);
+        filter.addAction(Intent.ACTION_USER_SWITCHED);
+        filter.addAction(Intent.ACTION_USER_REMOVED);
         context.registerReceiver(new BroadcastReceiver() {
 
             public void onReceive(Context context, Intent intent) {
@@ -294,6 +308,10 @@ public class KeyguardUpdateMonitor {
                             MSG_BATTERY_UPDATE, new BatteryStatus(status, level, plugged, health));
                     mHandler.sendMessage(msg);
                 } else if (TelephonyIntents.ACTION_SIM_STATE_CHANGED.equals(action)) {
+                    if (DEBUG_SIM_STATES) {
+                        Log.v(TAG, "action " + action + " state" +
+                            intent.getStringExtra(IccCard.INTENT_KEY_ICC_STATE));
+                    }
                     mHandler.sendMessage(mHandler.obtainMessage(
                             MSG_SIM_STATE_CHANGE, SimArgs.fromIntent(intent)));
                 } else if (AudioManager.RINGER_MODE_CHANGED_ACTION.equals(action)) {
@@ -304,6 +322,12 @@ public class KeyguardUpdateMonitor {
                     mHandler.sendMessage(mHandler.obtainMessage(MSG_PHONE_STATE_CHANGED, state));
                 } else if ("com.aokp.romcontrol.INTENT_WEATHER_UPDATE".equals(action)) {
                     mHandler.sendMessage(mHandler.obtainMessage(MSG_WEATHER_CHANGED, intent));
+                } else if (DevicePolicyManager.ACTION_DEVICE_POLICY_MANAGER_STATE_CHANGED
+                        .equals(action)) {
+                    mHandler.sendMessage(mHandler.obtainMessage(MSG_DPM_STATE_CHANGED));
+                } else if (Intent.ACTION_USER_SWITCHED.equals(action)) {
+                    mHandler.sendMessage(mHandler.obtainMessage(MSG_USER_CHANGED,
+                            intent.getIntExtra(Intent.EXTRA_USERID, 0), 0));
                 }
             }
         }, filter);
@@ -318,6 +342,18 @@ public class KeyguardUpdateMonitor {
                 mHandler.sendMessage(mHandler.obtainMessage(MSG_CALENDAR_CHANGED));
             }
         }, calendarFilter);
+    }
+
+    protected void handleDevicePolicyManagerStateChanged() {
+        for (int i = 0; i < mInfoCallbacks.size(); i++) {
+            mInfoCallbacks.get(i).onDevicePolicyManagerStateChanged();
+        }
+    }
+
+    protected void handleUserChanged(int userId) {
+        for (int i = 0; i < mInfoCallbacks.size(); i++) {
+            mInfoCallbacks.get(i).onUserChanged(userId);
+        }
     }
 
     protected void handleDeviceProvisioned() {
@@ -425,6 +461,7 @@ public class KeyguardUpdateMonitor {
         }
 
         if (state != IccCard.State.UNKNOWN && state != mSimState) {
+            if (DEBUG_SIM_STATES) Log.v(TAG, "dispatching state: " + state);
             mSimState = state;
             for (int i = 0; i < mSimStateCallbacks.size(); i++) {
                 mSimStateCallbacks.get(i).onSimStateChanged(state);
@@ -567,6 +604,48 @@ public class KeyguardUpdateMonitor {
          * Called when the device becomes provisioned
          */
         void onDeviceProvisioned();
+
+        /**
+         * Called when the device policy changes.
+         * See {@link DevicePolicyManager#ACTION_DEVICE_POLICY_MANAGER_STATE_CHANGED}
+         */
+        void onDevicePolicyManagerStateChanged();
+
+        /**
+         * Called when the user changes.
+         */
+        void onUserChanged(int userId);
+    }
+
+    // Simple class that allows methods to easily be overwritten
+    public static class InfoCallbackImpl implements InfoCallback {
+        public void onRefreshBatteryInfo(boolean showBatteryInfo, boolean pluggedIn,
+                int batteryLevel) {
+        }
+
+        public void onTimeChanged() {
+        }
+
+        public void onRefreshCarrierInfo(CharSequence plmn, CharSequence spn) {
+        }
+
+        public void onRingerModeChanged(int state) {
+        }
+
+        public void onPhoneStateChanged(int phoneState) {
+        }
+
+        public void onClockVisibilityChanged() {
+        }
+
+        public void onDeviceProvisioned() {
+        }
+
+        public void onDevicePolicyManagerStateChanged() {
+        }
+
+        public void onUserChanged(int userId) {
+        }
     }
 
     /**
@@ -634,10 +713,6 @@ public class KeyguardUpdateMonitor {
         handleSimStateChange(new SimArgs(IccCard.State.READY));
     }
 
-    public boolean isKeyguardBypassEnabled() {
-        return mKeyguardBypassEnabled;
-    }
-
     public boolean isDevicePluggedIn() {
         return isPluggedIn(mBatteryStatus);
     }
@@ -681,6 +756,7 @@ public class KeyguardUpdateMonitor {
 
     public void clearFailedAttempts() {
         mFailedAttempts = 0;
+        mFailedBiometricUnlockAttempts = 0;
     }
 
     public void reportFailedAttempt() {
@@ -693,5 +769,19 @@ public class KeyguardUpdateMonitor {
 
     public int getPhoneState() {
         return mPhoneState;
+    }
+
+    public void reportFailedBiometricUnlockAttempt() {
+        mFailedBiometricUnlockAttempts++;
+    }
+
+    public boolean getMaxBiometricUnlockAttemptsReached() {
+        return mFailedBiometricUnlockAttempts >= FAILED_BIOMETRIC_UNLOCK_ATTEMPTS_BEFORE_BACKUP;
+    }
+
+    public boolean isSimLocked() {
+        return mSimState == IccCard.State.PIN_REQUIRED
+            || mSimState == IccCard.State.PUK_REQUIRED
+            || mSimState == IccCard.State.PERM_DISABLED;
     }
 }

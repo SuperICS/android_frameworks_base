@@ -8,14 +8,14 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
- 
+
 package com.android.internal.os;
- 
+
 import android.view.KeyEvent;
- 
+
 public interface DeviceKeyHandler {
     public static final int KEYEVENT_CAUGHT = -1;
     public static final int KEYEVENT_UNCAUGHT = 0;
- 
+
     public int handleKeyEvent(KeyEvent event);
 }

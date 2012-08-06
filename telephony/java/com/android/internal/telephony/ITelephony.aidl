@@ -19,6 +19,7 @@ package com.android.internal.telephony;
 import android.os.Bundle;
 import java.util.List;
 import android.telephony.NeighboringCellInfo;
+import android.telephony.CellInfo;
 
 /**
  * Interface used to interact with the phone.  Mostly this is used by the
@@ -44,10 +45,10 @@ interface ITelephony {
     void call(String number);
 
     /**
-    * Toggle between 3G and LTE (NT_MODE_CDMA, NT_MODE_GLOBAL)
-	* @param boolean to turn on and off LTE
-	*/
-	void toggleLTE(boolean on);
+     * Toggle between 3G and LTE (NT_MODE_CDMA, NT_MODE_GLOBAL)
+     * @param boolean to turn on and off LTE
+     */
+    void toggleLTE(boolean on);
 	
     /**
     * Toggle between 2G and 3G (NT_MODE_GSM, NT_MODE_WCDMA_PREF)
@@ -290,6 +291,11 @@ interface ITelephony {
      * or {@link PHone#LTE_ON_CDMA_TRUE}
      */
     int getLteOnCdmaMode();
+
+    /**
+     * Returns the all observed cell information of the device.
+     */
+    List<CellInfo> getAllCellInfo();
 
     int getLteOnGsmMode();
 }

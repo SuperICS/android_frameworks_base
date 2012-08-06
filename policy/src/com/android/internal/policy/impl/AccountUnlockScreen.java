@@ -322,19 +322,11 @@ public class AccountUnlockScreen extends RelativeLayout implements KeyguardScree
         }
 
         if (mCheckingDialog == null) {
-            final Context uiContext;
-
             mUiContext = ThemeUtils.createUiContext(mContext);
 
-            if (mUiContext != null) {
-                ThemeUtils.registerThemeChangeReceiver(mContext, mThemeChangeReceiver);
-                uiContext = mUiContext;
-            }
-            else {
-                uiContext = mContext;
-            }
+            final Context context = mUiContext != null ? mUiContext : mContext;
 
-            mCheckingDialog = new ProgressDialog(uiContext);
+            mCheckingDialog = new ProgressDialog(context);
             mCheckingDialog.setMessage(
                     mContext.getString(R.string.lockscreen_glogin_checking_password));
             mCheckingDialog.setIndeterminate(true);

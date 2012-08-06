@@ -35,7 +35,6 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
 import android.text.method.TextKeyListener;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,7 +46,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Space;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
@@ -102,7 +100,7 @@ public class PasswordUnlockScreen extends LinearLayout implements KeyguardScreen
         } else {
             layoutInflater.inflate(R.layout.keyguard_screen_password_landscape, this, true);
         }
-
+        LockScreen.setBackground(context, (ViewGroup) findViewById(R.id.root));
         mStatusViewManager = new KeyguardStatusViewManager(this, mUpdateMonitor, mLockPatternUtils,
                 mCallback, true);
 
@@ -116,10 +114,7 @@ public class PasswordUnlockScreen extends LinearLayout implements KeyguardScreen
         mPasswordEntry.setOnEditorActionListener(this);
 
         mKeyboardHelper = new PasswordEntryKeyboardHelper(context, mKeyboardView, this, false);
-        mKeyboardHelper.setEnableHaptics(
-                Settings.Secure.getInt(mContext.getContentResolver(),
-                        Settings.Secure.LOCK_PATTERN_TACTILE_FEEDBACK_ENABLED, 0)
-                        != 0);
+        mKeyboardHelper.setEnableHaptics(mLockPatternUtils.isTactileFeedbackEnabled());
         boolean imeOrDeleteButtonVisible = false;
         if (mIsAlpha) {
             // We always use the system IME for alpha keyboard, so hide lockscreen's soft keyboard

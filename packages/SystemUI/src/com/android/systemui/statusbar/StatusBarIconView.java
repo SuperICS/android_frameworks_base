@@ -120,6 +120,7 @@ public class StatusBarIconView extends AnimatedImageView {
         return a.equals(b);
     }
 
+    
     /**
      * Returns whether the set succeeded.
      */
@@ -142,7 +143,7 @@ public class StatusBarIconView extends AnimatedImageView {
         if (!iconEquals || force) {
             Drawable drawable = getIcon(icon);
             if (drawable == null) {
-                Slog.w(StatusBar.TAG, "No icon for slot " + mSlot);
+                Slog.w(TAG, "No icon for slot " + mSlot);
                 return false;
             }
             setImageDrawable(drawable);
@@ -189,7 +190,7 @@ public class StatusBarIconView extends AnimatedImageView {
             try {
                 r = context.getPackageManager().getResourcesForApplication(icon.iconPackage);
             } catch (PackageManager.NameNotFoundException ex) {
-                Slog.e(StatusBar.TAG, "Icon package not found: " + icon.iconPackage);
+                Slog.e(TAG, "Icon package not found: " + icon.iconPackage);
                 return null;
             }
         } else {
@@ -203,7 +204,7 @@ public class StatusBarIconView extends AnimatedImageView {
         try {
             return r.getDrawable(icon.iconId);
         } catch (RuntimeException e) {
-            Slog.w(StatusBar.TAG, "Icon not found in "
+            Slog.w(TAG, "Icon not found in "
                   + (icon.iconPackage != null ? icon.iconId : "<system>")
                   + ": " + Integer.toHexString(icon.iconId));
         }
@@ -317,7 +318,9 @@ public class StatusBarIconView extends AnimatedImageView {
                     Settings.System.getUriFor(Settings.System.STATUS_BAR_NOTIF_COUNT),
                     false, this);
         }
-
+        void unobserve() {
+            mContext.getContentResolver().unregisterContentObserver(this);
+        }
         @Override
         public void onChange(boolean selfChange) {
             setAlpha(Settings.System.getFloat(mContext
@@ -328,10 +331,6 @@ public class StatusBarIconView extends AnimatedImageView {
                     Settings.System.STATUS_BAR_NOTIF_COUNT, 0) == 1;
             set(mIcon, true);
         }
-
-        void unobserve() {
-            mContext.getContentResolver().unregisterContentObserver(this);
-        }
-
     }
+
 }

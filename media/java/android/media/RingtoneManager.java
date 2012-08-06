@@ -231,7 +231,7 @@ public class RingtoneManager {
      * If a column (item from this list) exists in the Cursor, its value must
      * be true (value of 1) for the row to be returned.
      */
-    private List<String> mFilterColumns = new ArrayList<String>();
+    private final List<String> mFilterColumns = new ArrayList<String>();
     
     private boolean mStopPreviousRingtone = true;
     private Ringtone mPreviousRingtone;
@@ -372,6 +372,7 @@ public class RingtoneManager {
         final Cursor internalCursor = getInternalRingtones();
         final Cursor drmCursor = mIncludeDrm ? getDrmRingtones() : null;
         final Cursor mediaCursor = getMediaRingtones();
+
         final Cursor themeRegularCursor = getThemeRegularRingtones();
         final Cursor themeNotifCursor = getThemeNotificationRingtones();
 
@@ -403,13 +404,13 @@ public class RingtoneManager {
      * @return A {@link Uri} pointing to the ringtone.
      */
     public Uri getRingtoneUri(int position) {
-        final Cursor cursor = getCursor();
-        
-        if (!cursor.moveToPosition(position)) {
+        // use cursor directly instead of requerying it, which could easily
+        // cause position to shuffle.
+        if (mCursor == null || !mCursor.moveToPosition(position)) {
             return null;
         }
         
-        return getUriFromCursor(cursor);
+        return getUriFromCursor(mCursor);
     }
 
     private static Uri getUriFromCursor(Cursor cursor) {
@@ -516,7 +517,7 @@ public class RingtoneManager {
                     MediaStore.Audio.Media.DEFAULT_SORT_ORDER)
                 : null;
     }
-
+   
     private String getThemeWhereClause(String uriColumn) {
         /* Filter out themes with no ringtone and the default theme (which has no package). */
         String clause = uriColumn + " IS NOT NULL AND LENGTH(theme_package) > 0";
@@ -548,7 +549,7 @@ public class RingtoneManager {
             return null;
         }
     }
-
+ 
     private void setFilterColumnsList(int type) {
         List<String> columns = mFilterColumns;
         columns.clear();
@@ -647,7 +648,7 @@ public class RingtoneManager {
         ProfileGroup profileGroup = pm.getActiveProfileGroup(context.getPackageName());
 
         try {
-            Ringtone r = new Ringtone(context);
+            Ringtone r = new Ringtone(context, true);
             if (streamType >= 0) {
                 r.setStreamType(streamType);
             }
@@ -655,7 +656,7 @@ public class RingtoneManager {
             if (profileGroup != null) {
                 switch (profileGroup.getRingerMode()) {
                     case OVERRIDE :
-                        r.open(profileGroup.getRingerOverride());
+                        r.setUri(profileGroup.getRingerOverride());
                         return r;
                     case SUPPRESS :
                         r = null;
@@ -663,11 +664,11 @@ public class RingtoneManager {
                 }
             }
 
-            r.open(ringtoneUri);
+            r.setUri(ringtoneUri);
             return r;
 
         } catch (Exception ex) {
-            Log.e(TAG, "Failed to open ringtone " + ringtoneUri);
+            Log.e(TAG, "Failed to open ringtone " + ringtoneUri + ": " + ex);
         }
 
         return null;

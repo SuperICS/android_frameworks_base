@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.provider.Settings;
 import android.provider.Telephony;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Slog;
 import android.view.View;
@@ -120,6 +121,7 @@ public class CarrierLabel extends TextView {
         } else {
             setText(customLabel);
         }
+        setText(str);
     }
 
 }

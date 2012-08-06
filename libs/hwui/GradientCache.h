@@ -20,6 +20,7 @@
 #include <SkShader.h>
 
 #include <utils/threads.h>
+#include <utils/Mutex.h>
 #include <utils/Vector.h>
 
 #include "Texture.h"

@@ -23,45 +23,60 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.Slog;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
+
+import com.android.systemui.statusbar.policy.NetworkController;
 
 import com.android.systemui.R;
-import com.android.systemui.statusbar.policy.NetworkController;
 
 // Intimately tied to the design of res/layout/signal_cluster_view.xml
 public class SignalClusterView
-        extends LinearLayout 
+        extends LinearLayout
         implements NetworkController.SignalCluster {
 
     static final boolean DEBUG = false;
     static final String TAG = "SignalClusterView";
-    
-    private static final int EVENT_SIGNAL_STRENGTH_CHANGED = 200;
-    
+
     NetworkController mNC;
-    
+
+    private static final int SIGNAL_CLUSTER_STYLE_NORMAL = 0;
+
+    private int mSignalClusterStyle;
     private boolean mWifiVisible = false;
     private int mWifiStrengthId = 0, mWifiActivityId = 0;
     private boolean mMobileVisible = false;
     private int mMobileStrengthId = 0, mMobileActivityId = 0, mMobileTypeId = 0;
     private boolean mIsAirplaneMode = false;
+    private int mAirplaneIconId = 0;
     private String mWifiDescription, mMobileDescription, mMobileTypeDescription;
-   
-    private boolean showingSignalText = false;
-    private boolean showingWiFiText = false;
-    private boolean mHideSignal = false;
-    
+
     ViewGroup mWifiGroup, mMobileGroup;
-    ImageView mWifi, mMobile, mWifiActivity, mMobileActivity, mMobileType;
-    TextView mMobileText,mWiFiText;
-    
+    ImageView mWifi, mMobile, mWifiActivity, mMobileActivity, mMobileType, mAirplane;
+    View mSpacer;
+
     Handler mHandler;
-        
+
+    class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_SIGNAL_TEXT), false, this);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            updateSettings();
+        }
+    }
+
     public SignalClusterView(Context context) {
         this(context, null);
     }
@@ -72,6 +87,11 @@ public class SignalClusterView
 
     public SignalClusterView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+
+        mHandler = new Handler();
+
+        SettingsObserver settingsObserver = new SettingsObserver(mHandler);
+        settingsObserver.observe();
     }
 
     public void setNetworkController(NetworkController nc) {
@@ -90,14 +110,9 @@ public class SignalClusterView
         mMobile         = (ImageView) findViewById(R.id.mobile_signal);
         mMobileActivity = (ImageView) findViewById(R.id.mobile_inout);
         mMobileType     = (ImageView) findViewById(R.id.mobile_type);
-        mMobileText		= (TextView)  findViewById(R.id.signal_text);
-        mWiFiText		= (TextView)  findViewById(R.id.wifi_signal_text);
-        
-        mHandler = new Handler();
-        
-        SettingsObserver settingsObserver = new SettingsObserver(mHandler);
-        settingsObserver.observe();
-        
+        mSpacer         =             findViewById(R.id.spacer);
+        mAirplane       = (ImageView) findViewById(R.id.airplane);
+
         apply();
     }
 
@@ -110,12 +125,13 @@ public class SignalClusterView
         mMobile         = null;
         mMobileActivity = null;
         mMobileType     = null;
-        mMobileText		= null;
-        mWiFiText		= null;
+        mSpacer         = null;
+        mAirplane       = null;
 
         super.onDetachedFromWindow();
     }
 
+    @Override
     public void setWifiIndicators(boolean visible, int strengthIcon, int activityIcon,
             String contentDescription) {
         mWifiVisible = visible;
@@ -126,6 +142,7 @@ public class SignalClusterView
         apply();
     }
 
+    @Override
     public void setMobileDataIndicators(boolean visible, int strengthIcon, int activityIcon,
             int typeIcon, String contentDescription, String typeContentDescription) {
         mMobileVisible = visible;
@@ -138,8 +155,23 @@ public class SignalClusterView
         apply();
     }
 
-    public void setIsAirplaneMode(boolean is) {
+    @Override
+    public void setIsAirplaneMode(boolean is, int airplaneIconId) {
         mIsAirplaneMode = is;
+        mAirplaneIconId = airplaneIconId;
+
+        apply();
+    }
+
+    @Override
+    public boolean dispatchPopulateAccessibilityEvent(AccessibilityEvent event) {
+        // Standard group layout onPopulateAccessibilityEvent() implementations
+        // ignore content description, so populate manually
+        if (mWifiVisible && mWifiGroup.getContentDescription() != null)
+            event.getText().add(mWifiGroup.getContentDescription());
+        if (mMobileVisible && mMobileGroup.getContentDescription() != null)
+            event.getText().add(mMobileGroup.getContentDescription());
+        return super.dispatchPopulateAccessibilityEvent(event);
     }
 
     // Run after each indicator change.
@@ -151,15 +183,6 @@ public class SignalClusterView
             mWifi.setImageResource(mWifiStrengthId);
             mWifiActivity.setImageResource(mWifiActivityId);
             mWifiGroup.setContentDescription(mWifiDescription);
-            if (showingWiFiText){
-            	mWifi.setVisibility(View.GONE);
-            	mWifiActivity.setVisibility(View.GONE);
-            	mWiFiText.setVisibility(View.VISIBLE);
-            } else {
-            	mWifi.setVisibility(View.VISIBLE);
-            	mWifiActivity.setVisibility(View.VISIBLE);
-            	mWiFiText.setVisibility(View.GONE);
-            }
         } else {
             mWifiGroup.setVisibility(View.GONE);
         }
@@ -169,28 +192,27 @@ public class SignalClusterView
                     (mWifiVisible ? "VISIBLE" : "GONE"),
                     mWifiStrengthId, mWifiActivityId));
 
-        if (mMobileVisible) {
+        if (mMobileVisible && !mIsAirplaneMode) {
             mMobileGroup.setVisibility(View.VISIBLE);
             mMobile.setImageResource(mMobileStrengthId);
             mMobileActivity.setImageResource(mMobileActivityId);
             mMobileType.setImageResource(mMobileTypeId);
             mMobileGroup.setContentDescription(mMobileTypeDescription + " " + mMobileDescription);
-            if (showingSignalText && !mIsAirplaneMode) {
-            	mMobile.setVisibility(View.GONE);
-            	mMobileText.setVisibility(View.VISIBLE);
-            } else{
-            	mMobile.setVisibility(View.VISIBLE);
-            	mMobileText.setVisibility(View.GONE);
-            }
         } else {
             mMobileGroup.setVisibility(View.GONE);
         }
-        if (mMobileVisible && mWifiVisible && mIsAirplaneMode) {
-            float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6,
-                    getContext().getResources().getDisplayMetrics());
-             mMobileGroup.setPadding((int) px, 0, 0, 0);
+
+        if (mIsAirplaneMode) {
+            mAirplane.setVisibility(View.VISIBLE);
+            mAirplane.setImageResource(mAirplaneIconId);
         } else {
-            mMobileGroup.setPadding(0, 0, 0, 0);
+            mAirplane.setVisibility(View.GONE);
+        }
+
+        if (mMobileVisible && mWifiVisible && mIsAirplaneMode) {
+            mSpacer.setVisibility(View.INVISIBLE);
+        } else {
+            mSpacer.setVisibility(View.GONE);
         }
 
         if (DEBUG) Slog.d(TAG,
@@ -200,60 +222,19 @@ public class SignalClusterView
 
         mMobileType.setVisibility(
                 !mWifiVisible ? View.VISIBLE : View.GONE);
-    }
-    
-    class SettingsObserver extends ContentObserver {
-        SettingsObserver(Handler handler) {
-            super(handler);
-        }
 
-        void observe() {
-            ContentResolver resolver = mContext.getContentResolver();
-            resolver.registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.STATUSBAR_SIGNAL_TEXT), false,
-                    this);
-            resolver.registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.STATUSBAR_WIFI_SIGNAL_TEXT), false,
-                    this);
-            resolver.registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.STATUSBAR_FONT_SIZE), false, this);
-            resolver.registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.STATUSBAR_HIDE_SIGNAL_BARS), false,
-                    this);
-            updateSettings();
-        }
-
-        @Override
-        public void onChange(boolean selfChange) {
-            updateSettings();
-        }
+        updateSettings();
     }
 
-    protected void updateSettings() {
+    private void updateSignalClusterStyle() {
+        mMobileGroup.setVisibility(mSignalClusterStyle != SIGNAL_CLUSTER_STYLE_NORMAL ? View.GONE : View.VISIBLE);
+    }
+
+    private void updateSettings() {
         ContentResolver resolver = mContext.getContentResolver();
-
-        showingSignalText = Settings.System.getInt(resolver,
-                Settings.System.STATUSBAR_SIGNAL_TEXT, 0) != 0;
-        showingWiFiText = Settings.System.getInt(resolver,
-                Settings.System.STATUSBAR_WIFI_SIGNAL_TEXT, 0) != 0;
-
-        int hideSignalBarsByDefault = getContext().getResources().getBoolean(R.bool.config_hideSignalBars) ? 1 : 0;
-        mHideSignal = (Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.STATUSBAR_HIDE_SIGNAL_BARS, hideSignalBarsByDefault) == 1);
-        int fontSize = Settings.System.getInt(resolver,
-                Settings.System.STATUSBAR_FONT_SIZE, 16);
-        if (mMobileText != null)
-        	mMobileText.setTextSize(fontSize);
-        if (mWiFiText != null)
-        	mWiFiText.setTextSize(fontSize);
-        if(mWifiGroup != null) {
-            float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6,
-                    getContext().getResources().getDisplayMetrics());
-            if(mHideSignal) mWifiGroup.setPadding(0, 0, (int) px, 0);
-            else mWifiGroup.setPadding(0, 0, 0, 0);
-        }
-        apply();
+        mSignalClusterStyle = (Settings.System.getInt(resolver,
+                Settings.System.STATUS_BAR_SIGNAL_TEXT, SIGNAL_CLUSTER_STYLE_NORMAL));
+        updateSignalClusterStyle();
     }
- 
 }
 

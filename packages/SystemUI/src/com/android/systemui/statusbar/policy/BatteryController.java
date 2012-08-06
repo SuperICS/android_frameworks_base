@@ -35,6 +35,7 @@ import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.util.Slog;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -53,8 +54,7 @@ public class BatteryController extends LinearLayout {
     private TextView mBatteryCenterText;
     private ViewGroup mBatteryGroup;
     private TextView mBatteryTextOnly;
-
-    private static int mBatteryStyle;
+    private int mBatteryStyle;
 
     private int mLevel = -1;
     private boolean mPlugged = false;
@@ -65,6 +65,42 @@ public class BatteryController extends LinearLayout {
     public static final int STYLE_ICON_CENTERED_TEXT = 3;
     public static final int STYLE_ICON_CIRCLE = 4;
     public static final int STYLE_HIDE = 5;
+
+    private static final int BATTERY_STYLE_NORMAL  = 0;
+    private static final int BATTERY_STYLE_TEXT    = 1;
+    private static final int BATTERY_STYLE_GONE    = 2;
+
+    private static final int BATTERY_ICON_STYLE_NORMAL      = R.drawable.stat_sys_battery;
+    private static final int BATTERY_ICON_STYLE_CHARGE      = R.drawable.stat_sys_battery_charge;
+    private static final int BATTERY_ICON_STYLE_NORMAL_MIN  = R.drawable.stat_sys_battery_min;
+    private static final int BATTERY_ICON_STYLE_CHARGE_MIN  = R.drawable.stat_sys_battery_charge_min;
+
+    private static final int BATTERY_TEXT_STYLE_NORMAL  = R.string.status_bar_settings_battery_meter_format;
+    private static final int BATTERY_TEXT_STYLE_MIN     = R.string.status_bar_settings_battery_meter_min_format;
+
+    private boolean mBatteryPlugged = false;
+
+    Handler mHandler;
+
+    class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System
+                    .getUriFor(Settings.System.STATUSBAR_BATTERY_ICON), false,
+                    this);
+            resolver.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.STATUSBAR_FONT_SIZE), false, this);
+        }
+
+        @Override 
+        public void onChange(boolean selfChange) {
+            updateSettings();
+        }
+    }
 
     public BatteryController(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -114,6 +150,19 @@ public class BatteryController extends LinearLayout {
                 final boolean plugged = intent.getIntExtra(
                         BatteryManager.EXTRA_PLUGGED, 0) != 0;
                 setBatteryIcon(level, plugged);
+            }
+            int N = mIconViews.size();
+            for (int i=0; i<N; i++) {
+                ImageView v = mIconViews.get(i);
+                v.setImageLevel(level);
+                v.setContentDescription(mContext.getString(R.string.accessibility_battery_level,
+                        level));
+            }
+            N = mLabelViews.size();
+            for (int i=0; i<N; i++) {
+                TextView v = mLabelViews.get(i);
+                v.setText(mContext.getString(BATTERY_TEXT_STYLE_MIN,
+                        level));
             }
         }
     };
@@ -176,26 +225,6 @@ public class BatteryController extends LinearLayout {
                 mBatteryTextOnly.setTextColor(0xFF33B5E5);
             }
 
-        }
-    }
-
-    class SettingsObserver extends ContentObserver {
-        SettingsObserver(Handler handler) {
-            super(handler);
-        }
-
-        void observe() {
-            ContentResolver resolver = mContext.getContentResolver();
-            resolver.registerContentObserver(Settings.System
-                    .getUriFor(Settings.System.STATUSBAR_BATTERY_ICON), false,
-                    this);
-            resolver.registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.STATUSBAR_FONT_SIZE), false, this);
-        }
-
-        @Override
-        public void onChange(boolean selfChange) {
-            updateSettings();
         }
     }
 

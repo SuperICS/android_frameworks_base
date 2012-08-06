@@ -41,7 +41,7 @@ import android.widget.TextView;
 
 import com.android.systemui.R;
 
-public class DockBatteryController extends LinearLayout {
+public class DockBatteryController extends BroadcastReceiver {
     private static final String TAG = "StatusBar.DockBatteryController";
 
     private Context mContext;
@@ -102,6 +102,50 @@ public class DockBatteryController extends LinearLayout {
         filter.addAction(Intent.ACTION_BATTERY_CHANGED);
         filter.addAction(Intent.ACTION_DOCK_EVENT);
         mContext.registerReceiver(mBatteryBroadcastReceiver, filter);
+    private static final int BATTERY_STYLE_NORMAL  = 0;
+    private static final int BATTERY_STYLE_TEXT    = 1;
+    private static final int BATTERY_STYLE_GONE    = 2;
+
+    private static final int BATTERY_ICON_STYLE_NORMAL      = R.drawable.stat_sys_kb_battery;
+    private static final int BATTERY_ICON_STYLE_CHARGE      = R.drawable.stat_sys_kb_battery_charge;
+
+    private boolean mDockStatus = false;
+    private boolean mDockCharging = false;
+    private int mBatteryStyle;
+    private int mBatteryIcon = BATTERY_ICON_STYLE_NORMAL;
+
+    private static final int BATTERY_TEXT_STYLE_NORMAL  = R.string.status_bar_settings_battery_meter_format;
+    private static final int BATTERY_TEXT_STYLE_MIN     = R.string.status_bar_settings_battery_meter_min_format;
+
+    Handler mHandler;
+
+    class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_BATTERY), false, this);
+        }
+
+        @Override public void onChange(boolean selfChange) {
+            updateSettings();
+        }
+    }
+
+    public DockBatteryController(Context context) {
+        mContext = context;
+        mHandler = new Handler();
+
+        SettingsObserver settingsObserver = new SettingsObserver(mHandler);
+        settingsObserver.observe();
+        updateSettings();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        context.registerReceiver(this, filter);
     }
 
     public void addIconView(ImageView v) {
@@ -227,6 +271,56 @@ public class DockBatteryController extends LinearLayout {
         @Override
         public void onChange(boolean selfChange) {
             updateSettings();
+    public void onReceive(Context context, Intent intent) {
+        final String action = intent.getAction();
+        if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
+            final int level = intent.getIntExtra(BatteryManager.EXTRA_DOCK_LEVEL, 0);
+            mDockCharging = intent.getIntExtra(BatteryManager.EXTRA_DOCK_STATUS, 0) == BatteryManager.DOCK_STATE_CHARGING;
+            mDockStatus = intent.getIntExtra(BatteryManager.EXTRA_DOCK_STATUS, 0) != BatteryManager.DOCK_STATE_UNDOCKED;
+
+            int N = mIconViews.size();
+            for (int i=0; i<N; i++) {
+                ImageView v = mIconViews.get(i);
+                v.setImageLevel(level);
+                v.setContentDescription(mContext.getString(R.string.accessibility_battery_level,
+                        level));
+            }
+            N = mLabelViews.size();
+            for (int i=0; i<N; i++) {
+                TextView v = mLabelViews.get(i);
+                v.setText(mContext.getString(BATTERY_TEXT_STYLE_MIN,
+                        level));
+            }
+            updateBattery();
+        }
+    }
+
+    private void updateBattery() {
+        int mIcon = View.GONE;
+        int mText = View.GONE;
+        int mIconStyle = BATTERY_ICON_STYLE_NORMAL;
+
+        if (mBatteryStyle == 0) {
+            mIcon = mDockStatus ? (View.VISIBLE) : (View.GONE);
+            mIconStyle = mDockCharging ? BATTERY_ICON_STYLE_CHARGE
+                    : BATTERY_ICON_STYLE_NORMAL;
+        } else if(mBatteryStyle == 1){
+            mIcon = mDockStatus ? (View.VISIBLE) : (View.GONE);
+            mText = mDockStatus ? (View.VISIBLE) : (View.GONE);
+            mIconStyle = mDockCharging ? BATTERY_ICON_STYLE_CHARGE
+                    : BATTERY_ICON_STYLE_NORMAL;
+        }
+
+        int N = mIconViews.size();
+        for (int i=0; i<N; i++) {
+            ImageView v = mIconViews.get(i);
+            v.setVisibility(mIcon);
+            v.setImageResource(mIconStyle);
+        }
+        N = mLabelViews.size();
+        for (int i=0; i<N; i++) {
+            TextView v = mLabelViews.get(i);
+            v.setVisibility(mText);
         }
     }
 

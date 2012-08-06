@@ -34,6 +34,8 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.MediaController.MediaPlayerControl;
 
 import java.io.IOException;
@@ -77,6 +79,8 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
     private int         mVideoHeight;
     private int         mSurfaceWidth;
     private int         mSurfaceHeight;
+    private int         mPreviousWidth;
+    private int         mPreviousHeight;
     private MediaController mMediaController;
     private OnCompletionListener mOnCompletionListener;
     private MediaPlayer.OnPreparedListener mOnPreparedListener;
@@ -119,9 +123,33 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
                         //width+"/"+height+"="+
                         //mVideoWidth+"/"+mVideoHeight);
             }
+            mPreviousWidth = mVideoWidth;
+            mPreviousHeight = mVideoHeight;
+        } else if (mPreviousWidth > 0 && mPreviousHeight > 0) {
+            width = getDefaultSize(mPreviousWidth, widthMeasureSpec);
+            height = getDefaultSize(mPreviousHeight, heightMeasureSpec);
+            if ( mPreviousWidth * height > width * mPreviousHeight ) {
+               Log.i("VideoView", "image too tall, correcting");
+               height = width * mPreviousHeight / mPreviousWidth;
+            } else if ( mPreviousWidth * height < width * mPreviousHeight ) {
+               Log.i("VideoView", "image too wide, correcting");
+               width = height * mPreviousWidth / mPreviousHeight;
+            }
         }
         //Log.i("@@@@@@@@@@", "setting size: " + width + 'x' + height);
         setMeasuredDimension(width, height);
+    }
+
+    @Override
+    public void onInitializeAccessibilityEvent(AccessibilityEvent event) {
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(VideoView.class.getName());
+    }
+
+    @Override
+    public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(VideoView.class.getName());
     }
 
     public int resolveAdjustedSize(int desiredSize, int measureSpec) {
@@ -380,7 +408,6 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
                 }
 
                 new AlertDialog.Builder(mContext)
-                        .setTitle(com.android.internal.R.string.VideoView_error_title)
                         .setMessage(messageId)
                         .setPositiveButton(com.android.internal.R.string.VideoView_error_button,
                                 new DialogInterface.OnClickListener() {

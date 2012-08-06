@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-#include <utils/PackageRedirectionMap.h>
+#include <androidfw/PackageRedirectionMap.h>
 
 #include "jni.h"
 #include "JNIHelp.h"
 #include <utils/misc.h>
 #include <android_runtime/AndroidRuntime.h>
 
-#include "android_util_Binder.h"
+#include "android_os_Parcel.h"
 #include <binder/Parcel.h>
 
-#include <utils/ResourceTypes.h>
+#include <androidfw/ResourceTypes.h>
 
 #include <stdio.h>
 
