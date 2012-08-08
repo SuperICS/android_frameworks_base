@@ -1116,8 +1116,6 @@ status_t EventHub::openDeviceLocked(const char *devicePath) {
     if (device->classes & (INPUT_DEVICE_CLASS_KEYBOARD | INPUT_DEVICE_CLASS_JOYSTICK)) {
         String8 layout;
         if (mOrKeyLayouts.tryGetProperty(device->identifier.name, layout)) {
-            LOGI("Replacing key layout and character map of %s with %s",
-                    device->identifier.name.string(), layout.string());
             if (!device->configuration) {
                 device->configuration = new PropertyMap();
             }
