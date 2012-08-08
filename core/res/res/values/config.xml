@@ -928,18 +928,12 @@
     <!-- Workaround for devices with broken keyboards -->
     <bool name="config_forceDisableHardwareKeyboard">false</bool>
 
-    <!-- Asus dock compatibility disabled by default -->
-    <bool name="config_hasDockBattery">false</bool>
-
     <!-- True if the Sym key should open the InputMethodPicker (default) -->
     <bool name="config_symKeyShowsImePicker">true</bool>
 
     <!-- Whether to set a system prop (sys.orientation.landscape)
          when rotating for devices that have rotating buttons -->
     <bool name="config_setLandscapeProp">false</bool>
-    <!-- Flag indicating whether we should enable automatic brightness for
-         the button and keyboard backlights. -->
-    <bool name="config_autoBrightnessButtonKeyboard">true</bool>
 
     <!-- Path to the library that contains a device specific key handler -->
     <string name="config_deviceKeyHandlerLib" translatable="false"></string>

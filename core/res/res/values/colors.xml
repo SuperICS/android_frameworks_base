@@ -184,5 +184,8 @@
     <drawable name="notification_template_icon_bg">#3333B5E5</drawable>
     <drawable name="notification_template_icon_low_bg">#0cffffff</drawable>
 
+    <!-- FaceLock -->
+    <color name="facelock_color_background">#000000</color>
+
 </resources>
 
