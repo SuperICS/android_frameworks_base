@@ -352,6 +352,10 @@ public class AudioService extends IAudioService.Stub implements OnFinished {
     // Broadcast receiver for device connections intent broadcasts
     private final BroadcastReceiver mReceiver = new AudioServiceBroadcastReceiver();
 
+    //  Broadcast receiver for media button broadcasts (separate from mReceiver to
+    //  independently change its priority)
+    private final BroadcastReceiver mMediaButtonReceiver = new MediaButtonBroadcastReceiver();
+
     // Used to alter media button redirection when the phone is ringing.
     private boolean mIsRinging = false;
 
@@ -3166,6 +3170,57 @@ public class AudioService extends IAudioService.Stub implements OnFinished {
                     onRegisterVolumeObserverForRcc(msg.arg1 /* rccId */,
                             (IRemoteVolumeObserver)msg.obj /* rvo */);
                     break;
+            }
+        }
+    }
+
+    //==========================================================================================
+    // RemoteControl
+    //==========================================================================================
+    /**
+     * Receiver for media button intents. Handles the dispatching of the media button event
+     * to one of the registered listeners, or if there was none, resumes the intent broadcast
+     * to the rest of the system.
+     */
+    private class MediaButtonBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (!Intent.ACTION_MEDIA_BUTTON.equals(action)) {
+                return;
+            }
+            KeyEvent event = (KeyEvent) intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+            if (event != null) {
+                // if in a call or ringing, do not break the current phone app behavior
+                // TODO modify this to let the phone app specifically get the RC focus
+                //      add modify the phone app to take advantage of the new API
+                synchronized(mRingingLock) {
+                    if (mIsRinging || (getMode() == AudioSystem.MODE_IN_CALL) ||
+                            (getMode() == AudioSystem.MODE_IN_COMMUNICATION) ||
+                            (getMode() == AudioSystem.MODE_RINGTONE) ) {
+                        return;
+                    }
+                }
+                synchronized(mRCStack) {
+                    if (!mRCStack.empty()) {
+                        // create a new intent to fill in the extras of the registered PendingIntent
+                        Intent targetedIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+                        Bundle extras = intent.getExtras();
+                        if (extras != null) {
+                            targetedIntent.putExtras(extras);
+                            // trap the current broadcast
+                            abortBroadcast();
+                            //Log.v(TAG, " Sending intent" + targetedIntent);
+                            // send the intent that was registered by the client
+                            try {
+                                mRCStack.peek().mMediaIntent.send(context, 0, targetedIntent);
+                            } catch (CanceledException e) {
+                                Log.e(TAG, "Error sending pending intent " + mRCStack.peek());
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
             }
         }
     }

@@ -209,7 +209,7 @@ again:
     *err = errno = 0;
     int ret = poll(&pfd, 1, timeout_ms);
     if (ret < 0) {
-        LOGE("poll() error\n");
+        ALOGE("poll() error\n");
         *err = errno;
         return NULL;
     }
@@ -218,7 +218,7 @@ again:
     }
 
     if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) {
-        LOGW("RFCOMM poll() returned  success (%d), "
+        ALOGW("RFCOMM poll() returned  success (%d), "
              "but with an unexpected revents bitmask: %#x\n", ret, pfd.revents);
         errno = EIO;
         *err = errno;
@@ -235,12 +235,12 @@ again:
 
         if (rc < 0) {
             if (errno == EBUSY) {
-                LOGI("read() error %s (%d): repeating read()...",
+                ALOGI("read() error %s (%d): repeating read()...",
                      strerror(errno), errno);
                 goto again;
             }
             *err = errno;
-            LOGE("read() error %s (%d)", strerror(errno), errno);
+            ALOGE("read() error %s (%d)", strerror(errno), errno);
             return NULL;
         }
 

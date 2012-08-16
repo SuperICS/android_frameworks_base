@@ -16,13 +16,15 @@
 
 package android.net.wifi;
 
+import static android.net.wifi.WifiConfiguration.INVALID_NETWORK_ID;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.DhcpInfoInternal;
 import android.net.LinkAddress;
 import android.net.LinkProperties;
-import android.net.NetworkUtils;
 import android.net.NetworkInfo.DetailedState;
+import android.net.NetworkUtils;
 import android.net.ProxyProperties;
 import android.net.RouteInfo;
 import android.net.wifi.WifiConfiguration.EnterpriseField;
@@ -30,10 +32,7 @@ import android.net.wifi.WifiConfiguration.IpAssignment;
 import android.net.wifi.WifiConfiguration.KeyMgmt;
 import android.net.wifi.WifiConfiguration.ProxySettings;
 import android.net.wifi.WifiConfiguration.Status;
-import android.net.wifi.NetworkUpdateResult;
-import static android.net.wifi.WifiConfiguration.INVALID_NETWORK_ID;
 import android.os.Environment;
-import android.os.Message;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.text.TextUtils;
@@ -48,14 +47,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class provides the API to manage configured
@@ -1125,32 +1122,6 @@ class WifiConfigStore {
                 break setVariables;
             }
 
-            // Android sometimes call this function with infrastructure
-            // configuration for ad-hoc networks (from selectNetwork),
-            // so we only set the variable if the mode is ad-hoc.
-            // (Infrastructure is default and does not have to be set.)
-            if (config.mode == WifiConfiguration.Mode.ADHOC) {
-                if (!WifiNative.setNetworkVariableCommand(
-                            netId,
-                            WifiConfiguration.Mode.varName,
-                            Integer.toString(config.mode))) {
-                    loge(config.SSID + ": failed to set mode: "
-                            +config.mode);
-                    break setVariables;
-                }
-
-                // Some drivers/wpa_supplicant require the frequency
-                // to be set for ad-hoc networks, even though it will
-                // not actually be used. Set it to Channel 11.
-                if (!WifiNative.setNetworkVariableCommand(
-                            netId,
-                            "frequency",
-                            "2462")) {
-                    loge(config.SSID + ": failed to set frequency: 2462");
-                    break setVariables;
-                }
-            }
-
             for (WifiConfiguration.EnterpriseField field
                     : config.enterpriseFields) {
                 String varName = field.varName();
@@ -1377,7 +1348,7 @@ class WifiConfigStore {
             }
         }
 
-        value = WifiNative.getNetworkVariableCommand(netId, WifiConfiguration.Mode.varName);
+        value = mWifiNative.getNetworkVariable(netId, WifiConfiguration.Mode.varName);
         config.mode = WifiConfiguration.Mode.INFRASTRUCTURE;
         if (!TextUtils.isEmpty(value)) {
             try {

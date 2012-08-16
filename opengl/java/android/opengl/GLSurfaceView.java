@@ -1138,27 +1138,7 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
          */
         public int swap() {
             if (! mEgl.eglSwapBuffers(mEglDisplay, mEglSurface)) {
-
-                /*
-                 * Check for EGL_CONTEXT_LOST, which means the context
-                 * and all associated data were lost (For instance because
-                 * the device went to sleep). We need to sleep until we
-                 * get a new surface.
-                 */
-                int error = mEgl.eglGetError();
-                switch(error) {
-                case EGL11.EGL_CONTEXT_LOST:
-                case EGL10.EGL_BAD_ALLOC:
-                    return false;
-                case EGL10.EGL_BAD_NATIVE_WINDOW:
-                    // The native window is bad, probably because the
-                    // window manager has closed it. Ignore this error,
-                    // on the expectation that the application will be closed soon.
-                    Log.e("EglHelper", "eglSwapBuffers returned EGL_BAD_NATIVE_WINDOW. tid=" + Thread.currentThread().getId());
-                    break;
-                default:
-                    throwEglException("eglSwapBuffers", error);
-                }
+                return mEgl.eglGetError();
             }
             return EGL10.EGL_SUCCESS;
         }

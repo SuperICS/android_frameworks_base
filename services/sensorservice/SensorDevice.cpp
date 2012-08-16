@@ -145,14 +145,14 @@ SensorDevice::SensorDevice()
 #else
         if (!sensors_control_open(&mSensorModule->common, &mSensorControlDevice)) {
             if (sensors_data_open(&mSensorModule->common, &mSensorDataDevice)) {
-                LOGE("couldn't open data device in backwards-compat mode for module %s (%s)",
+                ALOGE("couldn't open data device in backwards-compat mode for module %s (%s)",
                         SENSORS_HARDWARE_MODULE_ID, strerror(-err));
             } else {
-                LOGD("Opened sensors in backwards compat mode");
+                ALOGD("Opened sensors in backwards compat mode");
                 mOldSensorsCompatMode = true;
             }
         } else {
-            LOGE("couldn't open control device in backwards-compat mode for module %s (%s)",
+            ALOGE("couldn't open control device in backwards-compat mode for module %s (%s)",
                     SENSORS_HARDWARE_MODULE_ID, strerror(-err));
         }
 #endif
@@ -242,7 +242,7 @@ ssize_t SensorDevice::poll(sensors_event_t* buffer, size_t count) {
         //LOGV("%d buffers were requested",count);
         while (!mOldSensorsEnabled) {
             sleep(1);
-            LOGV("Waiting...");
+            ALOGV("Waiting...");
         }
         while (pollsDone < (size_t)mOldSensorsEnabled && pollsDone < count) {
             sensors_data_t oldBuffer;
@@ -259,13 +259,13 @@ ssize_t SensorDevice::poll(sensors_event_t* buffer, size_t count) {
                     if (mOldSensorsList[i].handle == result) {
                         sensorType = mOldSensorsList[i].type;
                         maxRange = mOldSensorsList[i].maxRange;
-                        LOGV("mapped sensor type to %d",sensorType);
+                        ALOGV("mapped sensor type to %d",sensorType);
                     }
                 }
             }
             if ( sensorType <= 0 ||
                  sensorType > SENSOR_TYPE_ROTATION_VECTOR) {
-                LOGV("Useless output at round %u from %d",pollsDone, oldBuffer.sensor);
+                ALOGV("Useless output at round %u from %d",pollsDone, oldBuffer.sensor);
                 count--;
                 continue;
             }
@@ -277,7 +277,7 @@ ssize_t SensorDevice::poll(sensors_event_t* buffer, size_t count) {
              * we only need to copy a sensors_vec_t and a float */
             buffer[pollsDone].acceleration = oldBuffer.vector;
             buffer[pollsDone].temperature = oldBuffer.temperature;
-            LOGV("Adding results for sensor %d", buffer[pollsDone].sensor);
+            ALOGV("Adding results for sensor %d", buffer[pollsDone].sensor);
             /* The ALS and PS sensors only report values on change,
              * instead of a data "stream" like the others. So don't wait
              * for the number of requested samples to fill, and deliver
@@ -394,7 +394,7 @@ status_t SensorDevice::activate(void* ident, int handle, int enabled)
                 mOldSensorsEnabled++;
             else if (mOldSensorsEnabled > 0)
                 mOldSensorsEnabled--;
-            LOGV("Activation for %d (%d)",handle,enabled);
+            ALOGV("Activation for %d (%d)",handle,enabled);
             if (enabled) {
                 mSensorControlDevice->wake(mSensorControlDevice);
             }

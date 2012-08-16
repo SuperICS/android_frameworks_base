@@ -43,7 +43,7 @@ import android.view.View;
 import android.webkit.WebViewClassic.FocusNodeHref;
 import android.webkit.WebViewInputDispatcher.WebKitCallbacks;
 
-import junit.framework.Assert;
+import org.codeaurora.Performance;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -52,11 +52,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
-import org.json.*;
-
-import junit.framework.Assert;
-import org.codeaurora.Performance;
 
 /**
  * @hide
@@ -234,13 +229,6 @@ public final class WebViewCore {
         Message init = sWebCoreHandler.obtainMessage(
                 WebCoreThread.INITIALIZE, this);
         sWebCoreHandler.sendMessage(init);
-    }
-
-    private void sendPriorityMessageToWebView()
-    {
-        if (mWebView != null)
-            mWebView.mPrivateHandler.sendMessageAtFrontOfQueue(
-                mWebView.mPrivateHandler.obtainMessage(WebView.RESUME_RENDER_PRIORITY));
     }
 
     /* Initialize private data within the WebCore thread.
@@ -784,7 +772,6 @@ public final class WebViewCore {
         @Override
         public void run() {
             Looper.prepare();
-            Assert.assertNull(sWebCoreHandler);
             synchronized (WebViewCore.class) {
                 sWebCoreHandler = new Handler() {
                     @Override
@@ -834,11 +821,6 @@ public final class WebViewCore {
                                 }
                                 Process.setThreadPriority(
                                         Process.THREAD_PRIORITY_DEFAULT);
-
-                                if (core != null)
-                                {
-                                    core.sendPriorityMessageToWebView();
-                                }
 
                                 if (SystemProperties.QCOM_HARDWARE ) {
                                     /* Enable power collapse and reset the min frequency */

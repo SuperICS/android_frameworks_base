@@ -441,20 +441,6 @@ public final class CallManager {
                 audioManager.setParameters(aPValues[0] + "=" + aPValues[2]);
             }
         }
-
-        for (String parameter : audioParams) {
-            if (mode == AudioManager.MODE_IN_CALL) {
-                Log.d(LOG_TAG, "setAudioMode(): " + parameter + "=on");
-                audioManager.setParameters(parameter + "=on");
-            } else if (mode == AudioManager.MODE_NORMAL) {
-                Log.d(LOG_TAG, "setAudioMode(): " + parameter + "=off");
-                audioManager.setParameters(parameter + "=off");
-            }
-        }
-
-        // calling audioManager.setMode() multiple times in a short period of
-        // time seems to break the audio recorder in in-call mode
-        if (audioManager.getMode() != mode) audioManager.setMode(mode);
     }
 
     private Context getContext() {

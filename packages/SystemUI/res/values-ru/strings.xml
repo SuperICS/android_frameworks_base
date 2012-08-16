@@ -142,15 +142,6 @@
     <string name="accessibility_clear_all" msgid="5235938559247164925">"Удалить все уведомления"</string>
 
     <!-- Dialog title for navigation bar button selection -->
-    <string name="navbar_dialog_title">Выберите действие</string>
-    <string name="navbar_home_button">Домой</string>
-    <string name="navbar_recent_button">Запущ. приложения</string>
-    <string name="navbar_search_button">Поиск</string>
-    <string name="navbar_back_button">Назад</string>
-    <string name="navbar_empty_button">Пустая кнопка</string>
-    <string name="navbar_menu_conditional_button">Меню (скрывающ.)</string>
-    <string name="navbar_menu_always_button">Меню (не скрывающ.)</string>
-    <string name="navbar_menu_big_button">Меню</string>
     <string name="dreams_dock_launcher" msgid="3541196417659166245">"Активация заставки экрана"</string>
     <string name="status_bar_notification_inspect_item_title" msgid="1163547729015390250">"О приложении"</string>
     <string name="notifications_off_title" msgid="8936620513608443224">"Уведомления отключены"</string>

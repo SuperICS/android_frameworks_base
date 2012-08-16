@@ -115,8 +115,6 @@ import android.widget.Scroller;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import junit.framework.Assert;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -132,8 +130,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Implements a backend provider for the {@link WebView} public API.
@@ -3798,7 +3794,7 @@ public final class WebViewClassic implements WebViewProvider, WebViewProvider.Sc
                 abortAnimation();
                 nativeSetIsScrolling(false);
                 if (!mBlockWebkitViewMessages) {
-                    WebViewCore.resumePriority();
+                    WebViewCore.resumePriority(0);
                     if (!mSelectingText) {
                         WebViewCore.resumeUpdatePicture(mWebViewCore);
                     }
@@ -6080,7 +6076,7 @@ public final class WebViewClassic implements WebViewProvider, WebViewProvider.Sc
                         // device as we almost certain will get a MOVE. But this
                         // is possible on emulator.
                         mLastVelocity = 0;
-                        WebViewCore.resumePriority();
+                        WebViewCore.resumePriority(0);
                         if (!mSelectingText) {
                             WebViewCore.resumeUpdatePicture(mWebViewCore);
                         }
@@ -6270,7 +6266,7 @@ public final class WebViewClassic implements WebViewProvider, WebViewProvider.Sc
         if (mScroller.isFinished() && !mSelectingText
                 && (mTouchMode == TOUCH_DRAG_MODE
                 || mTouchMode == TOUCH_DRAG_LAYER_MODE)) {
-            WebViewCore.resumePriority();
+            WebViewCore.resumePriority(0);
             WebViewCore.resumeUpdatePicture(mWebViewCore);
             nativeSetIsScrolling(false);
         }
@@ -6309,7 +6305,7 @@ public final class WebViewClassic implements WebViewProvider, WebViewProvider.Sc
 
         if ((mTouchMode == TOUCH_DRAG_MODE
                 || mTouchMode == TOUCH_DRAG_LAYER_MODE) && !mSelectingText) {
-            WebViewCore.resumePriority();
+            WebViewCore.resumePriority(0);
             WebViewCore.resumeUpdatePicture(mWebViewCore);
             nativeSetIsScrolling(false);
         }
@@ -6686,7 +6682,7 @@ public final class WebViewClassic implements WebViewProvider, WebViewProvider.Sc
             }
         }
         if ((maxX == 0 && vy == 0) || (maxY == 0 && vx == 0)) {
-            WebViewCore.resumePriority();
+            WebViewCore.resumePriority(0);
             if (!mSelectingText) {
                 WebViewCore.resumeUpdatePicture(mWebViewCore);
             }

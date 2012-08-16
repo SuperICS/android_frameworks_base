@@ -44,9 +44,7 @@ public abstract class HardwareCanvas extends Canvas {
      * @return {@link DisplayList#STATUS_DREW} if anything was drawn (such as a call to clear
      * the canvas).
      */
-    abstract void onPreDraw(Rect dirty);
-    abstract void startTileRendering(Rect dirty);
-    abstract void endTileRendering();
+    public abstract int onPreDraw(Rect dirty);
 
     /**
      * Invoked after all drawing operation have been performed.

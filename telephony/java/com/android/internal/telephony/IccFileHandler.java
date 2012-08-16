@@ -16,8 +16,10 @@
 
 package com.android.internal.telephony;
 
-import android.os.*;
-import android.util.Log;
+import android.os.AsyncResult;
+import android.os.Handler;
+import android.os.Message;
+
 import java.util.ArrayList;
 
 /**
@@ -292,14 +294,12 @@ public abstract class IccFileHandler extends Handler implements IccConstants {
         AsyncResult ar;
         IccIoResult result;
         Message response = null;
-        String str;
         LoadLinearFixedContext lc;
 
         IccException iccException;
         byte data[];
         int size;
         int fileid;
-        int recordNum;
         int recordSize[];
 
         try {
@@ -377,9 +377,7 @@ public abstract class IccFileHandler extends Handler implements IccConstants {
 
                 data = result.payload;
                 fileid = lc.efid;
-                recordNum = lc.recordNum;
-
-                if (TYPE_EF != data[RESPONSE_DATA_FILE_TYPE]) {
+                    if (TYPE_EF != data[RESPONSE_DATA_FILE_TYPE]) {
                     throw new IccFileTypeMismatch();
                 }
 

@@ -258,25 +258,6 @@ class GLES20Canvas extends HardwareCanvas {
         return nCallDrawGLFunction(mRenderer, drawGLFunction);
     }
 
-    @Override
-    void startTileRendering(Rect dirty) {
-        if (dirty != null) {
-            nStartTileRendering(mRenderer, dirty.left, dirty.top, dirty.right, dirty.bottom);
-        } else {
-            nStartTileRendering(mRenderer, 0, 0, 0, 0);
-        }
-    }
-
-    @Override
-    void endTileRendering() {
-            nEndTileRendering(mRenderer);
-    }
-
-    private static native void nPrepare(int renderer, boolean opaque);
-    private static native void nPrepareDirty(int renderer, int left, int top, int right, int bottom,
-            boolean opaque);
-    private static native void nStartTileRendering(int renderer, int left, int top, int right, int bottom);
-    private static native void nEndTileRendering(int renderer);
     private static native int nCallDrawGLFunction(int renderer, int drawGLFunction);
 
     @Override

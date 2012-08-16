@@ -136,15 +136,6 @@
     <string name="gps_notification_found_text" msgid="4619274244146446464">"Locatie bepaald met GPS"</string>
     <string name="accessibility_clear_all" msgid="5235938559247164925">"Alle meldingen wissen."</string>
     <!-- Dialog title for navigation bar button selection -->
-    <string name="navbar_dialog_title">Kies de toe te wijzen functie</string>
-    <string name="navbar_home_button">Thuisknop</string>
-    <string name="navbar_recent_button">Recentknop</string>
-    <string name="navbar_search_button">Zoekknop</string>
-    <string name="navbar_back_button">Terugknop</string>
-    <string name="navbar_empty_button">Functieloze knop</string>
-    <string name="navbar_menu_conditional_button">Menuknop (altijd verbergen)</string>
-    <string name="navbar_menu_always_button">Menuknop (altijd tonen)</string>
-    <string name="navbar_menu_big_button">Menuknop</string>
     <string name="dreams_dock_launcher" msgid="3541196417659166245">"Schermbeveiliging inschakelen"</string>
     <string name="status_bar_notification_inspect_item_title" msgid="1163547729015390250">"App-info"</string>
     <string name="notifications_off_title" msgid="8936620513608443224">"Meldingen uit"</string>

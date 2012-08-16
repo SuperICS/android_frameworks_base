@@ -25,14 +25,9 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Parcel;
-import android.telephony.SmsMessage;
 import android.os.SystemProperties;
 import android.text.TextUtils;
 import android.util.Log;
-
-import com.android.internal.telephony.RILConstants;
-import com.android.internal.telephony.gsm.SmsBroadcastConfigInfo;
-import com.android.internal.telephony.cdma.CdmaInformationRecords;
 
 import java.util.ArrayList;
 
@@ -376,7 +371,6 @@ public class QualcommSharedRIL extends RIL implements CommandsInterface {
     protected void
     processSolicited (Parcel p) {
         int serial, error;
-        boolean found = false;
 
         serial = p.readInt();
         error = p.readInt();
@@ -515,7 +509,6 @@ public class QualcommSharedRIL extends RIL implements CommandsInterface {
             case 105: ret = responseInts(p); break; // RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE
             case 106: ret = responseStrings(p); break; // RIL_REQUEST_CDMA_PRL_VERSION
             case 107: ret = responseInts(p);  break; // RIL_REQUEST_IMS_REGISTRATION_STATE
-            case 108: ret = responseSMS(p);  break; // RIL_REQUEST_IMS_SEND_SMS
             case RIL_REQUEST_VOICE_RADIO_TECH: ret = responseInts(p); break;
 
             default:
@@ -634,7 +627,6 @@ public class QualcommSharedRIL extends RIL implements CommandsInterface {
         CommandsInterface.RadioState radioState;
         HandlerThread handlerThread;
         Looper looper;
-        IccHandler iccHandler;
 
         switch (stateCode) {
             case RIL_INT_RADIO_OFF:

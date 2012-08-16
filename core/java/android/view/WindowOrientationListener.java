@@ -16,15 +16,11 @@
 
 package android.view;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.ContentObserver;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Handler;
-import android.provider.Settings;
 import android.os.SystemProperties;
 import android.util.FloatMath;
 import android.util.Log;
@@ -85,7 +81,7 @@ public abstract class WindowOrientationListener {
                 ? Sensor.TYPE_GRAVITY : Sensor.TYPE_ACCELEROMETER);
         if (mSensor != null) {
             // Create listener only if sensors do exist
-            mSensorEventListener = new SensorEventListenerImpl(this, context);
+            mSensorEventListener = new SensorEventListenerImpl(this);
         }
     }
 
@@ -365,14 +361,8 @@ public abstract class WindowOrientationListener {
         private long[] mTiltHistoryTimestampNanos = new long[TILT_HISTORY_SIZE];
         private int mTiltHistoryIndex;
 
-        protected Context mContext;
-        private int mSettleTimeMs = SETTLE_TIME_MIN_MS;
-
-        public SensorEventListenerImpl(WindowOrientationListener orientationListener, Context c) {
+        public SensorEventListenerImpl(WindowOrientationListener orientationListener) {
             mOrientationListener = orientationListener;
-            mContext = c;
-            SettingsObserver settingsObserver = new SettingsObserver(new Handler());
-            settingsObserver.observe();
             reset();
         }
 
@@ -719,32 +709,6 @@ public abstract class WindowOrientationListener {
 
         private static float remainingMS(long now, long until) {
             return now >= until ? 0 : (until - now) * 0.000001f;
-        }
-
-        class SettingsObserver extends ContentObserver {
-            SettingsObserver(Handler handler) {
-                super(handler);
-            }
-
-            void observe() {
-                ContentResolver resolver = mContext.getContentResolver();
-                resolver.registerContentObserver(
-                        Settings.System.getUriFor(Settings.System.ACCELEROMETER_ROTATION_SETTLE_TIME), false,
-                        this);
-                updateSettings();
-            }
-
-            @Override
-            public void onChange(boolean selfChange) {
-                updateSettings();
-            }
-        }
-
-        protected void updateSettings() {
-            ContentResolver resolver = mContext.getContentResolver();
-
-            mSettleTimeMs = Settings.System.getInt(resolver,
-                    Settings.System.ACCELEROMETER_ROTATION_SETTLE_TIME, SETTLE_TIME_MIN_MS);
         }
     }
 }

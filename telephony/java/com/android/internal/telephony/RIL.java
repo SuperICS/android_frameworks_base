@@ -1278,12 +1278,6 @@ public class RIL extends BaseCommands implements CommandsInterface {
         rr.mp.writeInt(1);
         rr.mp.writeInt(index);
 
-        if (false) {
-            if (RILJ_LOGD) riljLog(rr.serialString() + "> "
-                    + requestToString(rr.mRequest)
-                    + " " + index);
-        }
-
         send(rr);
     }
 
@@ -1293,12 +1287,6 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
         rr.mp.writeInt(1);
         rr.mp.writeInt(index);
-
-        if (false) {
-            if (RILJ_LOGD) riljLog(rr.serialString() + "> "
-                    + requestToString(rr.mRequest)
-                    + " " + index);
-        }
 
         send(rr);
     }
@@ -1313,12 +1301,6 @@ public class RIL extends BaseCommands implements CommandsInterface {
         rr.mp.writeString(pdu);
         rr.mp.writeString(smsc);
 
-        if (false) {
-            if (RILJ_LOGD) riljLog(rr.serialString() + "> "
-                    + requestToString(rr.mRequest)
-                    + " " + status);
-        }
-
         send(rr);
     }
 
@@ -1330,12 +1312,6 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
         rr.mp.writeInt(status);
         rr.mp.writeString(pdu);
-
-        if (false) {
-            if (RILJ_LOGD) riljLog(rr.serialString() + "> "
-                    + requestToString(rr.mRequest)
-                    + " " + status);
-        }
 
         send(rr);
     }
@@ -2967,26 +2943,15 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     protected Object
     responseStrings(Parcel p) {
-        int num;
         String response[];
 
         response = p.readStringArray();
-
-        if (false) {
-            num = p.readInt();
-
-            response = new String[num];
-            for (int i = 0; i < num; i++) {
-                response[i] = p.readString();
-            }
-        }
 
         return response;
     }
 
     protected Object
     responseRaw(Parcel p) {
-        int num;
         byte response[];
 
         response = p.createByteArray();
@@ -3012,9 +2977,6 @@ public class RIL extends BaseCommands implements CommandsInterface {
     protected Object
     responseICC_IO(Parcel p) {
         int sw1, sw2;
-        byte data[] = null;
-        Message ret;
-
         sw1 = p.readInt();
         sw2 = p.readInt();
 

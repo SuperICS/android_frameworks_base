@@ -16,11 +16,10 @@
 
 package com.android.internal.telephony;
 
-import com.android.internal.telephony.gsm.SmsBroadcastConfigInfo;
-
-import android.os.Message;
 import android.os.Handler;
-import android.util.Log;
+import android.os.Message;
+
+import com.android.internal.telephony.gsm.SmsBroadcastConfigInfo;
 
 /**
  * {@hide}

@@ -77,18 +77,9 @@ public abstract class HardwareRenderer {
     static final String RENDER_DIRTY_REGIONS_PROPERTY = "debug.hwui.render_dirty_regions";
     
     /**
-     * System property used to enable or disable tile rendering
-     *
-     * Possible values:
-     * "true", to enable tile rendering
-     * "false", to disable tile rendering
-     */
-    static final String TILE_RENDERING_PROPERTY = "debug.enabletr";
-
-    /**
      * System property used to enable or disable vsync.
      * The default value of this property is assumed to be false.
-     *
+     * 
      * Possible values:
      * "true", to disable vsync
      * "false", to enable vsync
@@ -595,8 +586,6 @@ public abstract class HardwareRenderer {
         static final int SURFACE_STATE_ERROR = 0;
         static final int SURFACE_STATE_SUCCESS = 1;
         static final int SURFACE_STATE_UPDATED = 2;
-        static final int SURFACE_STATE_UNDEFINED = 3;
-        
 
         static final int FUNCTOR_PROCESS_DELAY = 4;
 
@@ -622,16 +611,10 @@ public abstract class HardwareRenderer {
 
         static boolean sDirtyRegions;
         static final boolean sDirtyRegionsRequested;
-        static boolean sTileRendering;
         static {
             String dirtyProperty = SystemProperties.get(RENDER_DIRTY_REGIONS_PROPERTY, "true");
-            String trProperty = SystemProperties.get(TILE_RENDERING_PROPERTY, "false");
             //noinspection PointlessBooleanExpression,ConstantConditions
-            //enable dirty regions if tile-rendering enabled or dirty regions property enabled
-            sTileRendering = "true".equalsIgnoreCase(trProperty);
-            sDirtyRegions = RENDER_DIRTY_REGIONS &&
-                            ("true".equalsIgnoreCase(dirtyProperty) ||
-                             sTileRendering);
+            sDirtyRegions = RENDER_DIRTY_REGIONS && "true".equalsIgnoreCase(dirtyProperty);
             sDirtyRegionsRequested = sDirtyRegions;
         }
 
@@ -1071,12 +1054,6 @@ public abstract class HardwareRenderer {
             return mGl != null && mCanvas != null;
         }        
         
-        void startTileRendering(Rect dirty) {
-        }
-
-        void endTileRendering() {
-        }
-
         int onPreDraw(Rect dirty) {
             return DisplayList.STATUS_DONE;
         }
@@ -1115,7 +1092,7 @@ public abstract class HardwareRenderer {
                 view.mPrivateFlags |= View.DRAWN;
 
                 final int surfaceState = checkCurrent();
-                if ((surfaceState != SURFACE_STATE_ERROR) && (surfaceState != SURFACE_STATE_UNDEFINED)) {
+                if (surfaceState != SURFACE_STATE_ERROR) {
                     HardwareCanvas canvas = mCanvas;
                     attachInfo.mHardwareCanvas = canvas;
 
@@ -1141,8 +1118,6 @@ public abstract class HardwareRenderer {
                         }
                     }
 
-                    if (sTileRendering)
-                        startTileRendering(dirty);
                     int status = onPreDraw(dirty);
                     int saveCount = canvas.save();
                     callbacks.onHardwarePreDraw(canvas);
@@ -1223,8 +1198,6 @@ public abstract class HardwareRenderer {
                     }
 
                     onPostDraw();
-                    if (sTileRendering)
-                        endTileRendering();
 
                     attachInfo.mIgnoreDirtyState = false;
                     
@@ -1327,13 +1300,6 @@ public abstract class HardwareRenderer {
                     }
                     return SURFACE_STATE_UPDATED;
                 }
-            } else {
-                int[] width = new int[1];
-                int[] height = new int[1];
-                sEgl.eglQuerySurface(sEglDisplay, mEglSurface, EGL_WIDTH, width);
-                sEgl.eglQuerySurface(sEglDisplay, mEglSurface, EGL_HEIGHT, height);
-                if ((mWidth != -1) && (mHeight != -1) && (width[0] != mWidth || height[0] != mHeight))
-                    return SURFACE_STATE_UNDEFINED;
             }
             return SURFACE_STATE_SUCCESS;
         }
@@ -1443,16 +1409,6 @@ public abstract class HardwareRenderer {
         @Override
         void onPostDraw() {
             mGlCanvas.onPostDraw();
-        }
-
-        @Override
-        void startTileRendering(Rect dirty) {
-            mGlCanvas.startTileRendering(dirty);
-        }
-
-        @Override
-        void endTileRendering() {
-            mGlCanvas.endTileRendering();
         }
 
         @Override

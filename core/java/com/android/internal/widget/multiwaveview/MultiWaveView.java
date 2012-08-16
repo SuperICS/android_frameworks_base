@@ -239,7 +239,7 @@ public class MultiWaveView extends View {
             if (mNewTargetResources != 0) {
                 internalSetTargetResources(mNewTargetResources);
                 mNewTargetResources = 0;
-                hideTargets(false);
+                hideTargets(false, false);
             } else if (mNewTargetDrawables != null) {
                 internalSetTargetResources(mNewTargetDrawables);
                 mNewTargetDrawables = null;
@@ -703,6 +703,18 @@ public class MultiWaveView extends View {
         updateTargetPositions();
     }
 
+    private void updateTargetPositions() {
+        // Reposition the target drawables if the view changed.
+        for (int i = 0; i < mTargetDrawables.size(); i++) {
+            final TargetDrawable targetIcon = mTargetDrawables.get(i);
+            double angle = -2.0f * Math.PI * i / mTargetDrawables.size();
+            float xPosition = mWaveCenterX + mOuterRadius * (float) Math.cos(angle);
+            float yPosition = mWaveCenterY + mOuterRadius * (float) Math.sin(angle);
+            targetIcon.setX(xPosition);
+            targetIcon.setY(yPosition);
+        }
+    }
+    
     /**
      * Loads an array of drawables from the given resourceId.
      *

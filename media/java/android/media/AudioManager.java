@@ -417,7 +417,6 @@ public class AudioManager {
      */
     public AudioManager(Context context) {
         mContext = context;
-        mHandler = new Handler(context.getMainLooper());
         mUseMasterVolume = mContext.getResources().getBoolean(
                 com.android.internal.R.bool.config_useMasterVolume);
         mProfileManager = (ProfileManager) context.getSystemService(Context.PROFILE_SERVICE);

@@ -58,11 +58,7 @@ import java.util.Map;
  */
 public class ActivityManager {
     private static String TAG = "ActivityManager";
-    private static boolean localLOGV = false;
-
     private final Context mContext;
-    private final Handler mHandler;
-
     /**
      * Result for IActivityManager.startActivity: an error where the
      * start had to be canceled.
@@ -213,7 +209,6 @@ public class ActivityManager {
 
     /*package*/ ActivityManager(Context context, Handler handler) {
         mContext = context;
-        mHandler = handler;
     }
 
     /**
@@ -1564,16 +1559,6 @@ public class ActivityManager {
     public List<ApplicationInfo> getRunningExternalApplications() {
         try {
             return ActivityManagerNative.getDefault().getRunningExternalApplications();
-        } catch (RemoteException e) {
-            return null;
-        }
-    }
-    /**
-     * @hide
-     */
-    public Configuration getConfiguration() {
-        try {
-            return ActivityManagerNative.getDefault().getConfiguration();
         } catch (RemoteException e) {
             return null;
         }

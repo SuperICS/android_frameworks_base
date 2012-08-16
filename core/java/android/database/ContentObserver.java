@@ -27,70 +27,7 @@ public abstract class ContentObserver {
     private final Object mLock = new Object();
     private Transport mTransport; // guarded by mLock
 
-    private Transport mTransport;
-
-    // Protects mTransport
-    private Object lock = new Object();
-
-    /* package */ Handler mHandler;
-
-    private final class NotificationRunnable implements Runnable {
-
-        private boolean mSelf;
-	private Uri mUri = null;
-
-        public NotificationRunnable(boolean self) {
-            mSelf = self;
-        }
-
-
-        public NotificationRunnable(Uri uri, boolean self) {
-            mSelf = self;
-            mUri = uri;
-        }
-
-        public void run() { 
-            if (mUri != null) {
-                ContentObserver.this.onChangeUri(mUri, mSelf);
-            } else {
-                ContentObserver.this.onChange(mSelf);
-            }
-        }
-    }
-
-    private static final class Transport extends IContentObserver.Stub {
-        ContentObserver mContentObserver;
-
-        public Transport(ContentObserver contentObserver) {
-            mContentObserver = contentObserver;
-        }
-
-        public boolean deliverSelfNotifications() {
-            ContentObserver contentObserver = mContentObserver;
-            if (contentObserver != null) {
-                return contentObserver.deliverSelfNotifications();
-            }
-            return false;
-        }
-
-        public void onChangeUri(Uri uri, boolean selfChange) {
-            ContentObserver contentObserver = mContentObserver;
-            if (contentObserver != null) {
-                contentObserver.dispatchChange(uri, selfChange);
-            }
-        }
-
-        public void onChange(boolean selfChange) {
-            ContentObserver contentObserver = mContentObserver;
-            if (contentObserver != null) {
-                contentObserver.dispatchChange(selfChange);
-            }
-        }
-
-        public void releaseContentObserver() {
-            mContentObserver = null;
-        }
-    }
+    Handler mHandler;
 
     /**
      * Creates a content observer.
@@ -263,15 +200,4 @@ public abstract class ContentObserver {
             mContentObserver = null;
         }
     }
-
-
-    /** @hide */
-    public final void dispatchChange(Uri uri, boolean selfChange) {
-        if (mHandler == null) {
-            onChangeUri(uri, selfChange);
-        } else {
-            mHandler.post(new NotificationRunnable(uri, selfChange));
-        }
-    }
-
 }

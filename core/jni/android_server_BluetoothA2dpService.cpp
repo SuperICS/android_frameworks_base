@@ -227,7 +227,7 @@ static jboolean avrcpVolumeUpNative(JNIEnv *env, jobject object,
 static jboolean sendMetaDataNative(JNIEnv *env, jobject obj,
                                      jstring path) {
 #ifdef HAVE_BLUETOOTH
-    LOGV(__FUNCTION__);
+    ALOGV(__FUNCTION__);
     if (nat) {
         jstring title, artist, album, media_number, total_media_count, playing_time;
         const char *c_title, *c_artist, *c_album, *c_media_number;
@@ -275,7 +275,7 @@ static jboolean sendMetaDataNative(JNIEnv *env, jobject obj,
 static jboolean sendPlayStatusNative(JNIEnv *env, jobject object, jstring path,
                                         jint duration, jint position, jint play_status) {
 #ifdef HAVE_BLUETOOTH
-    LOGV(__FUNCTION__);
+    ALOGV(__FUNCTION__);
     if (nat) {
         const char *c_path = env->GetStringUTFChars(path, NULL);
         bool ret = dbus_func_args_async(env, nat->conn, -1, onStatusReply, NULL, nat,
@@ -294,7 +294,7 @@ static jboolean sendPlayStatusNative(JNIEnv *env, jobject object, jstring path,
 static jboolean sendEventNative(JNIEnv *env, jobject object,
                                      jstring path, jint event_id, jlong data) {
 #ifdef HAVE_BLUETOOTH
-    LOGV(__FUNCTION__);
+    ALOGV(__FUNCTION__);
     if (nat) {
         const char *c_path = env->GetStringUTFChars(path, NULL);
 
@@ -404,7 +404,7 @@ void onConnectSinkResult(DBusMessage *msg, void *user, void *n) {
 }
 
 void onStatusReply(DBusMessage *msg, void *user, void *n) {
-    LOGV(__FUNCTION__);
+    ALOGV(__FUNCTION__);
 
     native_data_t *nat = (native_data_t *)n;
     DBusError err;

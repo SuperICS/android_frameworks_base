@@ -24,7 +24,6 @@ import com.android.internal.telephony.IccCard;
 import com.android.internal.telephony.IccCardApplication;
 import com.android.internal.telephony.IccConstants;
 import com.android.internal.telephony.IccFileHandler;
-import com.android.internal.telephony.PhoneBase;
 
 /**
  * {@hide}
@@ -52,9 +51,8 @@ public final class SIMFileHandler extends IccFileHandler implements IccConstants
     }
 
     protected String getEFPath(int efid) {
-        if (phone.mCM.needsOldRilFeature("qcomuiccstack")) {
-            IccCard icccard = phone.getIccCard();
-            if (icccard != null && icccard.isApplicationOnIcc(IccCardApplication.AppType.APPTYPE_USIM))
+        if (mCi.needsOldRilFeature("qcomuiccstack")) {
+            if (mParentCard != null && mParentCard.isApplicationOnIcc(IccCardApplication.AppType.APPTYPE_USIM))
                 return getEFPathForUICC(efid);
         }
 

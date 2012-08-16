@@ -18,14 +18,10 @@ package android.net.wifi;
 
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pGroup;
-import android.net.wifi.p2p.WifiP2pDevice;
-import android.text.TextUtils;
 import android.net.wifi.p2p.nsd.WifiP2pServiceInfo;
-import android.net.wifi.p2p.nsd.WifiP2pServiceRequest;
+import android.text.TextUtils;
 import android.util.Log;
 
-import java.io.InputStream;
-import java.lang.Process;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,7 +64,6 @@ public class WifiNative {
      * for a graceful stop and a mild-sounding "stop" interface
      * to kill the process
      */
-    public native static boolean stopSupplicant();
     public native static boolean startSupplicant(boolean p2pSupported);
 
     /* Sends a kill signal to supplicant. To be used when we have lost connection

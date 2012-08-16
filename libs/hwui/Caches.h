@@ -99,16 +99,6 @@ class ANDROID_API Caches: public Singleton<Caches> {
 
     CacheLogger mLogger;
 
-    GLuint mCurrentBuffer;
-
-    // Used to render layers
-    TextureVertex* mRegionMesh;
-    GLuint mRegionMeshIndices;
-
-    mutable Mutex mGarbageLock;
-    Vector<Layer*> mLayerGarbage;
-    Vector<DisplayList*> mDisplayListGarbage;
-
 public:
     enum FlushMode {
         kFlushMode_Layers = 0,
