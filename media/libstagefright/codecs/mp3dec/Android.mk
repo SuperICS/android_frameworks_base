@@ -4,7 +4,7 @@ ifeq ($(TARGET_USES_QCOM_LPA),true)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := \
-        MP3Decoder.cpp \
+    MP3Decoder.cpp \
 	src/pvmp3_normalize.cpp \
  	src/pvmp3_alias_reduction.cpp \
  	src/pvmp3_crc.cpp \

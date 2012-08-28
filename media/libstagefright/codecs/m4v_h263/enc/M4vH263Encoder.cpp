@@ -134,7 +134,7 @@ static status_t ConvertOmxProfileLevel(
     *pvProfileLevel = profileLevel;
     return OK;
 }
-
+#ifndef AMLOGICPLAYER
 inline static void ConvertYUV420SemiPlanarToYUV420Planar(
         uint8_t *inyuv, uint8_t* outyuv,
         int32_t width, int32_t height) {
@@ -164,6 +164,7 @@ inline static void ConvertYUV420SemiPlanarToYUV420Planar(
         }
     }
 }
+#endif
 
 M4vH263Encoder::M4vH263Encoder(
         const sp<MediaSource>& source,

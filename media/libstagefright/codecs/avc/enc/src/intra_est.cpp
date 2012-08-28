@@ -28,7 +28,7 @@
 #define CLIP_RESULT(x)      if((uint)x > 0xFF){ \
                  x = 0xFF & (~(x>>31));}
 
-
+#ifndef NEON_OPTIMIZATION
 bool IntraDecisionABE(AVCEncObject *encvid, int min_cost, uint8 *curL, int picPitch)
 {
     AVCCommonObj *video = encvid->common;
@@ -425,7 +425,7 @@ void intrapred_luma_16x16(AVCEncObject *encvid)
 
     return ;
 }
-
+#endif
 
 /* evaluate each prediction mode of I16 */
 void find_cost_16x16(AVCEncObject *encvid, uint8 *orgY, int *min_cost)
@@ -488,7 +488,7 @@ void find_cost_16x16(AVCEncObject *encvid, uint8 *orgY, int *min_cost)
     return ;
 }
 
-
+#ifndef NEON_OPTIMIZATION
 int cost_i16(uint8 *org, int org_pitch, uint8 *pred, int min_cost)
 {
 
@@ -620,7 +620,7 @@ int cost_i16(uint8 *org, int org_pitch, uint8 *pred, int min_cost)
 
     return (cost >> 1);
 }
-
+#endif
 
 void mb_intra4x4_search(AVCEncObject *encvid, int *min_cost)
 {
@@ -1285,7 +1285,7 @@ PRED_RESULT_READY:
 
     return predIntra4x4PredMode;
 }
-
+#ifndef NEON_OPTIMIZATION
 void cost_i4(uint8 *org, int org_pitch, uint8 *pred, uint16 *cost)
 {
     int k;
@@ -1837,8 +1837,7 @@ int SATDChroma(uint8 *orgCb, uint8 *orgCr, int org_pitch, uint8 *pred, int min_c
 
     return cost;
 }
-
-
+#endif
 
 ///////////////////////////////// old code, unused
 /* find the best intra mode based on original (unencoded) frame */

@@ -15,10 +15,16 @@ LOCAL_SRC_FILES := \
     src/rate_control.cpp \
     src/residual.cpp \
     src/sad.cpp \
-    src/sad_halfpel.cpp \
     src/slice.cpp \
     src/vlc_encode.cpp
 
+ifeq ($(ARCH_ARM_HAVE_NEON),true)
+LOCAL_SRC_FILES += src/sad_neon.s src/sad_halfpel_neon.s src/motion_comp_neon.s \
+                   src/intra_est_neon.s src/block_neon.s src/motion_est_neon.s \
+                   src/sad_inline_neon.s  ColorConverter_neon.s
+else
+LOCAL_SRC_FILES += src/sad_halfpel.cpp
+endif
 
 LOCAL_MODULE := libstagefright_avcenc
 
@@ -31,5 +37,9 @@ LOCAL_C_INCLUDES := \
 LOCAL_CFLAGS := \
     -D__arm__ \
     -DOSCL_IMPORT_REF= -DOSCL_UNUSED_ARG= -DOSCL_EXPORT_REF=
+
+ifeq ($(ARCH_ARM_HAVE_NEON),true)
+LOCAL_CFLAGS += -DNEON_OPTIMIZATION
+endif
 
 include $(BUILD_STATIC_LIBRARY)
