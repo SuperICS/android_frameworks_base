@@ -464,6 +464,8 @@ private:
         virtual void        onFirstRef();
         AudioTrack& mReceiver;
         Mutex       mLock;
+        Mutex       mWaitLock;
+        Condition   mCv;
     };
 
             bool processAudioBuffer(const sp<AudioTrackThread>& thread);

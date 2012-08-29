@@ -608,8 +608,12 @@ status_t ATSParser::Stream::parsePES(ABitReader *br) {
 
         return ERROR_MALFORMED;
     }
-
+#ifdef AMLOGICPLAYER
+    if(packet_startcode_prefix!=0x000001)
+    return ERROR_MALFORMED;
+#else
     CHECK_EQ(packet_startcode_prefix, 0x000001u);
+#endif
 
     unsigned stream_id = br->getBits(8);
     LOGV("stream_id = 0x%02x", stream_id);

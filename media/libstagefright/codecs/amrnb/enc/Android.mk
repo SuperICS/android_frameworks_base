@@ -71,6 +71,10 @@ LOCAL_C_INCLUDES := \
 LOCAL_CFLAGS := \
         -DOSCL_UNUSED_ARG=
 
+ifeq ($(BOARD_USES_AMLOGICPLAYER),true)
+LOCAL_CFLAGS += -DAMLOGICPLAYER
+endif
+
 LOCAL_MODULE := libstagefright_amrnbenc
 
 include $(BUILD_STATIC_LIBRARY)

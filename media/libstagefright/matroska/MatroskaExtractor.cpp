@@ -41,7 +41,12 @@ struct DataSourceReader : public mkvparser::IMkvReader {
     }
 
     virtual int Read(long long position, long length, unsigned char* buffer) {
+#ifdef AMLOGICPLAYER
+        if(position<0)
+            return -1;
+#else
         CHECK(position >= 0);
+#endif
         CHECK(length >= 0);
 
         if (length == 0) {

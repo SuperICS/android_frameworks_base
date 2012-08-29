@@ -145,7 +145,27 @@ enum media_parameter_keys {
     // audio track, or zero for error (e.g. no audio track) or unknown.
     KEY_PARAMETER_AUDIO_CHANNEL_COUNT = 1200,                   // get only
 
+#ifdef AMLOGICPLAYER
+	KEY_PARAMETER_AML_VIDEO_POSITION_INFO=2000,
+
+	KEY_PARAMETER_AML_PLAYER_TYPE_STR=2001,
+	KEY_PARAMETER_AML_PLAYER_VIDEO_OUT_TYPE=2002,
+	
+	KEY_PARAMETER_AML_PLAYER_SWITCH_SOUND_TRACK=2003,
+	KEY_PARAMETER_AML_PLAYER_SWITCH_AUDIO_TRACK=2004,
+	KEY_PARAMETER_AML_PLAYER_TRICKPLAY_FORWARD=2005,
+	KEY_PARAMETER_AML_PLAYER_TRICKPLAY_BACKWARD=2006,
+	KEY_PARAMETER_AML_PLAYER_FORCE_HARD_DECODE=2007,
+	KEY_PARAMETER_AML_PLAYER_FORCE_SOFT_DECODE=2008,
+#endif	
 };
+
+#ifdef AMLOGICPLAYER
+enum video_out_type {
+	VIDEO_OUT_SOFT_RENDER=0,
+	VIDEO_OUT_HARDWARE=1,
+};
+#endif
 
 // ----------------------------------------------------------------------------
 // ref-counted object for callbacks

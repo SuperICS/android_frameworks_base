@@ -104,6 +104,10 @@ endif
 endif
 endif
 
+ifeq ($(BOARD_USES_AMLOGICPLAYER),true)
+LOCAL_CFLAGS += -DAMLOGICPLAYER
+endif
+
 LOCAL_C_INCLUDES+= \
 	$(JNI_H_INCLUDE) \
         $(TOP)/frameworks/base/include/media/stagefright/openmax \

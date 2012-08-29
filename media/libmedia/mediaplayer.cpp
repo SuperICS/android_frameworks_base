@@ -435,6 +435,20 @@ status_t MediaPlayer::seekTo_l(int msec)
             return NO_ERROR;
         }
     }
+#ifdef AMLOGICPLAYER
+    else if (mCurrentState == MEDIA_PLAYER_STATE_ERROR) {
+        // allow seek when player has errors.
+        if ( msec < 0 ) {
+            LOGW("Attempt to seek to invalid position: %d", msec);
+            msec = 0;
+        } else if ((mDuration > 0) && (msec > mDuration)) {
+            LOGW("Attempt to seek to past end of file: request = %d, EOF = %d", msec, mDuration);
+            msec = mDuration;
+        }
+        mCurrentPosition = msec;
+        return NO_ERROR;
+    }
+#endif    
     LOGE("Attempt to perform seekTo in wrong state: mPlayer=%p, mCurrentState=%u", mPlayer.get(), mCurrentState);
     return INVALID_OPERATION;
 }

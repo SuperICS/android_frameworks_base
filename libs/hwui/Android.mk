@@ -48,5 +48,9 @@ ifeq ($(USE_OPENGL_RENDERER),true)
 	
 	include $(BUILD_SHARED_LIBRARY)
 
+ifeq ($(BOARD_USES_AMLOGICPLAYER),true)
+	LOCAL_CFLAGS += -DAMLOGICPLAYER
+endif
+
     include $(call all-makefiles-under,$(LOCAL_PATH))
 endif

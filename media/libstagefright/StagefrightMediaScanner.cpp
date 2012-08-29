@@ -41,7 +41,11 @@ static bool FileHasAcceptableExtension(const char *extension) {
 #ifdef QCOM_HARDWARE
         ".avi"
 #else
-        ".qcp"
+	#ifdef AMLOGICPLAYER
+		 ".mpeg", ".avi"
+	#else
+		".qcp"
+	#endif
 #endif
     };
     static const size_t kNumValidExtensions =
