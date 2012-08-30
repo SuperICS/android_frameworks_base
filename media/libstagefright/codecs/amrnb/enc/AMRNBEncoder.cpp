@@ -96,10 +96,17 @@ status_t AMRNBEncoder::start(MetaData *params) {
     int32_t bitrate;
     if (params && params->findInt32(kKeyBitRate, &bitrate)) {
         mMode = PickModeFromBitrate(bitrate);
+#ifdef AMLOGICPLAYER
+    } else if (mMeta->findInt32(kKeyBitRate, &bitrate)) {
+        mMode = PickModeFromBitrate(bitrate);
+    } else {
+        mMode = MR122;
+    }
+#else
     } else {
         mMode = MR475;
     }
-
+#endif
     return OK;
 }
 

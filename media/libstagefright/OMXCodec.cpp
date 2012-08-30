@@ -3931,7 +3931,12 @@ bool OMXCodec::drainInputBuffer(BufferInfo *info) {
             memcpy((uint8_t *)info->mData + 4,
                    specific->mData, specific->mSize);
         } else {
+#ifdef AMLOGICPLAYER
+            if(!(info->mSize >= specific->mSize))
+			return false; 
+#else
             CHECK(info->mSize >= specific->mSize);
+#endif
             memcpy(info->mData, specific->mData, specific->mSize);
         }
 

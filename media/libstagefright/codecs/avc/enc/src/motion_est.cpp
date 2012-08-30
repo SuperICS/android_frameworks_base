@@ -183,7 +183,7 @@ void CleanMotionSearchModule(AVCHandle *avcHandle)
     return ;
 }
 
-
+#ifndef NEON_OPTIMIZATION
 bool IntraDecisionABE(int *min_cost, uint8 *cur, int pitch, bool ave)
 {
     int j;
@@ -231,6 +231,7 @@ bool IntraDecisionABE(int *min_cost, uint8 *cur, int pitch, bool ave)
 
     return intra;
 }
+#endif
 
 /******* main function for macroblock prediction for the entire frame ***/
 /* if turns out to be IDR frame, set video->nal_unit_type to AVC_NALTYPE_IDR */
@@ -477,7 +478,7 @@ void AVCMotionEstimation(AVCEncObject *encvid)
     Date:       09/16/2000
     Purpose:    Pad edge of a Vop
 =====================================================================*/
-
+#ifndef NEON_OPTIMIZATION
 void  AVCPaddingEdge(AVCPictureData *refPic)
 {
     uint8 *src, *dst;
@@ -561,7 +562,7 @@ void  AVCPaddingEdge(AVCPictureData *refPic)
 
     return ;
 }
-
+#endif
 /*===========================================================================
     Function:   AVCRasterIntraUpdate
     Date:       2/26/01
@@ -802,7 +803,7 @@ void    HTFMPrepareCurMB_AVC(AVCEncObject *encvid, HTFM_Stat *htfm_stat, uint8 *
 
 
 #endif // HTFM
-
+#ifndef NEON_OPTIMIZATION
 void    AVCPrepareCurMB(AVCEncObject *encvid, uint8 *cur, int pitch)
 {
     void* tmp = (void*)(encvid->currYMB);
@@ -821,7 +822,7 @@ void    AVCPrepareCurMB(AVCEncObject *encvid, uint8 *cur, int pitch)
 
     return ;
 }
-
+#endif
 #ifdef FIXED_INTERPRED_MODE
 
 /* due to the complexity of the predicted motion vector, we may not decide to skip

@@ -16,7 +16,7 @@
  * -------------------------------------------------------------------
  */
 #include "avcenc_lib.h"
-
+#ifndef NEON_OPTIMIZATION
 /* subtract with the prediction and do transformation */
 void trans(uint8 *cur, int pitch, uint8 *predBlock, int16 *dataBlock)
 {
@@ -1108,7 +1108,7 @@ void dct_chroma(AVCEncObject *encvid, uint8 *curC, uint8 *orgC, int cr)
 
     return ;
 }
-
+#endif
 
 /* only DC transform */
 int TransQuantIntra16DC(AVCEncObject *encvid)

@@ -45,7 +45,13 @@ enum player_type {
     // Test players are available only in the 'test' and 'eng' builds.
     // The shared library with the test player is passed passed as an
     // argument to the 'test:' url in the setDataSource call.
-    TEST_PLAYER = 5,
+#ifdef AMLOGICPLAYER
+    AMLOGIC_PLAYER = 5,
+    AMSUPER_PLAYER = 6,
+	TEST_PLAYER = 7,
+#else
+	TEST_PLAYER = 5,
+#endif
 };
 
 
@@ -170,13 +176,19 @@ public:
                                     Parcel *records) {
         return INVALID_OPERATION;
     };
-
+#ifdef AMLOGICPLAYER
+   virtual void        setNotifyCallback(
+            void* cookie, notify_callback_f notifyFunc) {
+        Mutex::Autolock autoLock(mNotifyLock);
+        mCookie = cookie; mNotify = notifyFunc;
+    }
+#else
     void        setNotifyCallback(
             void* cookie, notify_callback_f notifyFunc) {
         Mutex::Autolock autoLock(mNotifyLock);
         mCookie = cookie; mNotify = notifyFunc;
     }
-
+#endif
     void        sendEvent(int msg, int ext1=0, int ext2=0,
                           const Parcel *obj=NULL) {
         Mutex::Autolock autoLock(mNotifyLock);

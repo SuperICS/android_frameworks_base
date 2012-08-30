@@ -28,7 +28,9 @@ ABitReader::ABitReader(const uint8_t *data, size_t size)
 }
 
 void ABitReader::fillReservoir() {
+#ifndef AMLOGICPLAYER
     CHECK_GT(mSize, 0u);
+#endif
 
     mReservoir = 0;
     size_t i;

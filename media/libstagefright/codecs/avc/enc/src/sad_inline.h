@@ -23,6 +23,7 @@ extern "C"
 {
 #endif
 
+#ifndef NEON_OPTIMIZATION
 #if defined(__GNUC__) && defined(__arm__) /* ARM GNU COMPILER  */
 
     __inline int32 SUB_SAD(int32 sad, int32 tmp, int32 tmp2)
@@ -478,6 +479,9 @@ SadMBOffset1:
     }
 
 
+#endif
+#else
+extern int32 simd_sad_mb(uint8 *ref, uint8 *blk, int dmin, int lx);
 #endif
 
 #ifdef __cplusplus

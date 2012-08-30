@@ -38,6 +38,9 @@
 #include "MidiMetadataRetriever.h"
 #include "MetadataRetrieverClient.h"
 #include "StagefrightMetadataRetriever.h"
+#ifdef AMLOGICPLAYER
+#include "amlogic/AmlPlayerMetadataRetriever.h"
+#endif
 
 namespace android {
 
@@ -86,6 +89,21 @@ static sp<MediaMetadataRetrieverBase> createRetriever(player_type playerType)
 {
     sp<MediaMetadataRetrieverBase> p;
     switch (playerType) {
+#ifdef AMLOGICPLAYER
+	 case AMSUPER_PLAYER:
+	 case AMLOGIC_PLAYER:
+	 {
+	     char value[PROPERTY_VALUE_MAX];
+			
+	     property_get("media.amplayer.thumbnail",value,"false");
+			
+	     if((!strcmp(value, "1") || !strcmp(value, "true")))
+	         p = new AmlPlayerMetadataRetriever;
+	     else
+	         p = new StagefrightMetadataRetriever;;
+	     break;
+	 }
+#endif
         case STAGEFRIGHT_PLAYER:
         {
             p = new StagefrightMetadataRetriever;
@@ -151,6 +169,7 @@ status_t MetadataRetrieverClient::setDataSource(int fd, int64_t offset, int64_t 
     }
 
     player_type playerType = getPlayerType(fd, offset, length);
+
     LOGV("player type = %d", playerType);
     sp<MediaMetadataRetrieverBase> p = createRetriever(playerType);
     if (p == NULL) {

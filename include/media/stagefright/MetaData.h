@@ -155,6 +155,8 @@ enum {
     kKeyUseArbitraryMode  = 'ArbM'  //bool (int32_t)
 #endif
 
+kKeyAudioProfile      = 'aprf',  // int32_t
+
 };
 
 enum {

@@ -74,6 +74,7 @@ int AVCSAD_Macroblock_C(uint8 *ref, uint8 *blk, int dmin_lx, void *extra_info)
     return x10;
 }
 
+#ifndef NEON_OPTIMIZATION
 #ifdef HTFM   /* HTFM with uniform subsampling implementation 2/28/01 */
 /*===============================================================
     Function:   AVCAVCSAD_MB_HTFM_Collect and AVCSAD_MB_HTFM
@@ -285,6 +286,4 @@ int AVCSAD_MB_HTFM(uint8 *ref, uint8 *blk, int dmin_lx, void *extra_info)
     return sad;
 }
 #endif /* HTFM */
-
-
-
+#endif

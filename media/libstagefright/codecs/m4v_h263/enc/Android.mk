@@ -6,10 +6,8 @@ LOCAL_SRC_FILES := \
     src/bitstream_io.cpp \
     src/combined_encode.cpp \
     src/datapart_encode.cpp \
-    src/dct.cpp \
     src/findhalfpel.cpp \
     src/fastcodemb.cpp \
-    src/fastidct.cpp \
     src/fastquant.cpp \
     src/me_utils.cpp \
     src/mp4enc_api.cpp \
@@ -17,16 +15,29 @@ LOCAL_SRC_FILES := \
     src/motion_est.cpp \
     src/motion_comp.cpp \
     src/sad.cpp \
-    src/sad_halfpel.cpp \
     src/vlc_encode.cpp \
     src/vop.cpp
 
+
+ifeq ($(ARCH_ARM_HAVE_NEON),true)
+LOCAL_SRC_FILES += src/dct_neon.s src/sad_neon.s src/sad_halfpel_neon.s src/fastidct_neon.s src/dct4sad.c ColorConverter_neon.s
+else
+LOCAL_SRC_FILES += src/dct.cpp src/fastidct.cpp src/sad_halfpel.cpp
+endif
 
 LOCAL_MODULE := libstagefright_m4vh263enc
 
 LOCAL_CFLAGS := \
     -DBX_RC \
     -DOSCL_IMPORT_REF= -DOSCL_UNUSED_ARG= -DOSCL_EXPORT_REF=
+
+ifeq ($(BOARD_USES_AMLOGICPLAYER),true)
+LOCAL_CFLAGS += -DAMLOGICPLAYER
+endif
+
+ifeq ($(ARCH_ARM_HAVE_NEON),true)
+LOCAL_CFLAGS += -DNEON_OPTIMIZATION
+endif
 
 LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/src \

@@ -91,6 +91,17 @@ class Metadata {
     static const Type kVideoWidth            = 29; // Integer
     static const Type kNumTracks             = 30; // Integer
     static const Type kDrmCrippled           = 31; // Boolean
+#ifdef AMLOGICPLAYER
+    static const int kAmlTypeBase = 8192;
+    static const Type kAudioTrackNum = kAmlTypeBase+1;
+    static const Type kVideoTrackNum = kAmlTypeBase+2;
+    static const Type kInnerSubtitleNum = kAmlTypeBase+3;
+    static const Type kAudioCodecAllInfo = kAmlTypeBase+4;
+    static const Type kVideoCodecAllInfo = kAmlTypeBase+5;
+    static const Type kInnerSubtitleAllInfo = kAmlTypeBase +6;
+    static const Type kStreamType = kAmlTypeBase+7;
+	static const Type kPlayerType = kAmlTypeBase+8;
+#endif    
 
     // @param p[inout] The parcel to append the metadata records
     // to. The global metadata header should have been set already.

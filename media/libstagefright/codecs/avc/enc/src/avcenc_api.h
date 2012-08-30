@@ -314,8 +314,9 @@ extern "C"
     OSCL_IMPORT_REF AVCEnc_Status PVAVCEncUpdateIDRInterval(AVCHandle *avcHandle, int IDRInterval);
     OSCL_IMPORT_REF AVCEnc_Status PVAVCEncIDRRequest(AVCHandle *avcHandle);
     OSCL_IMPORT_REF AVCEnc_Status PVAVCEncUpdateIMBRefresh(AVCHandle *avcHandle, int numMB);
-
-
+#ifdef AMLOGICPLAYER
+    OSCL_IMPORT_REF void ConvertYUV420SemiPlanarToYUV420Planar(uint8_t *inyuv, uint8_t* outyuv,int32_t width, int32_t height);
+#endif
 #ifdef __cplusplus
 }
 #endif

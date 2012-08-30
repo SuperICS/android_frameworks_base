@@ -1283,6 +1283,14 @@ void OpenGLRenderer::setupDrawAALine(GLvoid* vertices, GLvoid* widthCoords,
     int inverseBoundaryWidthSlot = mCaches.currentProgram->getUniform("inverseBoundaryWidth");
     glUniform1f(inverseBoundaryWidthSlot, (1 / boundaryWidthProportion));
 }
+#ifdef AMLOGICPLAYER
+void OpenGLRenderer::finishDrawAALine() {
+    int widthSlot = mCaches.currentProgram->getAttrib("vtxWidth");
+    glDisableVertexAttribArray(widthSlot);
+    int lengthSlot = mCaches.currentProgram->getAttrib("vtxLength");
+    glDisableVertexAttribArray(lengthSlot);
+}
+#endif
 
 void OpenGLRenderer::finishDrawTexture() {
     glDisableVertexAttribArray(mTexCoordsSlot);
@@ -1666,6 +1674,9 @@ void OpenGLRenderer::drawAARect(float left, float top, float right, float bottom
         dirtyLayer(left, top, right, bottom, *mSnapshot->transform);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
+#ifdef AMLOGICPLAYER
+    finishDrawAALine();
+#endif
 }
 
 /**
@@ -1913,6 +1924,11 @@ void OpenGLRenderer::drawLines(float* points, int count, SkPaint* paint) {
     if (generatedVerticesCount > 0) {
        glDrawArrays(GL_TRIANGLE_STRIP, 0, generatedVerticesCount);
     }
+#ifdef AMLOGICPLAYER
+    if (isAA) {
+        finishDrawAALine();
+    }
+#endif
 }
 
 void OpenGLRenderer::drawPoints(float* points, int count, SkPaint* paint) {

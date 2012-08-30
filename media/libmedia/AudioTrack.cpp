@@ -440,6 +440,25 @@ status_t AudioTrack::initCheck() const
 
 uint32_t AudioTrack::latency() const
 {
+#ifdef AMLOGICPLAYER
+    if ((mChannelMask & ~AUDIO_CHANNEL_OUT_ALL) == 0) {
+        uint32_t latency = 1000;
+
+        if (AudioSystem::getOutputLatency(&latency, mStreamType) == NO_ERROR) {
+            LOGV("latency = %d", latency);
+            if (mCblk) {
+                int frames = mCblk->framesReady();
+
+                LOGV("mCblk->framesReady = %d", frames);
+                latency += frames * 1000 / mCblk->sampleRate;
+            }
+
+            return latency;
+        }
+            LOGV("latency getOutputLatency error");
+    }
+#endif
+
     return mLatency;
 }
 
@@ -1125,8 +1144,11 @@ create_new_track:
 
     uint32_t u = cblk->user;
     uint32_t bufferEnd = cblk->userBase + cblk->frameCount;
-
+#ifdef AMLOGICPLAYER
+    if (u + framesReq > bufferEnd && u < bufferEnd) {
+#else
     if (u + framesReq > bufferEnd) {
+#endif
         framesReq = bufferEnd - u;
     }
 
@@ -1315,7 +1337,11 @@ bool AudioTrack::processAudioBuffer(const sp<AudioTrackThread>& thread)
             // Keep this thread going to handle timed events and
             // still try to get more data in intervals of WAIT_PERIOD_MS
             // but don't just loop and block the CPU, so wait
+#ifdef AMLOGICPLAYER
+            thread->mCv.waitRelative(thread->mWaitLock, milliseconds(WAIT_PERIOD_MS));
+#else
             usleep(WAIT_PERIOD_MS*1000);
+#endif
             break;
         }
         if (writtenSize > reqSize) writtenSize = reqSize;

@@ -106,7 +106,7 @@ static status_t ConvertOmxAvcLevelToAvcSpecLevel(
     *pvLevel = level;
     return OK;
 }
-
+#ifndef NEON_OPTIMIZATION
 inline static void ConvertYUV420SemiPlanarToYUV420Planar(
         uint8_t *inyuv, uint8_t* outyuv,
         int32_t width, int32_t height) {
@@ -136,7 +136,7 @@ inline static void ConvertYUV420SemiPlanarToYUV420Planar(
         }
     }
 }
-
+#endif
 static int32_t MallocWrapper(
         void *userData, int32_t size, int32_t attrs) {
     return reinterpret_cast<int32_t>(malloc(size));

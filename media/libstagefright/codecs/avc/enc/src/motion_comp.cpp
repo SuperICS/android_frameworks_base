@@ -186,7 +186,7 @@ void eLumaMotionComp(uint8 *ref, int picpitch, int picheight,
 
     return ;
 }
-
+#ifndef NEON_OPTIMIZATION
 void eCreateAlign(uint8 *ref, int picpitch, int y_pos,
                   uint8 *out, int blkwidth, int blkheight)
 {
@@ -779,6 +779,8 @@ void eHorzInterp3MC(uint8 *in, int inpitch, int *out, int outpitch,
 
     return ;
 }
+#endif
+
 void eVertInterp1MC(uint8 *in, int inpitch, uint8 *out, int outpitch,
                     int blkwidth, int blkheight, int dy)
 {
@@ -1082,6 +1084,7 @@ void eVertInterp1MC(uint8 *in, int inpitch, uint8 *out, int outpitch,
     return ;
 }
 
+#ifndef NEON_OPTIMIZATION
 void eVertInterp2MC(uint8 *in, int inpitch, int *out, int outpitch,
                     int blkwidth, int blkheight)
 {
@@ -1147,6 +1150,7 @@ void eVertInterp2MC(uint8 *in, int inpitch, int *out, int outpitch,
 
     return ;
 }
+#endif
 
 void eVertInterp3MC(int *in, int inpitch, uint8 *out, int outpitch,
                     int blkwidth, int blkheight, int dy)
@@ -1648,7 +1652,7 @@ void eDiagonalInterpMC(uint8 *in1, uint8 *in2, int inpitch,
 
     return ;
 }
-
+#ifndef NEON_OPTIMIZATION
 /* position G */
 void eFullPelMC(uint8 *in, int inpitch, uint8 *out, int outpitch,
                 int blkwidth, int blkheight)
@@ -1697,7 +1701,7 @@ void eFullPelMC(uint8 *in, int inpitch, uint8 *out, int outpitch,
     }
     return ;
 }
-
+#endif
 void ePadChroma(uint8 *ref, int picwidth, int picheight, int picpitch, int x_pos, int y_pos)
 {
     int pad_height;
@@ -1832,7 +1836,7 @@ void eChromaMotionComp(uint8 *ref, int picwidth, int picheight,
     return ;
 }
 
-
+#ifndef NEON_OPTIMIZATION
 /* SIMD routines, unroll the loops in vertical direction, decreasing loops (things to be done) */
 void eChromaDiagonalMC_SIMD(uint8 *pRef, int srcPitch, int dx, int dy,
                             uint8 *pOut, int predPitch, int blkwidth, int blkheight)
@@ -2154,3 +2158,4 @@ void eChromaFullMC_SIMD(uint8 *pRef, int srcPitch, int dx, int dy,
     }
     return ;
 }
+#endif
