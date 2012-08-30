@@ -1011,7 +1011,7 @@ extern "C"
     */
     AVCEnc_Status ce_RunBefore(AVCEncBitstream *stream, int run_before, int zerosLeft);
 
-#ifdef AMLOGICPLAYER
+#ifdef NEON_OPTIMIZATION
     void eCreateAlign(uint8 *ref, int picpitch, int y_pos, uint8 *out, int blkwidth, int blkheight);
     extern bool IntraDecisionABE(int *min_cost, uint8 *cur, int pitch, bool ave);
 #endif
