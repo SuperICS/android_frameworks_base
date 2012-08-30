@@ -604,6 +604,11 @@ player_type getPlayerType(int fd, int64_t offset, int64_t length)
     return getDefaultPlayerType();
 }
 
+player_type getPlayerType(const char* url)
+{
+    if (TestPlayerStub::canBeUsed(url)) {
+        return TEST_PLAYER;
+    }
 #ifndef AMLOGICPLAYER
 	if (!strncasecmp("http://", url, 7)
 	        || !strncasecmp("https://", url, 8)) {
