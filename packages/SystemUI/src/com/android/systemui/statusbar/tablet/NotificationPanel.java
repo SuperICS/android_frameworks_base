@@ -23,16 +23,13 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Slog;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
@@ -41,8 +38,6 @@ import android.widget.ScrollView;
 
 import com.android.systemui.ExpandHelper;
 import com.android.systemui.R;
-import com.android.systemui.statusbar.policy.Prefs;
-import com.android.systemui.statusbar.policy.toggles.TogglesView;
 import com.android.systemui.statusbar.policy.NotificationRowLayout;
 
 public class NotificationPanel extends RelativeLayout implements StatusBarPanel,
@@ -75,9 +70,6 @@ public class NotificationPanel extends RelativeLayout implements StatusBarPanel,
     float mContentFrameMissingTranslation;
 
     Choreographer mChoreo = new Choreographer();
-
-    TogglesView mQuickToggles;
-    boolean togglesVisible;
 
     public NotificationPanel(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -114,11 +106,6 @@ public class NotificationPanel extends RelativeLayout implements StatusBarPanel,
         mClearButton.setOnClickListener(mClearButtonListener);
 
         mShowing = false;
-
-        mQuickToggles = (TogglesView) findViewById(R.id.quick_toggles);
-        setToggleVisibility();
-
-        setContentFrameVisible(mNotificationCount > 0, false);
     }
 
     @Override
@@ -143,11 +130,6 @@ public class NotificationPanel extends RelativeLayout implements StatusBarPanel,
     }
 
     public void show(boolean show, boolean animate) {
-        setToggleVisibility();
-        if (show && !mShowing) {
-            setContentFrameVisible(mSettingsView != null || mNotificationCount > 0, false);
-        }
-
         if (animate) {
             if (mShowing != show) {
                 mShowing = show;
@@ -216,13 +198,23 @@ public class NotificationPanel extends RelativeLayout implements StatusBarPanel,
     }
 
     /*
-     * @Override protected void onLayout(boolean changed, int l, int t, int r, int b) {
-     * super.onLayout(changed, l, t, r, b); if (DEBUG) Slog.d(TAG,
-     * String.format("PANEL: onLayout: (%d, %d, %d, %d)", l, t, r, b)); }
-     * @Override public void onSizeChanged(int w, int h, int oldw, int oldh) {
-     * super.onSizeChanged(w, h, oldw, oldh); if (DEBUG) { Slog.d(TAG,
-     * String.format("PANEL: onSizeChanged: (%d -> %d, %d -> %d)", oldw, w, oldh, h)); } }
-     */
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+
+        if (DEBUG) Slog.d(TAG, String.format("PANEL: onLayout: (%d, %d, %d, %d)", l, t, r, b));
+    }
+
+    @Override
+    public void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        
+        if (DEBUG) {
+            Slog.d(TAG, String.format("PANEL: onSizeChanged: (%d -> %d, %d -> %d)",
+                        oldw, w, oldh, h));
+        }
+    }
+    */
 
     public void onClick(View v) {
         if (mSettingsButton.isEnabled() && v == mTitleArea) {
@@ -234,74 +226,10 @@ public class NotificationPanel extends RelativeLayout implements StatusBarPanel,
         mNotificationCount = n;
     }
 
-    private void setToggleVisibility() {
-        togglesVisible = Prefs.read(getContext()).getBoolean(Prefs.SHOW_TOGGLES, true);
-        mQuickToggles
-                .setVisibility(togglesVisible ? View.VISIBLE
-                        : View.GONE);
-
-        DisplayMetrics metrics = getContext().getResources().getDisplayMetrics();
-        float dp = -50f;
-        int pixels = (int) (metrics.density * dp + 0.5f);
-
-        LayoutParams lp = (LayoutParams) mContentFrame.getLayoutParams();
-        lp.bottomMargin = (!togglesVisible ? pixels : 0);
-        mContentFrame.setLayoutParams(lp);
-    }
-
-    private void adjustQuickToggles(boolean showing) {
-
-        DisplayMetrics metrics = getContext().getResources().getDisplayMetrics();
-        float dp = -50f;
-        int pixels = (int) (metrics.density * dp + 0.5f);
-
-        LayoutParams lp = (LayoutParams) mQuickToggles.getLayoutParams();
-        lp.bottomMargin = (showing ? pixels : 0);
-        mQuickToggles.setLayoutParams(lp);
-    }
-
     public void setContentFrameVisible(final boolean showing, boolean animate) {
-        setToggleVisibility();
-        if (!animate) {
-            mContentFrame.setVisibility(showing ? View.VISIBLE : View.GONE);
-            adjustQuickToggles(showing);
-            mContentFrame.setAlpha(1f);
-            // the translation will be patched up when the window is slid into place
-            return;
-        }
-
-        if (showing) {
-            mContentFrame.setVisibility(View.VISIBLE);
-            adjustQuickToggles(true);
-        }
-        AnimatorSet set = new AnimatorSet();
-        set.play(ObjectAnimator.ofFloat(
-                mContentFrame, "alpha",
-                showing ? 0f : 1f,
-                showing ? 1f : 0f))
-            .with(ObjectAnimator.ofFloat(
-                mContentParent, "translationY",
-                showing ? mContentFrameMissingTranslation : 0f,
-                showing ? 0f : mContentFrameMissingTranslation))
-              ;
-
-        set.setDuration(200);
-        set.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator _a) {
-                if (!showing) {
-                    mContentFrame.setVisibility(View.GONE);
-                    mContentFrame.setAlpha(1f);
-                    adjustQuickToggles(false);
-                }
-                updateClearButton();
-            }
-        });
-        set.start();
     }
 
     public void swapPanels() {
-        setToggleVisibility();
         final View toShow, toHide;
         if (mSettingsView == null) {
             addSettingsView();
@@ -331,7 +259,6 @@ public class NotificationPanel extends RelativeLayout implements StatusBarPanel,
                 }
                 updateClearButton();
                 updatePanelModeButtons();
-                setToggleVisibility();
             }
         });
         a.start();
@@ -502,3 +429,4 @@ public class NotificationPanel extends RelativeLayout implements StatusBarPanel,
         }
     }
 }
+

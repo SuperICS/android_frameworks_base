@@ -23,12 +23,6 @@ import static android.net.NetworkStats.SET_DEFAULT;
 import static android.net.NetworkStats.TAG_NONE;
 import static android.net.NetworkStats.UID_ALL;
 import static android.net.TrafficStats.UID_TETHERING;
-import static android.provider.Settings.Secure.NETSTATS_ENABLED;
-import static android.provider.Settings.Secure.TETHER_LEASE_TIME;
-import static com.android.server.NetworkManagementSocketTagger.PROP_QTAGUID_ENABLED;
-
-import android.content.Context;
-import android.content.pm.PackageManager;
 import static com.android.server.NetworkManagementService.NetdResponseCode.InterfaceGetCfgResult;
 import static com.android.server.NetworkManagementService.NetdResponseCode.InterfaceListResult;
 import static com.android.server.NetworkManagementService.NetdResponseCode.InterfaceRxThrottleResult;
@@ -757,10 +751,6 @@ public class NetworkManagementService extends INetworkManagementService.Stub
         final Command cmd = new Command("tether", "start");
         for (String d : dhcpRange) {
             cmd.appendArg(d);
-        }
-
-        if (leaseTime != Settings.Secure.TETHER_LEASE_TIME_DEFAULT) {
-            cmd += " " + leaseTime;
         }
 
         try {

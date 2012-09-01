@@ -209,6 +209,18 @@ public class Camera {
         public static final int CAMERA_FACING_FRONT = 1;
 
         /**
+         * The facing of the camera is the same as that of the screen.
+         * @hide
+         */
+        public static final int CAMERA_SUPPORT_MODE_ZSL = 2;
+
+        /**
+         * The facing of the camera is the same as that of the screen.
+         * @hide
+         */
+        public static final int CAMERA_SUPPORT_MODE_NONZSL = 3;
+
+        /**
          * The direction that the camera faces. It should be
          * CAMERA_FACING_BACK or CAMERA_FACING_FRONT.
          */
@@ -1630,7 +1642,6 @@ public class Camera {
         private static final String KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO =
                                             "preferred-preview-size-for-video";
         private static final String KEY_MAX_NUM_DETECTED_FACES_HW = "max-num-detected-faces-hw";
-        private static final String KEY_MAX_NUM_DETECTED_FACES_SW = "max-num-detected-faces-sw";
         private static final String KEY_RECORDING_HINT = "recording-hint";
         private static final String KEY_VIDEO_SNAPSHOT_SUPPORTED = "video-snapshot-supported";
         private static final String KEY_VIDEO_STABILIZATION = "video-stabilization";

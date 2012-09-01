@@ -559,10 +559,6 @@ public class PowerManager
         }
     }
 
-    private PowerManager()
-    {
-    }
-
     /**
      * {@hide}
      */

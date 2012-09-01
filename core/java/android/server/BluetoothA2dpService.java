@@ -468,8 +468,8 @@ public class BluetoothA2dpService extends IBluetoothA2dp.Stub {
         Resources res = mContext.getResources();
         try {
             /* AVRCP 1.3 Intents */
-            metachanged_intents = Arrays.asList(res.getStringArray(R.array.avrcp_meta_changed_intents));
-            playstatechanged_intents = Arrays.asList(res.getStringArray(R.array.avrcp_playstate_changed_intents));
+//            metachanged_intents = Arrays.asList(res.getStringArray(R.array.avrcp_meta_changed_intents));
+//            playstatechanged_intents = Arrays.asList(res.getStringArray(R.array.avrcp_playstate_changed_intents));
 
             for (String intent: metachanged_intents) {
                 mIntentFilter.addAction(intent);
@@ -485,13 +485,13 @@ public class BluetoothA2dpService extends IBluetoothA2dp.Stub {
 
         try {
             /* AVRCP 1.3 special extra keys */
-            has_special_extra_keys = Arrays.asList(res.getStringArray(R.array.avrcp_special_extra_keys));
+//            has_special_extra_keys = Arrays.asList(res.getStringArray(R.array.avrcp_special_extra_keys));
 
             special_extra_keys = new HashMap<String, String>();
 
             String key_name;
             int resID;
-
+/*
             List<String> overridable_extra_keys = Arrays.asList(res.getStringArray(R.array.avrcp_overridable_extra_keys));
 
             for (String intent: has_special_extra_keys) {
@@ -512,6 +512,7 @@ public class BluetoothA2dpService extends IBluetoothA2dp.Stub {
                     }
                 }
             }
+            */
         }
         catch (Exception e) {
             Log.e(TAG, "Error getting AVRCP 1.3 special extra keys from the resource file.");

@@ -129,4 +129,34 @@ public class BridgePowerManager implements IPowerManager {
     public void userActivityWithForce(long arg0, boolean arg1, boolean arg2) throws RemoteException {
         // pass for now.
     }
+
+    @Override
+    public int getLightSensorValue() throws RemoteException {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public int getRawLightSensorValue() throws RemoteException {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public int getLightSensorScreenBrightness() throws RemoteException {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public int getLightSensorButtonBrightness() throws RemoteException {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public int getLightSensorKeyboardBrightness() throws RemoteException {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 }

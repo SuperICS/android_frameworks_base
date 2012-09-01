@@ -1344,4 +1344,6 @@
     <string name="default_audio_route_category_name" msgid="3722811174003886946">"시스템"</string>
     <string name="bluetooth_a2dp_audio_route_name" msgid="8575624030406771015">"블루투스 오디오"</string>
     <string name="media_route_chooser_grouping_done" msgid="7966438307723317169">"완료"</string>
+    <string name="choose_account_text" msgid="6891230675141555481">"어떤 계정을 사용하시겠습니까?"</string>
+
 </resources>

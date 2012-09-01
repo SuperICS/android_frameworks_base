@@ -23,23 +23,22 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.hardware.input.InputManager;
+import android.os.Binder;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.IVibratorService;
 import android.os.PowerManager;
 import android.os.Process;
 import android.os.RemoteException;
-import android.os.IBinder;
-import android.os.Binder;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import android.os.WorkSource;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
-import android.util.Slog;
 import android.view.InputDevice;
 
-import java.util.Calendar;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -178,29 +177,6 @@ public class VibratorService extends IVibratorService.Stub
         return false;
     }
 
-    private boolean inQuietHours() {
-        boolean quietHoursEnabled = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.QUIET_HOURS_ENABLED, 0) != 0;
-        int quietHoursStart = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.QUIET_HOURS_START, 0);
-        int quietHoursEnd = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.QUIET_HOURS_END, 0);
-        boolean quietHoursHaptic = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.QUIET_HOURS_HAPTIC, 0) != 0;
-        if (quietHoursEnabled && quietHoursHaptic && (quietHoursStart != quietHoursEnd)) {
-            // Get the date in "quiet hours" format.
-            Calendar calendar = Calendar.getInstance();
-            int minutes = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
-            if (quietHoursEnd < quietHoursStart) {
-                // Starts at night, ends in the morning.
-                return (minutes > quietHoursStart) || (minutes < quietHoursEnd);
-            } else {
-                return (minutes > quietHoursStart) && (minutes < quietHoursEnd);
-            }
-        }
-        return false;
-    }
-
     public void vibrate(long milliseconds, IBinder token) {
         if (mContext.checkCallingOrSelfPermission(android.Manifest.permission.VIBRATE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -248,15 +224,6 @@ public class VibratorService extends IVibratorService.Stub
         // so wakelock calls will succeed
         long identity = Binder.clearCallingIdentity();
         try {
-            if (false) {
-                String s = "";
-                int N = pattern.length;
-                for (int i=0; i<N; i++) {
-                    s += " " + pattern[i];
-                }
-                Slog.i(TAG, "vibrating with pattern: " + s);
-            }
-
             // we're running in the server so we can't fail
             if (pattern == null || pattern.length == 0
                     || isAll0(pattern)

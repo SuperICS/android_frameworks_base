@@ -28,52 +28,43 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.ContentObserver;
-import android.net.wifi.IWifiManager;
-import android.net.wifi.ScanResult;
-import android.net.wifi.SupplicantState;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiStateMachine;
-import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiWatchdogStateMachine;
-import android.net.wifi.WifiConfiguration.KeyMgmt;
-import android.net.wifi.WpsInfo;
-import android.net.wifi.WpsResult;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.NetworkInfo;
-import android.net.NetworkInfo.State;
 import android.net.NetworkInfo.DetailedState;
+import android.net.NetworkInfo.State;
 import android.net.TrafficStats;
+import android.net.wifi.IWifiManager;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiStateMachine;
+import android.net.wifi.WifiWatchdogStateMachine;
 import android.os.Binder;
 import android.os.Handler;
-import android.os.Messenger;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.INetworkManagementService;
 import android.os.Message;
+import android.os.Messenger;
 import android.os.RemoteException;
-import android.os.ServiceManager;
 import android.os.SystemProperties;
 import android.os.WorkSource;
 import android.provider.Settings;
-import android.text.TextUtils;
 import android.util.Slog;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.io.FileDescriptor;
-import java.io.PrintWriter;
 
 import com.android.internal.app.IBatteryStats;
 import com.android.internal.telephony.TelephonyIntents;
 import com.android.internal.util.AsyncChannel;
 import com.android.server.am.BatteryStatsService;
-import com.android.internal.R;
+
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * WifiService handles remote WiFi operation requests by implementing
@@ -116,8 +107,6 @@ public class WifiService extends IWifiManager.Stub {
 
     private final List<Multicaster> mMulticasters =
             new ArrayList<Multicaster>();
-    private int mMulticastEnabled;
-    private int mMulticastDisabled;
 
     private final IBatteryStats mBatteryStats;
 
@@ -493,11 +482,12 @@ public class WifiService extends IWifiManager.Stub {
                 persistWifiState(WIFI_ENABLED);
             }
         } else {
-            if (airplane && mPersistWifiState.get() != WIFI_ENABLED_AIRPLANE_OVERRIDE) {
+            if (airplaneEnabled && mPersistWifiState.get() != WIFI_ENABLED_AIRPLANE_OVERRIDE) {
                 // In this state, Wi-Fi will be re-enabled after airplane mode is off
                 mPersistWifiState.set(WIFI_DISABLED_AIRPLANE_ON);
             } else {
                 mPersistWifiState.set(WIFI_DISABLED);
+            }
         }
     }
 
@@ -801,7 +791,6 @@ public class WifiService extends IWifiManager.Stub {
      * TODO: deprecate this
      */
     public boolean saveConfiguration() {
-        boolean result = true;
         enforceChangePermission();
         if (mWifiStateMachineChannel != null) {
             return mWifiStateMachine.syncSaveConfig(mWifiStateMachineChannel);
@@ -1524,7 +1513,6 @@ public class WifiService extends IWifiManager.Stub {
         enforceMulticastChangePermission();
 
         synchronized (mMulticasters) {
-            mMulticastEnabled++;
             mMulticasters.add(new Multicaster(tag, binder));
             // Note that we could call stopFilteringMulticastV4Packets only when
             // our new size == 1 (first call), but this function won't
@@ -1548,7 +1536,6 @@ public class WifiService extends IWifiManager.Stub {
 
         int uid = Binder.getCallingUid();
         synchronized (mMulticasters) {
-            mMulticastDisabled++;
             int size = mMulticasters.size();
             for (int i = size - 1; i >= 0; i--) {
                 Multicaster m = mMulticasters.get(i);
@@ -1710,7 +1697,6 @@ public class WifiService extends IWifiManager.Stub {
         NotificationManager notificationManager = (NotificationManager) mContext
                 .getSystemService(Context.NOTIFICATION_SERVICE);
 
-        Message message;
         if (visible) {
 
             // Not enough time has passed to show the notification again

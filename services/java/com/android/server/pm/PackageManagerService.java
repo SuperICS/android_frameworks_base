@@ -1744,7 +1744,6 @@ public class PackageManagerService extends IPackageManager.Stub {
         if (!sUserManager.exists(userId)) return null;
         PackageSetting ps = mSettings.mPackages.get(packageName);
         if (ps != null) {
-            PackageParser.Package pkg = new PackageParser.Package(packageName);
             if (ps.pkg == null) {
                 ps.pkg = new PackageParser.Package(packageName);
                 ps.pkg.applicationInfo.packageName = packageName;
@@ -5199,15 +5198,13 @@ public class PackageManagerService extends IPackageManager.Stub {
                     if (intentCategory != null) {
                         intent.addCategory(intentCategory);
                     }
+                    intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
+                    if (intentCategory != null) {
+                        intent.addCategory(intentCategory);
+                    }
                     am.broadcastIntent(null, intent, null, finishedReceiver,
                             0, null, null, null, finishedReceiver != null, false, id);
                 }
-                intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
-                if (intentCategory != null) {
-                    intent.addCategory(intentCategory);
-                }
-                am.broadcastIntent(null, intent, null, finishedReceiver,
-                        0, null, null, null, finishedReceiver != null, false);
             } catch (RemoteException ex) {
             }
         }

@@ -18,7 +18,6 @@
 
 package com.android.systemui;
 
-import java.io.IOException;
 import java.util.List;
 
 import android.app.Activity;
@@ -34,9 +33,6 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.WindowManager;
-
-import com.android.systemui.R;
 
 /*
  * Torch is an LED flashlight.
@@ -59,7 +55,7 @@ public class Torch extends Activity implements SurfaceHolder.Callback {
     private WakeLock wakeLock;
 
     private static Torch torch;
-    
+
     public static final String KEY_TORCH_ON = "torch_on";
     public static final String INTENT_TORCH_ON = "com.android.systemui.INTENT_TORCH_ON";
     public static final String INTENT_TORCH_OFF = "com.android.systemui.INTENT_TORCH_OFF";
@@ -103,8 +99,8 @@ public class Torch extends Activity implements SurfaceHolder.Callback {
             return;
         }
         String flashMode = parameters.getFlashMode();
-        //Log.i(TAG, "Flash mode: " + flashMode);
-        //Log.i(TAG, "Flash modes: " + flashModes);
+        // Log.i(TAG, "Flash mode: " + flashMode);
+        // Log.i(TAG, "Flash modes: " + flashModes);
         if (!Parameters.FLASH_MODE_TORCH.equals(flashMode)) {
             // Turn on the flash
             if (flashModes.contains(Parameters.FLASH_MODE_TORCH)) {
@@ -193,62 +189,62 @@ public class Torch extends Activity implements SurfaceHolder.Callback {
         prefs = getSharedPreferences("torch", Context.MODE_WORLD_READABLE);
         Log.i(TAG, "onCreate");
     }
-    
-    private void toggleTorch(){
-    	if (prefs.getBoolean(KEY_TORCH_ON,false)) //find torch state
-    		stopTorch(); // torch is on - turn it off
-    	else
-    		startTorch(); // torch is off, turn it on
+
+    private void toggleTorch() {
+        if (prefs.getBoolean(KEY_TORCH_ON, false)) // find torch state
+            stopTorch(); // torch is on - turn it off
+        else
+            startTorch(); // torch is off, turn it on
     }
 
-    private void startTorch(){
-    	if (!startingTorch) {
-    		startingTorch = true;
-    		getCamera();
-    		startPreview();
-    		turnLightOn();
-    		SharedPreferences.Editor editor = prefs.edit();
-        	editor.putBoolean(KEY_TORCH_ON,true);
-        	editor.commit();
-        	startingTorch = false;
-    	}
+    private void startTorch() {
+        if (!startingTorch) {
+            startingTorch = true;
+            getCamera();
+            startPreview();
+            turnLightOn();
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean(KEY_TORCH_ON, true);
+            editor.commit();
+            startingTorch = false;
+        }
     }
-    
-    private void stopTorch(){
-    	if (!startingTorch) {
-    		if (mCamera != null) {
+
+    private void stopTorch() {
+        if (!startingTorch) {
+            if (mCamera != null) {
                 turnLightOff();
                 stopPreview();
                 mCamera.release();
-    		}
-    		SharedPreferences.Editor editor = prefs.edit();
-        	editor.putBoolean(KEY_TORCH_ON,false);
-        	editor.commit();
-    		this.finish();
-    	}
+            }
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean(KEY_TORCH_ON, false);
+            editor.commit();
+            this.finish();
+        }
     }
-    
-        @Override
+
+    @Override
     public void onRestart() {
         super.onRestart();
     }
 
     @Override
     public void onStart() {
-    	super.onStart();
+        super.onStart();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         String action = getIntent().getAction();
-    	if (action == INTENT_TORCH_ON) {
-    		startTorch();
-    	} else if (action == INTENT_TORCH_OFF) {
-    		stopTorch();
-    	} else { // assume we started from MAIN
-    		toggleTorch();
-    	}
+        if (action == INTENT_TORCH_ON) {
+            startTorch();
+        } else if (action == INTENT_TORCH_OFF) {
+            stopTorch();
+        } else { // assume we started from MAIN
+            toggleTorch();
+        }
     }
 
     @Override
@@ -265,22 +261,23 @@ public class Torch extends Activity implements SurfaceHolder.Callback {
     public void onDestroy() {
         super.onDestroy();
     }
-    
+
     @Override
-    public void onNewIntent(Intent intent){
-    	setIntent(intent);
+    public void onNewIntent(Intent intent) {
+        setIntent(intent);
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int I, int J, int K) {
-        moveTaskToBack(true); // once Surface is set up - we should be able to background ourselves.
+        moveTaskToBack(true); // once Surface is set up - we should be able to
+                              // background ourselves.
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         try {
             mCamera.setPreviewDisplay(holder);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -1345,9 +1345,6 @@
     <string name="sending" msgid="3245653681008218030">"Enviando..."</string>
     <string name="launchBrowserDefault" msgid="2057951947297614725">"¿Iniciar el navegador?"</string>
     <string name="app_killed_message">"Aplicación finalizada"</string>
-    <string name="toggle_navbar">Alterna barra de navegación</string>
-    <string name="notifications_off_title">Notificationes off</string>
-    <string name="notifications_off_text">Pulse aquí para activar las notificaciones de nuevo.</string>
 
     <!-- Lock screen Weather - Weather codes -->
     <string name="weather_0">Tornado</string>
@@ -1416,4 +1413,6 @@
     <string name="default_audio_route_category_name" msgid="3722811174003886946">"Sistema"</string>
     <string name="bluetooth_a2dp_audio_route_name" msgid="8575624030406771015">"Audio Bluetooth"</string>
     <string name="media_route_chooser_grouping_done" msgid="7966438307723317169">"Fin"</string>
+    <string name="choose_account_text" msgid="6891230675141555481">"¿Qué cuenta quieres usar?"</string>
+
 </resources>

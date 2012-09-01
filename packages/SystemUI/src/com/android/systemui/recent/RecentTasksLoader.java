@@ -30,9 +30,6 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Process;
-import android.os.SystemClock;
-import android.provider.Settings;
-import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.android.systemui.R;
@@ -84,20 +81,11 @@ public class RecentTasksLoader {
         mDefaultIconBackground = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888);
 
         // Render the default thumbnail background
-        int width = (int) res.getDimensionPixelSize(com.android.internal.R.dimen.thumbnail_width);
-        int height = (int) res.getDimensionPixelSize(com.android.internal.R.dimen.thumbnail_height);
-        int color;
-
-        if (Settings.System.getInt(mContext.getContentResolver(),
-            Settings.System.RECENT_APP_SWITCHER,0) == 2) {
-            color = res.getColor(R.drawable.status_bar_recents_app_thumbnail_background_sense4);
-        }
-        else {
-            color = res.getColor(R.drawable.status_bar_recents_app_thumbnail_background);
-        }
-
-        if (DEBUG) Log.v(TAG, "default thumbnail background: width="
-                        + width + ", height=" + height);
+        int thumbnailWidth =
+                (int) res.getDimensionPixelSize(com.android.internal.R.dimen.thumbnail_width);
+        int thumbnailHeight =
+                (int) res.getDimensionPixelSize(com.android.internal.R.dimen.thumbnail_height);
+        int color = res.getColor(R.drawable.status_bar_recents_app_thumbnail_background);
 
         mDefaultThumbnailBackground =
                 Bitmap.createBitmap(thumbnailWidth, thumbnailHeight, Bitmap.Config.ARGB_8888);

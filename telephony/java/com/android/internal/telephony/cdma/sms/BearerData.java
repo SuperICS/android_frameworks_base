@@ -937,8 +937,7 @@ public final class BearerData {
             bData.messageType = inStream.read(4);
             // Some Samsung CDMAphones parses messageId differently than other devices
             // fix it here so that incoming sms works correctly
-            boolean hasSamsungCDMAAlternateMessageIDEncoding = Resources.getSystem()
-                    .getBoolean(com.android.internal.R.bool.config_smsSamsungCdmaAlternateMessageIDEncoding);
+            boolean hasSamsungCDMAAlternateMessageIDEncoding = false;
             if (hasSamsungCDMAAlternateMessageIDEncoding) {
                 inStream.skip(4);
                 bData.messageId = inStream.read(8) << 8;

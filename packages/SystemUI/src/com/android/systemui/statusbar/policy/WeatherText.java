@@ -1,4 +1,3 @@
-
 package com.android.systemui.statusbar.policy;
 
 import android.content.BroadcastReceiver;
@@ -10,6 +9,7 @@ import android.database.ContentObserver;
 import android.os.Handler;
 import android.provider.Settings;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -25,24 +25,22 @@ public class WeatherText extends TextView {
     public static final String EXTRA_WIND = "wind";
     public static final String EXTRA_LOW = "todays_low";
     public static final String EXTRA_HIGH = "todays_high";
-
-    private static boolean showLocation = false;
+    
+    private Context mContext;
+    private boolean mShowLocation;
 
     BroadcastReceiver weatherReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String wText = (showLocation) ? (intent.getCharSequenceExtra(EXTRA_CITY) + ", "
-                    + intent.getCharSequenceExtra(EXTRA_TEMP) + ", "
-                    + intent.getCharSequenceExtra(EXTRA_CONDITION)) : (intent
-                    .getCharSequenceExtra(EXTRA_TEMP) + ", "
-                    + intent.getCharSequenceExtra(EXTRA_CONDITION));
-            setText(wText);
+            updateWeather(intent);
         }
     };
 
     public WeatherText(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setText("");
+        mContext = context;
+        ContentResolver resolver = mContext.getContentResolver();
+        SettingsObserver so = new SettingsObserver(getHandler());
     }
 
     @Override
@@ -51,9 +49,7 @@ public class WeatherText extends TextView {
         if (!mAttached) {
             mAttached = true;
             IntentFilter filter = new IntentFilter("com.aokp.romcontrol.INTENT_WEATHER_UPDATE");
-            getContext().registerReceiver(weatherReceiver, filter, null, getHandler());
-
-            SettingsObserver so = new SettingsObserver(getHandler());
+            mContext.registerReceiver(weatherReceiver, filter, null, getHandler());
         }
     }
 
@@ -61,9 +57,16 @@ public class WeatherText extends TextView {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         if (mAttached) {
-            getContext().unregisterReceiver(weatherReceiver);
+            mContext.unregisterReceiver(weatherReceiver);
             mAttached = false;
         }
+    }
+
+    public void updateWeather(Intent intent) {
+        String wText = (mShowLocation) ? (intent.getCharSequenceExtra(EXTRA_CITY) + ", " + intent.getCharSequenceExtra(EXTRA_TEMP) + ", "
+                + intent.getCharSequenceExtra(EXTRA_CONDITION)) : (intent.getCharSequenceExtra(EXTRA_TEMP) + ", "
+                        + intent.getCharSequenceExtra(EXTRA_CONDITION));
+        this.setText(wText);
     }
 
     class SettingsObserver extends ContentObserver {
@@ -81,7 +84,7 @@ public class WeatherText extends TextView {
                     Settings.System.getUriFor(Settings.System.WEATHER_SHOW_LOCATION), false,
                     this);
             resolver.registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.WEATHER_STATUSBAR_STYLE), false,
+                    Settings.System.getUriFor(Settings.System.STATUSBAR_WEATHER_STYLE), false,
                     this);
             updateSettings();
         }
@@ -94,12 +97,10 @@ public class WeatherText extends TextView {
 
     protected void updateSettings() {
         ContentResolver resolver = mContext.getContentResolver();
-
-        boolean useWeather = Settings.System.getInt(resolver, Settings.System.USE_WEATHER, 0) == 1
-                && Settings.System.getInt(resolver, Settings.System.WEATHER_STATUSBAR_STYLE, 1) == 0;
-
-        showLocation = Settings.System.getInt(resolver, Settings.System.WEATHER_SHOW_LOCATION, 0) == 1;
-        setVisibility(useWeather ? View.VISIBLE : View.GONE);
+        boolean useWeather = (Settings.System.getBoolean(resolver, Settings.System.USE_WEATHER, false)
+                && Settings.System.getInt(resolver, Settings.System.STATUSBAR_WEATHER_STYLE, 2) == 0);
+        mShowLocation = Settings.System.getBoolean(resolver, Settings.System.WEATHER_SHOW_LOCATION, true);
+        
+        this.setVisibility(useWeather ? View.VISIBLE : View.GONE);
     }
-
 }

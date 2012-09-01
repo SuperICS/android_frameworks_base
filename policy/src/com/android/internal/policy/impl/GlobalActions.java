@@ -17,19 +17,10 @@
 
 package com.android.internal.policy.impl;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
-import com.android.internal.telephony.TelephonyIntents;
-import com.android.internal.telephony.TelephonyProperties;
-import com.android.internal.R;
-
 import android.app.ActivityManagerNative;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.Profile;
 import android.app.ProfileManager;
-import android.app.StatusBarManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -39,6 +30,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.UserInfo;
 import android.database.ContentObserver;
+import android.hardware.input.IInputManager;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.os.Handler;
@@ -58,10 +50,10 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.util.Slog;
 import android.view.IWindowManager;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.view.WindowManagerPolicy.WindowManagerFuncs;
 import android.widget.AdapterView;
@@ -70,25 +62,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.internal.R;
-import com.android.internal.app.ShutdownThread;
+import com.android.internal.app.ThemeUtils;
 import com.android.internal.telephony.TelephonyIntents;
 import com.android.internal.telephony.TelephonyProperties;
-import com.google.android.collect.Lists;
-
-import com.android.internal.app.ThemeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-/**
- * Needed for takeScreenshot
- */
-import android.content.ServiceConnection;
-import android.content.ComponentName;
-import android.os.IBinder;
-import android.os.Messenger;
-import android.os.RemoteException;
 
 
 /**
@@ -115,7 +95,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
     private ToggleAction mAirplaneModeOn;
     private ToggleAction mPowerSaverOn;
     private ToggleAction mTorchToggle;
-    private NavBarAction mNavBarHideToggle;
 
     private MyAdapter mAdapter;
 
@@ -128,7 +107,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
     private boolean mEnableTorchToggle = true;
     private boolean mEnableAirplaneToggle = true;
     private boolean mReceiverRegistered = false;    
-    private boolean mEnableNavBarHideToggle = false;;
 
     public static final String INTENT_TORCH_ON = "com.android.systemui.INTENT_TORCH_ON";
     public static final String INTENT_TORCH_OFF = "com.android.systemui.INTENT_TORCH_OFF";
@@ -138,9 +116,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
     private boolean mHasVibrator;
 
     private IWindowManager mIWindowManager;
-    private Profile mChosenProfile;
-
-    private static final String SYSTEM_PROFILES_ENABLED = "system_profiles_enabled";
 
     /**
      * @param context everything needs a context :(
@@ -222,11 +197,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         mEnableAirplaneToggle = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.POWER_DIALOG_SHOW_AIRPLANE_TOGGLE, 1) == 1;
         
-        mEnableNavBarHideToggle= Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.POWER_DIALOG_SHOW_NAVBAR_HIDE, 0) == 1;
-        
-        mSilentModeAction = new SilentModeAction(mAudioManager, mHandler);
-
         // Simple toggle style if there's no vibrator, otherwise use a tri-state
         if (!mHasVibrator) {
             mSilentModeAction = new SilentModeToggleAction();
@@ -298,8 +268,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
             }
         };
         
-        mNavBarHideToggle = new NavBarAction(mHandler); 
-        
         mTorchToggle = new ToggleAction(
                 R.drawable.ic_lock_torch,
                 R.drawable.ic_lock_torch,
@@ -339,7 +307,12 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
 
                 public void onPress() {
                     // shutdown by making sure radio and power are handled accordingly.
-                    ShutdownThread.shutdown(getUiContext(), true);
+                    mWindowManagerFuncs.shutdown();
+                }
+                
+                public boolean onLongPress() {
+                    mWindowManagerFuncs.rebootSafeMode();
+                    return true;
                 }
 
                 public boolean showDuringKeyguard() {
@@ -356,7 +329,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
                 new SinglePressAction(com.android.internal.R.drawable.ic_lock_reboot,
                         R.string.global_action_reboot) {
                     public void onPress() {
-                        ShutdownThread.reboot(getUiContext(), "null", true);
+                        mWindowManagerFuncs.reboot();
                     }
 
                     public boolean showDuringKeyguard() {
@@ -406,6 +379,12 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
                 public boolean showBeforeProvisioning() {
                     return false;
                 }
+
+                @Override
+                public boolean onLongPress() {
+                    // TODO Auto-generated method stub
+                    return false;
+                }
             });
 
         // next: screenshot
@@ -437,14 +416,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
             Slog.e(TAG, "not adding TorchToggle");
         }
               
-        // Next NavBar Hide
-        if(mEnableNavBarHideToggle) {
-            Slog.e(TAG, "Adding NavBarhHideToggle");
-            mItems.add(mNavBarHideToggle); 
-        } else {
-            Slog.e(TAG, "not adding NavBarHideToggle");
-        }
-
         // next: users
         List<UserInfo> users = mContext.getPackageManager().getUsers();
         if (users.size() > 1) {
@@ -877,42 +848,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
     }
 
     /**
-     * A single press action maintains no state, just responds to a press
-     * and takes an action.
-     */
-    private abstract class ProfileChooseAction implements Action {
-        private ProfileManager mProfileManager;
-
-        protected ProfileChooseAction() {
-            mProfileManager = (ProfileManager)mContext.getSystemService(Context.PROFILE_SERVICE);
-        }
-
-        public boolean isEnabled() {
-            return true;
-        }
-
-        abstract public void onPress();
-
-        public View create(
-                Context context, View convertView, ViewGroup parent, LayoutInflater inflater) {
-            View v = (convertView != null) ?
-                    convertView :
-                    inflater.inflate(R.layout.global_actions_item, parent, false);
-
-            ImageView icon = (ImageView) v.findViewById(R.id.icon);
-            TextView messageView = (TextView) v.findViewById(R.id.message);
-            TextView statusView = (TextView) v.findViewById(R.id.status);
-            statusView.setVisibility(View.VISIBLE);
-            statusView.setText(mProfileManager.getActiveProfile().getName());
-
-            icon.setImageDrawable(context.getResources().getDrawable(com.android.internal.R.drawable.ic_lock_profile));
-            messageView.setText(R.string.global_action_choose_profile);
-
-            return v;
-        }
-    }
-
-    /**
      * A toggle action knows whether it is on or off, and displays an icon
      * and status message accordingly.
      */
@@ -1073,12 +1008,9 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
 
         private final AudioManager mAudioManager;
         private final Handler mHandler;
-        private final Context mContext;
-
         SilentModeTriStateAction(Context context, AudioManager audioManager, Handler handler) {
             mAudioManager = audioManager;
             mHandler = handler;
-            mContext = context;
         }
 
         private int ringerModeToIndex(int ringerMode) {
@@ -1125,9 +1057,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
             return true;
         }
 
-        void willCreate() {
-        }
-
         public void onClick(View v) {
             if (!(v.getTag() instanceof Integer)) return;
 
@@ -1135,108 +1064,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
             mAudioManager.setRingerMode(indexToRingerMode(index));
             mHandler.sendEmptyMessageDelayed(MESSAGE_DISMISS, DIALOG_DISMISS_DELAY);
         }
-    }
-
-    private static class NavBarAction implements Action, View.OnClickListener {
-
-        private final int[] ITEM_IDS = { R.id.navbartoggle, R.id.navbarhome, R.id.navbarback,R.id.navbarmenu };
-        
-        public Context mContext;
-        public boolean mNavBarVisible;
-        private final Handler mHandler;
-        private IWindowManager mWindowManager;
-        private int mInjectKeycode;
-
-        NavBarAction(Handler handler) {
-        	mHandler = handler;  
-        }
-
-
-        public View create(Context context, View convertView, ViewGroup parent,
-                LayoutInflater inflater) {
-        	mContext = context;
-        	mNavBarVisible = Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.NAVIGATION_BAR_BUTTONS_SHOW, 1) == 1;
-        	mWindowManager = IWindowManager.Stub.asInterface(ServiceManager.getService("window"));
-                 	
-            View v = inflater.inflate(R.layout.global_actions_navbar_mode, parent, false);
-
-            for (int i = 0; i < 4; i++) {
-                View itemView = v.findViewById(ITEM_IDS[i]);
-                itemView.setSelected((i==0)&&mNavBarVisible);  // set selected on item 0 if NavBarHideOn is off
-                // Set up click handler
-                itemView.setTag(i);
-                itemView.setOnClickListener(this);
-            }
-            return v;
-        }
-
-        public void onPress() {
-        }
-
-        public boolean showDuringKeyguard() {
-            return false;
-        }
-
-        public boolean showBeforeProvisioning() {
-            return false;
-        }
-
-        public boolean isEnabled() {
-            return true;
-        }
-
-        void willCreate() {
-        }
-
-        public void onClick(View v) {
-            if (!(v.getTag() instanceof Integer)) return;
-
-            int index = (Integer) v.getTag();
-            
-            switch (index) {
-            
-            case 0 :
-                Settings.System.putInt(mContext.getContentResolver(),
-                        Settings.System.NAVIGATION_BAR_BUTTONS_SHOW,
-                         mNavBarVisible ? 0 : 1);
-                v.setSelected(!mNavBarVisible);
-                mHandler.sendEmptyMessage(MESSAGE_DISMISS);
-                break;
-                
-            case 1:
-            	 injectKeyDelayed(KeyEvent.KEYCODE_HOME);
-            	 mHandler.sendEmptyMessage(MESSAGE_DISMISS);
-            	break;
-            	
-            case 2:    	
-            	injectKeyDelayed(KeyEvent.KEYCODE_BACK);
-            	mHandler.sendEmptyMessage(MESSAGE_DISMISS);
-            	break;
-            	
-            case 3:    	
-            	injectKeyDelayed(KeyEvent.KEYCODE_MENU);
-            	mHandler.sendEmptyMessage(MESSAGE_DISMISS);
-            	break;	    
-            }  
-        }
-     
-        public void injectKeyDelayed(int keycode){
-        	mInjectKeycode = keycode;
-        	mHandler.removeCallbacks(onInjectKeyDelayed);
-        	mHandler.postDelayed(onInjectKeyDelayed, 50);
-        }
-
-        final Runnable onInjectKeyDelayed = new Runnable() {
-        	public void run() {
-        		try {
-        			mWindowManager.injectKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, mInjectKeycode), true);
-        			mWindowManager.injectKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, mInjectKeycode), true);
-        		} catch (RemoteException e) {
-        			e.printStackTrace();
-        		}
-        	}
-        };
     }
 
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {

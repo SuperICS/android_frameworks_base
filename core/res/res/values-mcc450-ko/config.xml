@@ -17,5 +17,4 @@
 */
 -->
 <resources>
-    <string name="gsm_alphabet_default_charset">euc-kr</string>
 </resources>

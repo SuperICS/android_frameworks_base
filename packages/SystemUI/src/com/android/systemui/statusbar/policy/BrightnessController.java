@@ -16,7 +16,6 @@
 
 package com.android.systemui.statusbar.policy;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.IPowerManager;
@@ -24,30 +23,16 @@ import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
-import android.util.Slog;
-import android.view.IWindowManager;
-import android.widget.CompoundButton;
 
 public class BrightnessController implements ToggleSlider.Listener {
-    private static final String TAG = "StatusBar.BrightnessController";
-
-    // Backlight range is from 0 - 255. Need to make sure that user
-    // doesn't set the backlight to 0 and get stuck
-    private int mScreenBrightnessDim = android.os.Power.BRIGHTNESS_DIM;
     private static final int MINIMUM_BACKLIGHT = android.os.PowerManager.BRIGHTNESS_DIM;
     private static final int MAXIMUM_BACKLIGHT = android.os.PowerManager.BRIGHTNESS_ON;
 
     private Context mContext;
-    private ToggleSlider mControl;
     private IPowerManager mPower;
 
     public BrightnessController(Context context, ToggleSlider control) {
         mContext = context;
-        mControl = control;
-
-        mScreenBrightnessDim = mContext.getResources().getInteger(
-                com.android.internal.R.integer.config_screenBrightnessDim);
-
         boolean automaticAvailable = context.getResources().getBoolean(
                 com.android.internal.R.bool.config_automatic_brightness_available);
         mPower = IPowerManager.Stub.asInterface(ServiceManager.getService("power"));
@@ -63,49 +48,46 @@ public class BrightnessController implements ToggleSlider.Listener {
             control.setChecked(automatic != 0);
         } else {
             control.setChecked(false);
-            // control.hideToggle();
         }
-
+        
         int value;
         try {
-            value = Settings.System.getInt(mContext.getContentResolver(),
+            value = Settings.System.getInt(mContext.getContentResolver(), 
                     Settings.System.SCREEN_BRIGHTNESS);
         } catch (SettingNotFoundException ex) {
             value = MAXIMUM_BACKLIGHT;
         }
 
-        control.setMax(MAXIMUM_BACKLIGHT - mScreenBrightnessDim);
-        control.setValue(value - mScreenBrightnessDim);
+        control.setMax(MAXIMUM_BACKLIGHT - MINIMUM_BACKLIGHT);
+        control.setValue(value - MINIMUM_BACKLIGHT);
 
         control.setOnChangedListener(this);
     }
 
     public void onChanged(ToggleSlider view, boolean tracking, boolean automatic, int value) {
-        setMode(automatic ? Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
-                : Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+        int mode = (automatic ? Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+                              : Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+        Settings.System.putInt(mContext.getContentResolver(),
+                Settings.System.SCREEN_BRIGHTNESS_MODE, mode);
+        
         if (!automatic) {
-            final int val = value + mScreenBrightnessDim;
+            final int val = value + MINIMUM_BACKLIGHT;
             setBrightness(val);
             if (!tracking) {
                 AsyncTask.execute(new Runnable() {
-                    public void run() {
-                        Settings.System.putInt(mContext.getContentResolver(),
-                                Settings.System.SCREEN_BRIGHTNESS, val);
-                    }
-                });
+                        public void run() {
+                            Settings.System.putInt(mContext.getContentResolver(), 
+                                    Settings.System.SCREEN_BRIGHTNESS, val);
+                        }
+                    });
             }
         }
-    }
-
-    private void setMode(int mode) {
-        Settings.System.putInt(mContext.getContentResolver(),
-                Settings.System.SCREEN_BRIGHTNESS_MODE, mode);
     }
 
     private void setBrightness(int brightness) {
         try {
             mPower.setBacklightBrightness(brightness);
         } catch (RemoteException ex) {
-        }
+        }        
     }
 }

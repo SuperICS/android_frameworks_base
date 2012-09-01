@@ -16,17 +16,6 @@
 
 package com.android.internal.policy.impl;
 
-import com.android.internal.R;
-import com.android.internal.policy.impl.LockPatternKeyguardView.UnlockMode;
-import com.android.internal.policy.IFaceLockCallback;
-import com.android.internal.policy.IFaceLockInterface;
-import com.android.internal.app.ThemeUtils;
-import com.android.internal.telephony.IccCard;
-import com.android.internal.widget.LockPatternUtils;
-import com.android.internal.widget.LockScreenWidgetCallback;
-import com.android.internal.widget.LockScreenWidgetInterface;
-import com.android.internal.widget.TransportControlView;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
@@ -38,16 +27,11 @@ import android.app.Profile;
 import android.app.ProfileManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.PixelFormat;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.PowerManager;
@@ -65,13 +49,12 @@ import android.view.WindowManager;
 import android.view.accessibility.AccessibilityManager;
 
 import com.android.internal.R;
+import com.android.internal.app.ThemeUtils;
 import com.android.internal.policy.impl.KeyguardUpdateMonitor.InfoCallbackImpl;
 import com.android.internal.telephony.IccCard;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.internal.widget.LockScreenWidgetCallback;
 import com.android.internal.widget.TransportControlView;
-
-import com.android.internal.app.ThemeUtils;
 
 import java.io.IOException;
 
@@ -300,54 +283,36 @@ public class LockPatternKeyguardView extends KeyguardViewBase {
     /**
      * The current {@link KeyguardScreen} will use this to communicate back to us.
      */
-    public LockPatternKeyguardView(
-            Context context,
-            KeyguardUpdateMonitor updateMonitor,
-            LockPatternUtils lockPatternUtils,
-            KeyguardWindowController controller) {
-        super(context);
 
-        mHandler = new Handler(this);
-        mConfiguration = context.getResources().getConfiguration();
-        mEnableFallback = false;
-        mRequiresSim = TextUtils.isEmpty(SystemProperties.get("keyguard.no_require_sim"));
-        mUpdateMonitor = updateMonitor;
-        mLockPatternUtils = lockPatternUtils;
-        mWindowController = controller;
-        mHasOverlay = false;
-        mProfileManager = (ProfileManager) context.getSystemService(Context.PROFILE_SERVICE);
+    KeyguardScreenCallback mKeyguardScreenCallback = new KeyguardScreenCallback() {
 
-        mUpdateMonitor.registerInfoCallback(this);
-
-        mKeyguardScreenCallback = new KeyguardScreenCallback() {
-
-            public void goToLockScreen() {
-                mForgotPattern = false;
-                if (mIsVerifyUnlockOnly) {
-                    // navigating away from unlock screen during verify mode means
-                    // we are done and the user failed to authenticate.
-                    mIsVerifyUnlockOnly = false;
-                    getCallback().keyguardDone(false);
-                } else {
-                    updateScreen(Mode.LockScreen, false);
-                }
+        public void goToLockScreen() {
+            mForgotPattern = false;
+            if (mIsVerifyUnlockOnly) {
+                // navigating away from unlock screen during verify mode means
+                // we are done and the user failed to authenticate.
+                mIsVerifyUnlockOnly = false;
+                getCallback().keyguardDone(false);
+            } else {
+                updateScreen(Mode.LockScreen, false);
             }
+        }
 
-            public void goToUnlockScreen() {
-                final IccCard.State simState = mUpdateMonitor.getSimState();
-                if (stuckOnLockScreenBecauseSimMissing()
-                         || (simState == IccCard.State.PUK_REQUIRED
-                             && !mLockPatternUtils.isPukUnlockScreenEnable())){
-                    // stuck on lock screen when sim missing or
-                    // puk'd but puk unlock screen is disabled
-                    return;
-                }
-                if (!isSecure()) {
-                    getCallback().keyguardDone(true);
-                } else {
-                    updateScreen(Mode.UnlockScreen, false);
-                }
+        public void goToUnlockScreen() {
+            final IccCard.State simState = mUpdateMonitor.getSimState();
+            if (stuckOnLockScreenBecauseSimMissing()
+                     || (simState == IccCard.State.PUK_REQUIRED
+                         && !mLockPatternUtils.isPukUnlockScreenEnable())){
+                // stuck on lock screen when sim missing or
+                // puk'd but puk unlock screen is disabled
+                return;
             }
+            if (!isSecure()) {
+                getCallback().keyguardDone(true);
+            } else {
+                updateScreen(Mode.UnlockScreen, false);
+            }
+        }
 
         public void forgotPattern(boolean isForgotten) {
             if (mEnableFallback) {
@@ -749,44 +714,6 @@ public class LockPatternKeyguardView extends KeyguardViewBase {
         removeCallbacks(mRecreateRunnable);
         if (DEBUG) Log.v(TAG, "recreating lockscreen because config changed");
         post(mRecreateRunnable);
-    }
-
-    //Ignore these events; they are implemented only because they come from the same interface
-    @Override
-    public void onRefreshBatteryInfo(boolean showBatteryInfo, boolean pluggedIn, int batteryLevel)
-    {}
-    @Override
-    public void onRefreshWeatherInfo(Intent weatherIntent)
-    {}
-    @Override
-    public void onRefreshCalendarInfo()
-    {}
-    @Override
-    public void onTimeChanged() {}
-    @Override
-    public void onRefreshCarrierInfo(CharSequence plmn, CharSequence spn) {}
-    @Override
-    public void onRingerModeChanged(int state) {}
-
-    @Override
-    public void onClockVisibilityChanged() {
-        int visFlags = getSystemUiVisibility() & ~View.STATUS_BAR_DISABLE_CLOCK;
-        setSystemUiVisibility(visFlags
-                | (mUpdateMonitor.isClockVisible() ? View.STATUS_BAR_DISABLE_CLOCK : 0));
-    }
-
-    @Override
-    public void onDeviceProvisioned() {}
-
-    //We need to stop faceunlock when a phonecall comes in
-    @Override
-    public void onPhoneStateChanged(int phoneState) {
-        if (DEBUG) Log.d(TAG, "phone state: " + phoneState);
-        if(phoneState == TelephonyManager.CALL_STATE_RINGING) {
-            mHasOverlay = true;
-            stopAndUnbindFromFaceLock();
-            hideFaceLockArea();
-        }
     }
 
     InfoCallbackImpl mInfoCallback = new InfoCallbackImpl() {
@@ -1246,7 +1173,6 @@ public class LockPatternKeyguardView extends KeyguardViewBase {
     }
 
     private void showAlmostAtWipeDialog(int attempts, int remaining) {
-        int timeoutInSeconds = (int) LockPatternUtils.FAILED_ATTEMPT_TIMEOUT_MS / 1000;
         String message = mContext.getString(
                 R.string.lockscreen_failed_attempts_almost_at_wipe, attempts, remaining);
         showDialog(null, message);
@@ -1256,64 +1182,6 @@ public class LockPatternKeyguardView extends KeyguardViewBase {
         String message = mContext.getString(
                 R.string.lockscreen_failed_attempts_now_wiping, attempts);
         showDialog(null, message);
-    }
-
-    /**
-     * Used to put wallpaper on the background of the lock screen.  Centers it
-     * Horizontally and pins the bottom (assuming that the lock screen is aligned
-     * with the bottom, so the wallpaper should extend above the top into the
-     * status bar).
-     */
-    static private class FastBitmapDrawable extends Drawable {
-        private Bitmap mBitmap;
-        private int mOpacity;
-
-        private FastBitmapDrawable(Bitmap bitmap) {
-            mBitmap = bitmap;
-            mOpacity = mBitmap.hasAlpha() ? PixelFormat.TRANSLUCENT : PixelFormat.OPAQUE;
-        }
-
-        @Override
-        public void draw(Canvas canvas) {
-            canvas.drawBitmap(
-                    mBitmap,
-                    (getBounds().width() - mBitmap.getWidth()) / 2,
-                    (getBounds().height() - mBitmap.getHeight()),
-                    null);
-        }
-
-        @Override
-        public int getOpacity() {
-            return mOpacity;
-        }
-
-        @Override
-        public void setAlpha(int alpha) {
-        }
-
-        @Override
-        public void setColorFilter(ColorFilter cf) {
-        }
-
-        @Override
-        public int getIntrinsicWidth() {
-            return mBitmap.getWidth();
-        }
-
-        @Override
-        public int getIntrinsicHeight() {
-            return mBitmap.getHeight();
-        }
-
-        @Override
-        public int getMinimumWidth() {
-            return mBitmap.getWidth();
-        }
-
-        @Override
-        public int getMinimumHeight() {
-            return mBitmap.getHeight();
-        }
     }
 
     /**

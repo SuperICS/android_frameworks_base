@@ -1379,4 +1379,6 @@
     <string name="default_audio_route_category_name" msgid="3722811174003886946">"Systeem"</string>
     <string name="bluetooth_a2dp_audio_route_name" msgid="8575624030406771015">"Bluetooth-audio"</string>
     <string name="media_route_chooser_grouping_done" msgid="7966438307723317169">"Gereed"</string>
+    <string name="choose_account_text" msgid="6891230675141555481">"Welk account wilt u gebruiken?"</string>
+
 </resources>

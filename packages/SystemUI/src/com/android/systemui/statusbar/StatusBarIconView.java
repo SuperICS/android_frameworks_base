@@ -17,7 +17,6 @@
 package com.android.systemui.statusbar;
 
 import android.app.Notification;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -54,17 +53,10 @@ public class StatusBarIconView extends AnimatedImageView {
     private int mNumberY;
     private String mNumberText;
     private Notification mNotification;
-    private Handler mHandler;
     private boolean mShowNotificationCount;
 
     public StatusBarIconView(Context context, String slot, Notification notification) {
         super(context);
-        mHandler = new Handler();
-	// only set the observer for notifications - not status icons
-        if (null != notification) {
-        	SettingsObserver settingsObserver = new SettingsObserver(mHandler);
-        	settingsObserver.observe();
-        }
         final Resources res = context.getResources();
         final float densityMultiplier = res.getDisplayMetrics().density;
         final float scaledPx = 8 * densityMultiplier;
@@ -91,6 +83,8 @@ public class StatusBarIconView extends AnimatedImageView {
             final float scale = (float)imageBounds / (float)outerBounds;
             setScaleX(scale);
             setScaleY(scale);
+            final float alpha = res.getFraction(R.dimen.status_bar_icon_drawing_alpha, 1, 1);
+            setAlpha(alpha);
         }
 
         setScaleType(ImageView.ScaleType.CENTER);
@@ -98,13 +92,14 @@ public class StatusBarIconView extends AnimatedImageView {
 
     public StatusBarIconView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mHandler = new Handler();
         final Resources res = context.getResources();
         final int outerBounds = res.getDimensionPixelSize(R.dimen.status_bar_icon_size);
         final int imageBounds = res.getDimensionPixelSize(R.dimen.status_bar_icon_drawing_size);
         final float scale = (float)imageBounds / (float)outerBounds;
         setScaleX(scale);
         setScaleY(scale);
+        final float alpha = res.getFraction(R.dimen.status_bar_icon_drawing_alpha, 1, 1);
+        setAlpha(alpha);
     }
 
     private static boolean streq(String a, String b) {
@@ -120,7 +115,6 @@ public class StatusBarIconView extends AnimatedImageView {
         return a.equals(b);
     }
 
-    
     /**
      * Returns whether the set succeeded.
      */
@@ -264,7 +258,6 @@ public class StatusBarIconView extends AnimatedImageView {
             NumberFormat f = NumberFormat.getIntegerInstance();
             str = f.format(mIcon.number);
         }
-
         mNumberText = str;
 
         final int w = getWidth();
@@ -300,20 +293,12 @@ public class StatusBarIconView extends AnimatedImageView {
         return "StatusBarIconView(slot=" + mSlot + " icon=" + mIcon 
             + " notification=" + mNotification + ")";
     }
-    
+
     class SettingsObserver extends ContentObserver {
-        ContentResolver resolver;
         SettingsObserver(Handler handler) {
             super(handler);
-            resolver = mContext.getContentResolver();
         }
         void observe() {
-            resolver.registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.STATUS_BAR_ICON_TRANSPARENCY), false,
-                    this);
-            setAlpha(Settings.System.getFloat(mContext
-                    .getContentResolver(), Settings.System.STATUS_BAR_ICON_TRANSPARENCY,
-                    0.80f));
             mContext.getContentResolver().registerContentObserver(
                     Settings.System.getUriFor(Settings.System.STATUS_BAR_NOTIF_COUNT),
                     false, this);
@@ -323,9 +308,6 @@ public class StatusBarIconView extends AnimatedImageView {
         }
         @Override
         public void onChange(boolean selfChange) {
-            setAlpha(Settings.System.getFloat(mContext
-                    .getContentResolver(), Settings.System.STATUS_BAR_ICON_TRANSPARENCY,
-                    0.80f));
             mShowNotificationCount = Settings.System.getInt(
                     mContext.getContentResolver(),
                     Settings.System.STATUS_BAR_NOTIF_COUNT, 0) == 1;

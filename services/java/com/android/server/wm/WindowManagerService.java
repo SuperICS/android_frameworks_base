@@ -625,8 +625,6 @@ public class WindowManagerService extends IWindowManager.Stub
 
     private boolean mForceDisableHardwareKeyboard = false;
 
-    private boolean mForceDisableHardwareKeyboard = false;
-
     // Who is holding the screen on.
     Session mHoldingScreenOn;
     PowerManager.WakeLock mHoldingScreenWakeLock;

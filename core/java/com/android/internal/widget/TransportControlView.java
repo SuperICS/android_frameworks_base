@@ -211,6 +211,7 @@ public class TransportControlView extends FrameLayout implements OnClickListener
     @Override
     public void onFinishInflate() {
         super.onFinishInflate();
+        /*
         if (Settings.System.getInt(mContext.getContentResolver(), Settings.System.LOCKSCREEN_STOCK_MUSIC_LAYOUT, 0) == 0) {
             mLayout = (View) findViewById(R.id.layout_stock);
             mLayout.setVisibility(View.GONE);
@@ -237,7 +238,7 @@ public class TransportControlView extends FrameLayout implements OnClickListener
             mBtnPlay = (ImageView) findViewById(R.id.btn_play_stock);
             mBtnNext = (ImageView) findViewById(R.id.btn_next_stock);
         }
-
+*/
         final View buttons[] = { mBtnPrev, mBtnPlay, mBtnNext };
         for (View view : buttons) {
             view.setOnClickListener(this);

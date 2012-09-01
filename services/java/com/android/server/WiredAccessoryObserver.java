@@ -70,7 +70,6 @@ class WiredAccessoryObserver extends UEventObserver {
     private static final int SUPPORTED_HEADSETS = (BIT_HEADSET|BIT_HEADSET_NO_MIC|
                                                    BIT_USB_HEADSET_ANLG|BIT_USB_HEADSET_DGTL|
                                                    BIT_HDMI_AUDIO);
-    private static final int HEADSETS_WITH_MIC = BIT_HEADSET;
 
     public static final String DOCK_AUDIO_SETTING_CHANGED = "DOCK_AUDIO_SETTING_CHANGED";
     private static class UEventInfo {
@@ -151,19 +150,17 @@ class WiredAccessoryObserver extends UEventObserver {
         return retVal;
     }
 
-    private static List<UEventInfo> uEventInfo = makeObservedUEventList();
+    private static List<UEventInfo> uEventInfoList = makeObservedUEventList();
 
     private int mHeadsetState;
     private int mPrevHeadsetState;
     private String mHeadsetName;
 
-    private final Context mContext;
     private final WakeLock mWakeLock;  // held while there is a pending route change
 
     private final AudioManager mAudioManager;
 
     public WiredAccessoryObserver(Context context) {
-        mContext = context;
         PowerManager pm = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WiredAccessoryObserver");
         mWakeLock.setReferenceCounted(false);
@@ -217,8 +214,8 @@ class WiredAccessoryObserver extends UEventObserver {
         // one on the board, one on the dock and one on HDMI:
         // observe three UEVENTs
         init();  // set initial status
-        for (int i = 0; i < uEventInfo.size(); ++i) {
-            UEventInfo uei = uEventInfo.get(i);
+        for (int i = 0; i < uEventInfoList.size(); ++i) {
+            UEventInfo uei = uEventInfoList.get(i);
             startObserving("DEVPATH="+uei.getDevPath());
         }
       }
@@ -241,6 +238,7 @@ class WiredAccessoryObserver extends UEventObserver {
     private synchronized final void updateState(String devPath, String name, int state)
     {
         if (LOG) Slog.v(TAG, "updateState name: " + name + " state " + state);
+        int switchState = 0;
         if (name.equals("usb_audio")) {
             switchState = ((mHeadsetState & (BIT_HEADSET|BIT_HEADSET_NO_MIC|BIT_HDMI_AUDIO)) |
                            ((state == 1) ? BIT_USB_HEADSET_ANLG :
@@ -271,8 +269,8 @@ class WiredAccessoryObserver extends UEventObserver {
         }
         if (LOG) Slog.v(TAG, "updateState switchState: " + switchState);
         update(name, switchState);
-        for (int i = 0; i < uEventInfo.size(); ++i) {
-            UEventInfo uei = uEventInfo.get(i);
+        for (int i = 0; i < uEventInfoList.size(); ++i) {
+            UEventInfo uei = uEventInfoList.get(i);
             if (devPath.equals(uei.getDevPath())) {
                 update(name, uei.computeNewHeadsetState(mHeadsetState, state));
                 return;
@@ -286,8 +284,8 @@ class WiredAccessoryObserver extends UEventObserver {
 
         if (LOG) Slog.v(TAG, "init()");
 
-        for (int i = 0; i < uEventInfo.size(); ++i) {
-            UEventInfo uei = uEventInfo.get(i);
+        for (int i = 0; i < uEventInfoList.size(); ++i) {
+            UEventInfo uei = uEventInfoList.get(i);
             try {
                 int curState;
                 FileReader file = new FileReader(uei.getSwitchStatePath());
@@ -311,8 +309,6 @@ class WiredAccessoryObserver extends UEventObserver {
     private synchronized final void update(String newName, int newState) {
         // Retain only relevant bits
         int headsetState = newState & SUPPORTED_HEADSETS;
-        int newOrOld = headsetState | mHeadsetState;
-        int delay = 0;
         int usb_headset_anlg = headsetState & BIT_USB_HEADSET_ANLG;
         int usb_headset_dgtl = headsetState & BIT_USB_HEADSET_DGTL;
         int h2w_headset = headsetState & (BIT_HEADSET | BIT_HEADSET_NO_MIC);
@@ -379,13 +375,13 @@ class WiredAccessoryObserver extends UEventObserver {
                 Intent intent;
                 //  Pack up the values and broadcast them to everyone
                 if (headset == BIT_USB_HEADSET_ANLG) {
-                    intent = new Intent(Intent.ACTION_USB_ANLG_HEADSET_PLUG);
+                    intent = new Intent(Intent.ACTION_ANALOG_AUDIO_DOCK_PLUG);
                     intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
                     intent.putExtra("state", state);
                     intent.putExtra("name", headsetName);
                     ActivityManagerNative.broadcastStickyIntent(intent, null);
                 } else if (headset == BIT_USB_HEADSET_DGTL) {
-                    intent = new Intent(Intent.ACTION_USB_DGTL_HEADSET_PLUG);
+                    intent = new Intent(Intent.ACTION_DIGITAL_AUDIO_DOCK_PLUG);
                     intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
                     intent.putExtra("state", state);
                     intent.putExtra("name", headsetName);
@@ -397,6 +393,7 @@ class WiredAccessoryObserver extends UEventObserver {
                     intent.putExtra("name", headsetName);
                     ActivityManagerNative.broadcastStickyIntent(intent, null);
                 }
+            }
 
             if (headset == BIT_HEADSET) {
                 device = AudioManager.DEVICE_OUT_WIRED_HEADSET;

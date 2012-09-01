@@ -1368,4 +1368,6 @@
     <string name="default_audio_route_category_name" msgid="3722811174003886946">"מערכת"</string>
     <string name="bluetooth_a2dp_audio_route_name" msgid="8575624030406771015">"אודיו Bluetooth"</string>
     <string name="media_route_chooser_grouping_done" msgid="7966438307723317169">"סיום"</string>
+    <string name="choose_account_text" msgid="6891230675141555481">"באיזה חשבון ברצונך להשתמש?"</string>
+
 </resources>

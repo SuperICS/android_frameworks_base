@@ -38,13 +38,11 @@ android_media_MediaProfiles_native_init(JNIEnv *env)
 {
     ALOGV("native_init");
     Mutex::Autolock lock(sLock);
-    LOGE("After native_init lock");
-
+    
     if (sProfiles == NULL) {
-        LOGE("Guru : native_init profiles");
+        ALOGE("Guru : native_init profiles");
         sProfiles = MediaProfiles::getInstance();
     }
-    LOGE("retun sProfiles");
 }
 
 static jint

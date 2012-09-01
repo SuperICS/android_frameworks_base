@@ -8027,10 +8027,6 @@ public final class WebViewClassic implements WebViewProvider, WebViewProvider.Sc
                     if (Container.OPTGROUP == c.mEnabled) {
                         // Currently select_dialog_multichoice uses CheckedTextViews.
                         // If that changes, the class cast will no longer be valid.
-                        if (mMultiple) {
-                            Assert.assertTrue(convertView instanceof CheckedTextView);
-                            ((CheckedTextView) convertView).setCheckMarkDrawable(null);
-                        }
                     } else {
                         // c.mEnabled == Container.OPTION_DISABLED
                         // Draw the disabled element in a disabled state.

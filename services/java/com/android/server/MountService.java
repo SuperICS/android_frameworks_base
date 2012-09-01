@@ -746,19 +746,7 @@ class MountService extends IMountService.Stub
             // FMT: NNN Volume <label> <mountpoint> disk removed (<major>:<minor>)
             // FMT: NNN Volume <label> <mountpoint> bad removal (<major>:<minor>)
             String action = null;
-            final String label = cooked[2];
             final String path = cooked[3];
-            int major = -1;
-            int minor = -1;
-
-            try {
-                String devComp = cooked[6].substring(1, cooked[6].length() -1);
-                String[] devTok = devComp.split(":");
-                major = Integer.parseInt(devTok[0]);
-                minor = Integer.parseInt(devTok[1]);
-            } catch (Exception ex) {
-                Slog.e(TAG, "Failed to parse major/minor", ex);
-            }
 
             if (code == VoldResponseCode.VolumeDiskInserted) {
                 new Thread() {
@@ -1205,13 +1193,13 @@ class MountService extends IMountService.Stub
 
             // Create new volumes
             StorageVolume newLeft = new StorageVolume(left.getPath(),
-                right.getDescription(), right.isRemovable(),
+                right.getDescriptionId(), right.isRemovable(),
                 right.isEmulated(), right.getMtpReserveSpace(),
                 right.allowMassStorage(), right.getMaxFileSize());
             newLeft.setStorageId(leftIndex);
 
             StorageVolume newRight = new StorageVolume(right.getPath(),
-                left.getDescription(), left.isRemovable(),
+                left.getDescriptionId(), left.isRemovable(),
                 left.isEmulated(), left.getMtpReserveSpace(),
                 left.allowMassStorage(), left.getMaxFileSize());
             newRight.setStorageId(rightIndex);

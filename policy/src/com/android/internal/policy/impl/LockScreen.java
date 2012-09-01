@@ -16,19 +16,21 @@
 
 package com.android.internal.policy.impl;
 
-import android.app.ActivityManager;
 import android.app.ActivityManagerNative;
 import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
+import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -37,19 +39,26 @@ import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.media.AudioManager;
+import android.net.Uri;
+import android.os.Handler;
 import android.os.RemoteException;
-import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
 import android.util.Slog;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.*;
+import android.widget.DigitalClock;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.android.internal.R;
 import com.android.internal.policy.impl.KeyguardUpdateMonitor.InfoCallbackImpl;
@@ -59,6 +68,7 @@ import com.android.internal.widget.LockPatternUtils;
 import com.android.internal.widget.SlidingTab;
 import com.android.internal.widget.WaveView;
 import com.android.internal.widget.multiwaveview.GlowPadView;
+import com.android.internal.widget.multiwaveview.MultiWaveView;
 import com.android.internal.widget.multiwaveview.TargetDrawable;
 
 import java.io.File;
@@ -75,7 +85,6 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
     private static final boolean DBG = false;
     private static final boolean DEBUG = DBG;
     private static final String TAG = "LockScreen";
-    private static final String ENABLE_MENU_KEY_FILE = "/data/local/enable_menu_key";
     private static final int WAIT_FOR_ANIMATION_TIMEOUT = 0;
     private static final int STAY_ON_WHILE_GRABBED_TIMEOUT = 30000;
     private static final String ASSIST_ICON_METADATA_NAME =
@@ -97,8 +106,6 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
 
     private int mLockscreenTargets = LAYOUT_STOCK;
     
-    private static final int COLOR_WHITE = 0xFFFFFFFF;
-
     private LockPatternUtils mLockPatternUtils;
     private KeyguardUpdateMonitor mUpdateMonitor;
     private KeyguardScreenCallback mCallback;
@@ -122,8 +129,6 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
     private TextView mCarrier;
     private DigitalClock mDigitalClock;
 
-    private Drawable[] lockDrawables;
-    
     ArrayList<Target> lockTargets = new ArrayList<Target>();
     
     private String mCustomAppActivity = (Settings.System.getString(mContext.getContentResolver(),
@@ -131,8 +136,6 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
     
     private boolean mCameraDisabled;
     private boolean mSearchDisabled;
-    // Is there a vibrator
-    private final boolean mHasVibrator;
 
     InfoCallbackImpl mInfoCallback = new InfoCallbackImpl() {
 
@@ -301,6 +304,24 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
 
         public void ping() {
         }
+
+        @Override
+        public void setEnabled(int resourceId, boolean enabled) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public int getTargetPosition(int resourceId) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public void cleanUp() {
+            // TODO Auto-generated method stub
+            
+        }
     }
 
     class WaveViewMethods implements WaveView.OnTriggerListener, UnlockWidgetCommonMethods {
@@ -352,16 +373,11 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
         }
     }
 
-    class GlowPadViewMethods implements GlowPadView.OnTriggerListener,
-            UnlockWidgetCommonMethods {
+    class MultiWaveViewMethods implements MultiWaveView.OnTriggerListener,
+    UnlockWidgetCommonMethods {
 
         private final MultiWaveView mMultiWaveView;
-        private boolean mCameraDisabled;
-        private final GlowPadView mGlowPadView;
-        private String[] mStoredTargets;
-        private int mTargetOffset;
-        private boolean mIsScreenLarge;
-
+        
         MultiWaveViewMethods(MultiWaveView multiWaveView) {
             mMultiWaveView = multiWaveView;
             final boolean cameraDisabled = mLockPatternUtils.getDevicePolicyManager()
@@ -376,19 +392,90 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
                         != R.array.lockscreen_targets_with_camera;
             }
         }
-
+        
         public void updateResources() {
             boolean isLandscape = (mCreationOrientation == Configuration
                     .ORIENTATION_LANDSCAPE);
-
+        
             targetController.setLandscape(isLandscape);
             targetController.setupTargets();
-
+        
             mMultiWaveView.setTargetResources(targetController.getDrawables());
+        }
+        
+        public void onGrabbed(View v, int handle) {
+        
+        }
+        
+        public void onReleased(View v, int handle) {
+        
+        }
+        
+        public void onTrigger(View v, int target) {
+            if (DBG)
+                Log.v(TAG, "onTrigger: target = " + target);
+            if (DBG)
+                Log.v(TAG, "onTrigger: Orientation = " + mCreationOrientation);
+            targetController.getTarget(target).doAction();
+        }
+        
+        public void onGrabbedStateChange(View v, int handle) {
+            // Don't poke the wake lock when returning to a state where the handle is
+            // not grabbed since that can happen when the system (instead of the user)
+            // cancels the grab.
+            if (handle != MultiWaveView.OnTriggerListener.NO_HANDLE) {
+                mCallback.pokeWakelock();
+            }
+        }
+        
+        public View getView() {
+            return mMultiWaveView;
+        }
+        
+        public void reset(boolean animate) {
+            mMultiWaveView.reset(animate);
+        }
+        
+        public void ping() {
+            mMultiWaveView.ping();
+        }
+
+        @Override
+        public void setEnabled(int resourceId, boolean enabled) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public int getTargetPosition(int resourceId) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public void cleanUp() {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void onFinishFinalAnimation() {
+            // TODO Auto-generated method stub
+            
+        }
+    }
+
+    class GlowPadViewMethods implements GlowPadView.OnTriggerListener,
+    UnlockWidgetCommonMethods {
+        private final GlowPadView mGlowPadView;
+        private String[] mStoredTargets;
+        private int mTargetOffset;
+        private boolean mIsScreenLarge;
+        
         GlowPadViewMethods(GlowPadView glowPadView) {
             mGlowPadView = glowPadView;
         }
-
+        
         public boolean isScreenLarge() {
             final int screenSize = Resources.getSystem().getConfiguration().screenLayout &
                     Configuration.SCREENLAYOUT_SIZE_MASK;
@@ -396,7 +483,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
                     screenSize == Configuration.SCREENLAYOUT_SIZE_XLARGE;
             return isScreenLarge;
         }
-
+        
         private StateListDrawable getLayeredDrawable(Drawable back, Drawable front, int inset, boolean frontBlank) {
             Resources res = getResources();
             InsetDrawable[] inactivelayer = new InsetDrawable[2];
@@ -417,11 +504,11 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
             states.addState(TargetDrawable.STATE_FOCUSED, activeLayerDrawable);
             return states;
         }
-
+        
         public boolean isTargetPresent(int resId) {
             return mGlowPadView.getTargetPosition(resId) != -1;
         }
-
+        
         public void updateResources() {
             String storedVal = Settings.System.getString(mContext.getContentResolver(),
                     Settings.System.LOCKSCREEN_TARGETS);
@@ -448,7 +535,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
                         boolean replaced = mGlowPadView.replaceTargetDrawablesIfPresent(component,
                                 ASSIST_ICON_METADATA_NAME + "_google",
                                 com.android.internal.R.drawable.ic_action_assist_generic);
-
+        
                         if (!replaced && !mGlowPadView.replaceTargetDrawablesIfPresent(component,
                                     ASSIST_ICON_METADATA_NAME,
                                     com.android.internal.R.drawable.ic_action_assist_generic)) {
@@ -554,21 +641,16 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
                 mGlowPadView.setTargetResources(storedDraw);
             }
         }
-
+        
         public void onGrabbed(View v, int handle) {
-
+        
         }
-
+        
         public void onReleased(View v, int handle) {
-
+        
         }
-
+        
         public void onTrigger(View v, int target) {
-            if (DBG)
-                Log.v(TAG, "onTrigger: target = " + target);
-            if (DBG)
-                Log.v(TAG, "onTrigger: Orientation = " + mCreationOrientation);
-            targetController.getTarget(target).doAction();
             if (mStoredTargets == null) {
                 final int resId = mGlowPadView.getResourceIdForTarget(target);
                 switch (resId) {
@@ -581,17 +663,17 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
                     }
                     mCallback.pokeWakelock();
                     break;
-
+        
                 case com.android.internal.R.drawable.ic_lockscreen_camera:
                     launchActivity(new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA));
                     mCallback.pokeWakelock();
                     break;
-
+        
                 case com.android.internal.R.drawable.ic_lockscreen_silent:
                     toggleRingMode();
                     mCallback.pokeWakelock();
                     break;
-
+        
                 case com.android.internal.R.drawable.ic_lockscreen_unlock_phantom:
                 case com.android.internal.R.drawable.ic_lockscreen_unlock:
                     mCallback.goToUnlockScreen();
@@ -617,7 +699,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
                 }
             }
         }
-
+        
         private void launchActivity(Intent intent) {
             intent.setFlags(
                     Intent.FLAG_ACTIVITY_NEW_TASK
@@ -634,7 +716,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
                 Log.w(TAG, "Activity not found for intent + " + intent.getAction());
             }
         }
-
+        
         public void onGrabbedStateChange(View v, int handle) {
             // Don't poke the wake lock when returning to a state where the handle is
             // not grabbed since that can happen when the system (instead of the user)
@@ -643,33 +725,33 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
                 mCallback.pokeWakelock();
             }
         }
-
+        
         public View getView() {
             return mGlowPadView;
         }
-
+        
         public void reset(boolean animate) {
             mGlowPadView.reset(animate);
         }
-
+        
         public void ping() {
             mGlowPadView.ping();
         }
-
+        
         public void setEnabled(int resourceId, boolean enabled) {
             mGlowPadView.setEnableTarget(resourceId, enabled);
         }
-
+        
         public int getTargetPosition(int resourceId) {
             return mGlowPadView.getTargetPosition(resourceId);
         }
-
+        
         public void cleanUp() {
             mGlowPadView.setOnTriggerListener(null);
         }
-
+        
         public void onFinishFinalAnimation() {
-
+        
         }
     }
 
@@ -968,8 +1050,6 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
         mEnableMenuKeyInLockScreen = shouldEnableMenuKey();
         mCreationOrientation = configuration.orientation;
 
-        mKeyboardHidden = configuration.hardKeyboardHidden;
-
         mSettingsObserver = new SettingsObserver(new Handler());
         mSettingsObserver.observe();
 
@@ -1038,8 +1118,6 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
         setFocusableInTouchMode(true);
         setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
 
-        Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-        mHasVibrator = vibrator == null ? false : vibrator.hasVibrator();
         mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         mSilentMode = isSilentMode();
 
@@ -1067,27 +1145,31 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
             slidingTabView.setOnTriggerListener(slidingTabMethods);
             mUnlockWidgetMethods = slidingTabMethods;
             mUnlockWidget2 = findViewById(R.id.unlock_widget2);
-            if(mUnlockWidget2 == null) Log.e("HELP", "ERROR UNLOCKWIDGET2 IS NULL");
-            SlidingTab slidingTabView2 = (SlidingTab) mUnlockWidget2;
-            slidingTabView2.setHoldAfterTrigger(true, false);
-            slidingTabView2.setLeftHintText(R.string.lockscreen_phone_label);
-            slidingTabView2.setLeftTabResources(
-                    R.drawable.ic_jog_dial_answer,
-                    R.drawable.jog_tab_target_green,
-                    R.drawable.jog_tab_bar_left_generic,
-                    R.drawable.jog_tab_left_generic);
-            slidingTabView2.setRightHintText(R.string.lockscreen_custom_label);
-            slidingTabView2.setRightTabResources(
-                    R.drawable.ic_jog_dial_custom,
-                    R.drawable.jog_tab_target_green,
-                    R.drawable.jog_tab_bar_right_generic,
-                    R.drawable.jog_tab_right_generic);
-            SlidingTabMethods2 slidingTabMethods2 = new SlidingTabMethods2(slidingTabView2);
-            slidingTabView2.setOnTriggerListener(slidingTabMethods2);
-            if (mLockscreen4Tab)
-                slidingTabView2.setVisibility(View.VISIBLE);
-            else	
-                slidingTabView2.setVisibility(View.GONE);
+            if(mUnlockWidget2 == null) {
+                return slidingTabMethods;
+            } else{
+                SlidingTab slidingTabView2 = (SlidingTab) mUnlockWidget2;
+                slidingTabView2.setHoldAfterTrigger(true, false);
+                slidingTabView2.setLeftHintText(R.string.lockscreen_phone_label);
+                slidingTabView2.setLeftTabResources(
+                        R.drawable.ic_jog_dial_answer,
+                        R.drawable.jog_tab_target_green,
+                        R.drawable.jog_tab_bar_left_generic,
+                        R.drawable.jog_tab_left_generic);
+                slidingTabView2.setRightHintText(R.string.lockscreen_custom_label);
+                slidingTabView2.setRightTabResources(
+                        R.drawable.ic_jog_dial_custom,
+                        R.drawable.jog_tab_target_green,
+                        R.drawable.jog_tab_bar_right_generic,
+                        R.drawable.jog_tab_right_generic);
+                SlidingTabMethods2 slidingTabMethods2 = new SlidingTabMethods2(slidingTabView2);
+                slidingTabView2.setOnTriggerListener(slidingTabMethods2);
+                if (mLockscreen4Tab)
+                    slidingTabView2.setVisibility(View.VISIBLE);
+                else	
+                    slidingTabView2.setVisibility(View.GONE);
+                return slidingTabMethods2;
+            }
         } else if (mUnlockWidget instanceof WaveView) {
             WaveView waveView = (WaveView) mUnlockWidget;
             WaveViewMethods waveViewMethods = new WaveViewMethods(waveView);
@@ -1346,9 +1428,6 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
         mLockscreenTargets = Settings.System.getInt(resolver,
                 Settings.System.LOCKSCREEN_LAYOUT, LAYOUT_STOCK);
         
-        int mLockscreenColor = Settings.System.getInt(resolver,
-                Settings.System.LOCKSCREEN_CUSTOM_TEXT_COLOR, COLOR_WHITE);
-
         // digital clock first (see @link com.android.internal.widget.DigitalClock.updateTime())
         try {
             mDigitalClock.updateTime();

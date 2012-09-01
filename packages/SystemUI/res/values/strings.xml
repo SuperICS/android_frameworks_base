@@ -441,4 +441,8 @@
     </string>
 
     <string name="powerwidget_screen_timeout_toast">Screen timeout set to: %1$d %2$s</string>
+    <string name="accessibility_data_connection_HP">HSPA+</string>
+
+    <string name="toggle_nfc">NFC</string>
+
 </resources>

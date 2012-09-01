@@ -1398,5 +1398,6 @@
     <string name="weather_tap_to_refresh">Нажмите для обновления</string>
     <string name="weather_refreshing">Обновление...</string>
 
-    <string name="powerwidget_screen_timeout_toast">Время отключения экрана установлено на: %1$d %2$s</string>
+    <string name="choose_account_text" msgid="6891230675141555481">"Выберите аккаунт"</string>
+
 </resources>

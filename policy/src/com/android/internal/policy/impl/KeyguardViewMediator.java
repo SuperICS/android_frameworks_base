@@ -224,8 +224,6 @@ public class KeyguardViewMediator implements KeyguardViewCallback,
 
     private int mWakelockSequence;
 
-    private PhoneWindowManager mCallback;
-
     /**
      * If the user has disabled the keyguard, then requests to exit, this is
      * how we'll ultimately let them know whether it was successful.  We use this
@@ -281,8 +279,6 @@ public class KeyguardViewMediator implements KeyguardViewCallback,
 
     };
 
-    private ProfileManager mProfileManager;
-
     public KeyguardViewMediator(Context context, PhoneWindowManager callback,
             LocalPowerManager powerManager) {
         mContext = context;
@@ -309,7 +305,6 @@ public class KeyguardViewMediator implements KeyguardViewCallback,
         context.registerReceiver(mBroadCastReceiver, filter);
         mAlarmManager = (AlarmManager) context
                 .getSystemService(Context.ALARM_SERVICE);
-        mCallback = callback;
 
         mUpdateMonitor = new KeyguardUpdateMonitor(context);
 
@@ -468,7 +463,6 @@ public class KeyguardViewMediator implements KeyguardViewCallback,
             } else if (why == WindowManagerPolicy.OFF_BECAUSE_OF_PROX_SENSOR) {
                 // Do not enable the keyguard if the prox sensor forced the screen off.
             } else {
-                final ContentResolver cr = mContext.getContentResolver();
                 // user turned the screen off likely
                 // we wanna check if the user wants to use the timeout setting here too
                 boolean userOverride = Settings.Secure.getInt(cr,
@@ -1171,7 +1165,6 @@ public class KeyguardViewMediator implements KeyguardViewCallback,
      */
     private void handleKeyguardDoneDrawing() {
         synchronized(this) {
-            if (false) Log.d(TAG, "handleKeyguardDoneDrawing");
             if (mWaitingUntilKeyguardVisible) {
                 if (DEBUG) Log.d(TAG, "handleKeyguardDoneDrawing: notifying mWaitingUntilKeyguardVisible");
                 mWaitingUntilKeyguardVisible = false;

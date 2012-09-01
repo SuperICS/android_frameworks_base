@@ -2985,7 +2985,6 @@
     <string name="wifi_watchdog_network_disabled_detailed">\u0020has a poor Internet connection.</string>
 
     <!-- Do not translate. Default access point SSID used for tethering -->
-    <string name="wifi_tether_configure_ssid_default" translatable="false">AndroidAP</string>
 
     <string name="wifi_p2p_dialog_title">Wi-Fi Direct</string>
     <string name="wifi_p2p_turnon_message">Start Wi-Fi Direct. This will turn off Wi-Fi client/hotspot.</string>
@@ -3524,6 +3523,8 @@
     <string name="description_target_soundon">Sound on</string>
     <!-- Description of the browser target in the Slide unlock screen. [CHAR_LIMIT=NONE] -->
     <string name="description_target_browser">Browser</string>
+    <string name="description_target_search">Search</string>
+
     <!-- Description of the custom target in the Slide unlock screen. [CHAR_LIMIT=NONE] -->
     <string name="description_target_custom">Custom</string>
     <!-- Description of the custom target in the Slide unlock screen. [CHAR_LIMIT=NONE] -->
@@ -3757,5 +3758,10 @@
     <string name="weather_no_data">No data</string>
     <string name="weather_tap_to_refresh">Tap to refresh</string>
     <string name="weather_refreshing">Refreshing</string>
+    <string name="weatherpanel_slash">/</string>
+
+    <string name="choose_account_text">"Which account would you like to use?"</string>
+
+    <string name="wifi_tether_configure_ssid_default" translatable="false">AndroidAP</string>
 
 </resources>

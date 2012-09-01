@@ -16,6 +16,7 @@
 
 package android.widget;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.ContentObserver;
@@ -42,6 +43,7 @@ public class DigitalClock extends TextView {
     private final static String m12 = "h:mm:ss aa";
     private final static String m24 = "k:mm:ss";
     private FormatChangeObserver mFormatChangeObserver;
+    private static final int COLOR_WHITE = 0xFFFFFFFF;
 
     private Runnable mTicker;
     private Handler mHandler;
@@ -50,6 +52,9 @@ public class DigitalClock extends TextView {
 
     String mFormat;
 
+    private TextView mTimeDisplayBackground;
+    private TextView mTimeDisplayForeground;
+    
     public DigitalClock(Context context) {
         super(context);
         initClock(context);
@@ -140,4 +145,20 @@ public class DigitalClock extends TextView {
         super.onInitializeAccessibilityNodeInfo(info);
         info.setClassName(DigitalClock.class.getName());
     }
+    
+    public void updateTime() {
+        mCalendar.setTimeInMillis(System.currentTimeMillis());
+
+        CharSequence newTime = DateFormat.format(mFormat, mCalendar);
+        mTimeDisplayBackground.setText(newTime);
+        mTimeDisplayForeground.setText(newTime);
+        
+        ContentResolver resolver = mContext.getContentResolver();
+        // our custom lockscreen colors need to be applied here
+        int mLockscreenColor = Settings.System.getInt(resolver,
+                Settings.System.LOCKSCREEN_CUSTOM_TEXT_COLOR, COLOR_WHITE);
+        mTimeDisplayBackground.setTextColor(mLockscreenColor);
+        mTimeDisplayForeground.setTextColor(mLockscreenColor);
+    }
+    
 }

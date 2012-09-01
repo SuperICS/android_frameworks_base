@@ -30,7 +30,6 @@ import android.content.IntentFilter;
 import android.content.pm.IPackageManager;
 import android.content.res.Configuration;
 import android.database.ContentObserver;
-import android.database.Cursor;
 import android.media.AudioService;
 import android.net.wifi.p2p.WifiP2pService;
 import android.os.Looper;
@@ -135,7 +134,6 @@ class ServerThread extends Thread {
 
         LightsService lights = null;
         PowerManagerService power = null;
-        DynamicMemoryManagerService dmm = null;
         BatteryService battery = null;
         VibratorService vibrator = null;
         AlarmManagerService alarm = null;
@@ -284,11 +282,6 @@ class ServerThread extends Thread {
                 if (bluetoothOn != 0) {
                     bluetooth.enable();
                 }
-            }
-
-            if (SystemProperties.QCOM_HARDWARE) {
-                Slog.i(TAG, "DynamicMemoryManager Service");
-                dmm = new DynamicMemoryManagerService(context);
             }
 
             cpuGovernorManager = new CpuGovernorService(context);
@@ -713,7 +706,6 @@ class ServerThread extends Thread {
 
             try {
                 Slog.i(TAG, "CertBlacklister");
-                CertBlacklister blacklister = new CertBlacklister(context);
             } catch (Throwable e) {
                 reportWtf("starting CertBlacklister", e);
             }
