@@ -396,7 +396,7 @@ String8 ProgramCache::generateVertexShader(const ProgramDescription& description
 
 #ifdef MISSING_EGL_EXTERNAL_IMAGE
     if (description.hasExternalTexture) {
-        LOGW("SHADER USE EXTERNAL TEXTURE OES");
+        ALOGW("SHADER USE EXTERNAL TEXTURE OES");
     }
 #endif
 
@@ -475,7 +475,7 @@ String8 ProgramCache::generateFragmentShader(const ProgramDescription& descripti
     String8 shader;
 #ifdef MISSING_EGL_EXTERNAL_IMAGE
     if (description.hasExternalTexture) {
-        LOGW("SHADER USE EXTERNAL TEXTURE OES");
+        ALOGW("SHADER USE EXTERNAL TEXTURE OES");
     }
 #endif
     const bool blendFramebuffer = description.framebufferMode >= SkXfermode::kPlus_Mode;
